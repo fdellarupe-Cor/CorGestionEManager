@@ -1,0 +1,27 @@
+USE [dbcordatv46_unif]
+GO
+
+/****** Object:  Table [dbo].[COMPLEMENTOS]    Script Date: 03/27/2018 17:32:59 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[COMPLEMENTOS](
+	[codcomp] [int] IDENTITY(1,1) NOT NULL,
+	[codiden] [nvarchar](20) NOT NULL,
+	[tipocomp] [nvarchar](20) NULL,
+	[descri] [nvarchar](200) NULL,
+	[CompUN] [int] NULL,
+ CONSTRAINT [aaaaaCOMPLEMENTOS_PK] PRIMARY KEY NONCLUSTERED 
+(
+	[codcomp] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON, FILLFACTOR = 90) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[COMPLEMENTOS] ADD  CONSTRAINT [DF_COMPLEMENTOS_CompUN]  DEFAULT ((1)) FOR [CompUN]
+GO
+

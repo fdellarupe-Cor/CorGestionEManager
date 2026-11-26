@@ -1,0 +1,715 @@
+
+<html>
+
+<head>
+    <title>Corflaticon WebFont</title>
+    <link rel="stylesheet" type="text/css" href="Corflaticon.css">
+
+    <style>
+    body {
+        font-family: sans-serif;
+        line-height: 1.5;
+        font-size: 16px;
+        padding: 20px;
+        color:#333;
+    }
+    * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    [class^="Corflaticon-"]:before, [class*=" Corflaticon-"]:before, [class^="Corflaticon-"]:after, [class*=" Corflaticon-"]:after {
+        font-family: Corflaticon;
+        font-size: 30px;
+        font-style: normal;
+        margin-left: 20px;
+        color: #333;
+    }
+    .image p {
+		font-size: 12px;
+		margin: 0px;
+		clear: none;
+		width: 300px;
+		line-height: 40px;
+	}
+    .text {
+        float: left;
+        font-size:14px;
+        margin-top: 15px;
+    }
+    .text ul {
+        margin-left:0px;
+        color:#111;
+        margin-bottom:20px;
+    }
+    .text .ex {
+        font-size:12px;
+        color:#666;
+        margin-left:35px;
+        display:block;
+    }
+    .text ul li {
+        margin-top:10px;
+        list-style:none;
+    }
+    .num {
+        background:#66A523;
+        color:#fff;
+        border-radius:20px;
+        padding:1px;
+        display:inline-block;
+        width:22px;
+        height:22px;
+        text-align:center;
+        margin-right: 5px;
+    }
+    .text ul strong {
+        font-weight:normal;
+        color:#000;
+    }
+    .image {
+        width: 280px;
+        float: left;
+        margin-bottom: 15px;
+        margin-right: 30px;
+    }
+    #glyphs {
+        clear: both;
+    }
+    .image p:nth-child(even) i {
+        clear: none;
+    }
+    .glyph {
+        display: inline-block;
+        width: 120px;
+        margin: 10px;
+        text-align: center;
+        vertical-align: top;
+        background: #FFF;
+    }
+    .glyph .glyph-icon {
+        padding: 10px;
+        display: block;
+        font-family:"Corflaticon";
+        font-size: 64px;
+        line-height: 1;
+    }
+    .glyph .glyph-icon:before {
+        font-size: 64px;
+        color: #666;
+        margin-left: 0;
+    }
+    .class-name {
+        font-size: 12px;
+    }
+    .author-name {
+		font-size: 10px;
+	}
+	a{
+		color: #66A523;
+	}
+    .instructions {
+        font-style:italic;
+        font-size:22px;
+        margin-bottom:10px;
+    }
+    .iconsuse {
+        font-size:22px;
+        font-style:italic;
+        padding-top:20px;
+        margin-top:20px;
+        border-top:1px solid #bbb;
+    }
+    .usetitle {
+        margin-bottom: 10px;
+        font-size: 20px;
+        font-style: italic;
+    }
+    .class-name:last-child {
+        font-size: 10px;
+        color:#888;
+    }
+    .class-name:last-child a {
+        font-size: 10px;
+        color:#555;
+    }
+    .class-name:last-child a:hover {
+        color:#66A523;
+    }
+    .glyph > input {
+        display: block;
+        width: 100px;
+        margin: 5px auto;
+        text-align: center;
+        font-size: 12px;
+        cursor: text;
+    }
+    .glyph > input.icon-input {
+        font-family:"Corflaticon";
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    h1.logo {
+        font-size: 40px;
+        letter-spacing: -1px;
+        margin-top: -16px;
+        text-transform: lowercase;
+        border-bottom:1px solid #bbb;
+    }
+    h1.logo strong {
+        font-size: 16px;
+        font-family:sans-serif;
+        font-weight:normal;
+        color:#333;
+    }
+    h1.logo a {
+        color:#34302d;
+        text-decoration: none;
+    }
+    h1.logo a span {
+        color:#66A523;
+    }
+    #footer {
+        padding-top:40px;
+        clear:both;
+        text-align:center;
+    }
+    #footer a {
+        color:#66A523;
+    }
+    textarea {
+		margin: 0px;
+		width: 800px;
+		height: 150px;
+		border: 1px solid #CCC;
+		resize: none;
+		background: #EEE;
+    }
+    .author-link, .attrDiv a{
+    	font-size: 12px;
+    	color: #333;
+    	text-decoration: none;
+    }
+    .external {
+    	display: block;
+    }
+    .attrDiv {
+		font-size: 12px;
+	}
+    .attribution {
+        border-top: 1px solid #AAA;
+        margin: 10px 0;
+        padding-top: 15px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1 class="logo">
+            <a href="http://www.Corflaticon.com">
+                <span>FLAT</span>ICON</a>
+            <strong>Font Demo</strong>
+        </h1>
+    </header>
+
+    <section class="demo">
+        <div class="text">
+
+            <div class="instructions">Instructions:</div>
+
+            <ul>
+                <li>
+                    <p>
+                        <span class="num">1</span>Copy the "Fonts" files and CSS files to your website CSS folder.
+                </li>
+                <li>
+                    <p>
+                        <span class="num">2</span>Add the CSS link to your website source code on header.
+                        <br />
+                        <span class="ex">&lt;head&gt;
+                            <br/>...
+                            <br/>&lt;link rel="stylesheet" type="text/css" href="your_website_domain/css_root/corCorflaticon.css"&gt;
+                            <br/>...
+                            <br/>&lt;/head&gt;</span>
+                </li>
+
+                <li>
+                    <p>
+                        <span class="num">3</span>Use the icon class on "display:inline" elements:
+                        <br />
+                        <span class="ex">Use example: &lt;i class=&quot;Corflaticon-airplane49&quot;&gt;&lt;/i&gt; or &lt;span class=&quot;Corflaticon-airplane49&quot;&gt;&lt;/span&gt;</span>
+                </li>
+            </ul>
+        </div>
+
+    </section>
+
+    <section id="glyphs"><div class="glyph">
+		<div class="glyph-icon Corflaticon-.notdef"></div>
+		<div class="class-name">.Corflaticon-.notdef</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quotedbl"></div>
+		<div class="class-name">.Corflaticon-quotedbl</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-numbersign"></div>
+		<div class="class-name">.Corflaticon-numbersign</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-dollar"></div>
+		<div class="class-name">.Corflaticon-dollar</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-percent"></div>
+		<div class="class-name">.Corflaticon-percent</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/percent-off_9006">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ampersand"></div>
+		<div class="class-name">.Corflaticon-ampersand</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/ampersand_3806">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quotesingle"></div>
+		<div class="class-name">.Corflaticon-quotesingle</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-parenleft"></div>
+		<div class="class-name">.Corflaticon-parenleft</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-parenright"></div>
+		<div class="class-name">.Corflaticon-parenright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-asterisk"></div>
+		<div class="class-name">.Corflaticon-asterisk</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/asterisk_4193">Adam Whitcroft</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-plus"></div>
+		<div class="class-name">.Corflaticon-plus</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/plus-symbol-in-a-circle-add-button_1224">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-comma"></div>
+		<div class="class-name">.Corflaticon-comma</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-hyphen"></div>
+		<div class="class-name">.Corflaticon-hyphen</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-period"></div>
+		<div class="class-name">.Corflaticon-period</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-slash"></div>
+		<div class="class-name">.Corflaticon-slash</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/slash-and-dot-sketch-variant_37278">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-zero"></div>
+		<div class="class-name">.Corflaticon-zero</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/zero-emission-badge_25097">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-one"></div>
+		<div class="class-name">.Corflaticon-one</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/one-free_2864">Icons8</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-two"></div>
+		<div class="class-name">.Corflaticon-two</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/two-page_1688">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-three"></div>
+		<div class="class-name">.Corflaticon-three</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/three-books-one-above-another_3627">Icons8</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-four"></div>
+		<div class="class-name">.Corflaticon-four</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/four-fingers_2403">Icons8</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-five"></div>
+		<div class="class-name">.Corflaticon-five</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/five-birthday-cake-layers-with-candles_11176">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-six"></div>
+		<div class="class-name">.Corflaticon-six</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/six-fingers-two-hands_4283">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-seven"></div>
+		<div class="class-name">.Corflaticon-seven</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/seven-piano-keys_11335">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-eight"></div>
+		<div class="class-name">.Corflaticon-eight</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-nine"></div>
+		<div class="class-name">.Corflaticon-nine</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/nine-tiles-square_8513">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-colon"></div>
+		<div class="class-name">.Corflaticon-colon</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/costa-rican-colon_66219">Vecree</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-semicolon"></div>
+		<div class="class-name">.Corflaticon-semicolon</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-less"></div>
+		<div class="class-name">.Corflaticon-less</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-equal"></div>
+		<div class="class-name">.Corflaticon-equal</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/equal-outline_2725">Stephen Hutchings</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-greater"></div>
+		<div class="class-name">.Corflaticon-greater</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/greater-than-and-single-line-not-equal-to-maths-sign_43268">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-question"></div>
+		<div class="class-name">.Corflaticon-question</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/question_1653">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-at"></div>
+		<div class="class-name">.Corflaticon-at</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/at-circular_2574">Stephen Hutchings</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-A"></div>
+		<div class="class-name">.Corflaticon-A</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/a-best-test-result_43567">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-B"></div>
+		<div class="class-name">.Corflaticon-B</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/b-icon-black_1524">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-C"></div>
+		<div class="class-name">.Corflaticon-C</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/c-test-result-interface-symbol-with-text-lines_43615">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-D"></div>
+		<div class="class-name">.Corflaticon-D</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/d-education-test-note-of-qualification_43644">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-E"></div>
+		<div class="class-name">.Corflaticon-E</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/e-plus-on-school-test-result_43700">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-F"></div>
+		<div class="class-name">.Corflaticon-F</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/f-plus-school-rating-paper-interface-symbol_43008">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-G"></div>
+		<div class="class-name">.Corflaticon-G</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/g-logo-circle_7719">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-H"></div>
+		<div class="class-name">.Corflaticon-H</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/symbol-h-from-helicopter-parking_10130">Scott de Jonge</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-I"></div>
+		<div class="class-name">.Corflaticon-I</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/i-read-the-first-page_2285">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-J"></div>
+		<div class="class-name">.Corflaticon-J</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/j-capital-letter-in-a-circle_1137">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-K"></div>
+		<div class="class-name">.Corflaticon-K</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-L"></div>
+		<div class="class-name">.Corflaticon-L</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/l-of-scrabble-with-1-point_8560">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-M"></div>
+		<div class="class-name">.Corflaticon-M</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-N"></div>
+		<div class="class-name">.Corflaticon-N</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-O"></div>
+		<div class="class-name">.Corflaticon-O</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-P"></div>
+		<div class="class-name">.Corflaticon-P</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/p-logo-circle_8173">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Q"></div>
+		<div class="class-name">.Corflaticon-Q</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/q_4307">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-R"></div>
+		<div class="class-name">.Corflaticon-R</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-S"></div>
+		<div class="class-name">.Corflaticon-S</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-T"></div>
+		<div class="class-name">.Corflaticon-T</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/t-capital-letter_1195">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-U"></div>
+		<div class="class-name">.Corflaticon-U</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/u-shaped-magnet-outline_23961">Icomoon</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-V"></div>
+		<div class="class-name">.Corflaticon-V</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/vimeo_3500">Daniel Bruce</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-W"></div>
+		<div class="class-name">.Corflaticon-W</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-X"></div>
+		<div class="class-name">.Corflaticon-X</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/x-symbol_1659">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Y"></div>
+		<div class="class-name">.Corflaticon-Y</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/y_3761">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Z"></div>
+		<div class="class-name">.Corflaticon-Z</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-bracketleft"></div>
+		<div class="class-name">.Corflaticon-bracketleft</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-backslash"></div>
+		<div class="class-name">.Corflaticon-backslash</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-bracketright"></div>
+		<div class="class-name">.Corflaticon-bracketright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-asciicircum"></div>
+		<div class="class-name">.Corflaticon-asciicircum</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-underscore"></div>
+		<div class="class-name">.Corflaticon-underscore</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-grave"></div>
+		<div class="class-name">.Corflaticon-grave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-a"></div>
+		<div class="class-name">.Corflaticon-a</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/a-best-test-result_43567">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-b"></div>
+		<div class="class-name">.Corflaticon-b</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/b-icon-black_1524">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-c"></div>
+		<div class="class-name">.Corflaticon-c</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/c-test-result-interface-symbol-with-text-lines_43615">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-d"></div>
+		<div class="class-name">.Corflaticon-d</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/d-education-test-note-of-qualification_43644">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-e"></div>
+		<div class="class-name">.Corflaticon-e</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/e-plus-on-school-test-result_43700">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-f"></div>
+		<div class="class-name">.Corflaticon-f</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/f-plus-school-rating-paper-interface-symbol_43008">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-g"></div>
+		<div class="class-name">.Corflaticon-g</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/g-logo-circle_7719">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-h"></div>
+		<div class="class-name">.Corflaticon-h</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/symbol-h-from-helicopter-parking_10130">Scott de Jonge</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-i"></div>
+		<div class="class-name">.Corflaticon-i</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/i-read-the-first-page_2285">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-j"></div>
+		<div class="class-name">.Corflaticon-j</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/j-capital-letter-in-a-circle_1137">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-k"></div>
+		<div class="class-name">.Corflaticon-k</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-l"></div>
+		<div class="class-name">.Corflaticon-l</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/l-of-scrabble-with-1-point_8560">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-m"></div>
+		<div class="class-name">.Corflaticon-m</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-n"></div>
+		<div class="class-name">.Corflaticon-n</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-o"></div>
+		<div class="class-name">.Corflaticon-o</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-p"></div>
+		<div class="class-name">.Corflaticon-p</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/p-logo-circle_8173">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-q"></div>
+		<div class="class-name">.Corflaticon-q</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/q_4307">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-r"></div>
+		<div class="class-name">.Corflaticon-r</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-s"></div>
+		<div class="class-name">.Corflaticon-s</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-t"></div>
+		<div class="class-name">.Corflaticon-t</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/t-capital-letter_1195">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-u"></div>
+		<div class="class-name">.Corflaticon-u</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/u-shaped-magnet-outline_23961">Icomoon</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-v"></div>
+		<div class="class-name">.Corflaticon-v</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/vimeo_3500">Daniel Bruce</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-w"></div>
+		<div class="class-name">.Corflaticon-w</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-x"></div>
+		<div class="class-name">.Corflaticon-x</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/x-symbol_1659">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-y"></div>
+		<div class="class-name">.Corflaticon-y</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/y_3761">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-z"></div>
+		<div class="class-name">.Corflaticon-z</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-braceleft"></div>
+		<div class="class-name">.Corflaticon-braceleft</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-bar"></div>
+		<div class="class-name">.Corflaticon-bar</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/bar-graphic_3703">Daniel Bruce</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-braceright"></div>
+		<div class="class-name">.Corflaticon-braceright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-asciitilde"></div>
+		<div class="class-name">.Corflaticon-asciitilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Adieresis"></div>
+		<div class="class-name">.Corflaticon-Adieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Aring"></div>
+		<div class="class-name">.Corflaticon-Aring</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ccedilla"></div>
+		<div class="class-name">.Corflaticon-Ccedilla</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Eacute"></div>
+		<div class="class-name">.Corflaticon-Eacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ntilde"></div>
+		<div class="class-name">.Corflaticon-Ntilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Odieresis"></div>
+		<div class="class-name">.Corflaticon-Odieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Udieresis"></div>
+		<div class="class-name">.Corflaticon-Udieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-aacute"></div>
+		<div class="class-name">.Corflaticon-aacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-agrave"></div>
+		<div class="class-name">.Corflaticon-agrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-acircumflex"></div>
+		<div class="class-name">.Corflaticon-acircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-adieresis"></div>
+		<div class="class-name">.Corflaticon-adieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-atilde"></div>
+		<div class="class-name">.Corflaticon-atilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-aring"></div>
+		<div class="class-name">.Corflaticon-aring</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ccedilla"></div>
+		<div class="class-name">.Corflaticon-ccedilla</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-eacute"></div>
+		<div class="class-name">.Corflaticon-eacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-egrave"></div>
+		<div class="class-name">.Corflaticon-egrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ecircumflex"></div>
+		<div class="class-name">.Corflaticon-ecircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-edieresis"></div>
+		<div class="class-name">.Corflaticon-edieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-iacute"></div>
+		<div class="class-name">.Corflaticon-iacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-igrave"></div>
+		<div class="class-name">.Corflaticon-igrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-icircumflex"></div>
+		<div class="class-name">.Corflaticon-icircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-idieresis"></div>
+		<div class="class-name">.Corflaticon-idieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ntilde"></div>
+		<div class="class-name">.Corflaticon-ntilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-oacute"></div>
+		<div class="class-name">.Corflaticon-oacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ograve"></div>
+		<div class="class-name">.Corflaticon-ograve</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ocircumflex"></div>
+		<div class="class-name">.Corflaticon-ocircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-odieresis"></div>
+		<div class="class-name">.Corflaticon-odieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-otilde"></div>
+		<div class="class-name">.Corflaticon-otilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-uacute"></div>
+		<div class="class-name">.Corflaticon-uacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ugrave"></div>
+		<div class="class-name">.Corflaticon-ugrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ucircumflex"></div>
+		<div class="class-name">.Corflaticon-ucircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-udieresis"></div>
+		<div class="class-name">.Corflaticon-udieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-dagger"></div>
+		<div class="class-name">.Corflaticon-dagger</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/dagger_38632">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-degree"></div>
+		<div class="class-name">.Corflaticon-degree</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-cent"></div>
+		<div class="class-name">.Corflaticon-cent</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/cent-currency_9497">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-sterling"></div>
+		<div class="class-name">.Corflaticon-sterling</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/sterling-pound-sign-of-money_44614">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-section"></div>
+		<div class="class-name">.Corflaticon-section</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/file_9866">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-bullet"></div>
+		<div class="class-name">.Corflaticon-bullet</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/bullet_4167">Adam Whitcroft</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-paragraph"></div>
+		<div class="class-name">.Corflaticon-paragraph</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/paragraph-overview-pages_2982">Icons8</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-germandbls"></div>
+		<div class="class-name">.Corflaticon-germandbls</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-registered"></div>
+		<div class="class-name">.Corflaticon-registered</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/registered-sign_35073">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-copyright"></div>
+		<div class="class-name">.Corflaticon-copyright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/copyright-letter_8571">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-trademark"></div>
+		<div class="class-name">.Corflaticon-trademark</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-acute"></div>
+		<div class="class-name">.Corflaticon-acute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/acute-angle-of-45-degrees_43609">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-dieresis"></div>
+		<div class="class-name">.Corflaticon-dieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-notequal"></div>
+		<div class="class-name">.Corflaticon-notequal</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-AE"></div>
+		<div class="class-name">.Corflaticon-AE</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Oslash"></div>
+		<div class="class-name">.Corflaticon-Oslash</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-infinity"></div>
+		<div class="class-name">.Corflaticon-infinity</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/infinity-sign_3529">Daniel Bruce</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-plusminus"></div>
+		<div class="class-name">.Corflaticon-plusminus</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-lessequal"></div>
+		<div class="class-name">.Corflaticon-lessequal</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-greaterequal"></div>
+		<div class="class-name">.Corflaticon-greaterequal</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-yen"></div>
+		<div class="class-name">.Corflaticon-yen</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-uni00B5"></div>
+		<div class="class-name">.Corflaticon-uni00B5</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-partialdiff"></div>
+		<div class="class-name">.Corflaticon-partialdiff</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-summation"></div>
+		<div class="class-name">.Corflaticon-summation</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-product"></div>
+		<div class="class-name">.Corflaticon-product</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/product-chemical_10454">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-pi"></div>
+		<div class="class-name">.Corflaticon-pi</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/pi-hand-drawn-symbol_35651">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-integral"></div>
+		<div class="class-name">.Corflaticon-integral</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/integral-mathematical-sign_43262">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ordfeminine"></div>
+		<div class="class-name">.Corflaticon-ordfeminine</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ordmasculine"></div>
+		<div class="class-name">.Corflaticon-ordmasculine</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Omega"></div>
+		<div class="class-name">.Corflaticon-Omega</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/omega_23584">Icomoon</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ae"></div>
+		<div class="class-name">.Corflaticon-ae</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-oslash"></div>
+		<div class="class-name">.Corflaticon-oslash</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-questiondown"></div>
+		<div class="class-name">.Corflaticon-questiondown</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-exclamdown"></div>
+		<div class="class-name">.Corflaticon-exclamdown</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-logicalnot"></div>
+		<div class="class-name">.Corflaticon-logicalnot</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-radical"></div>
+		<div class="class-name">.Corflaticon-radical</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-florin"></div>
+		<div class="class-name">.Corflaticon-florin</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-approxequal"></div>
+		<div class="class-name">.Corflaticon-approxequal</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Delta"></div>
+		<div class="class-name">.Corflaticon-Delta</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/delta-pay-card_39069">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-guillemotleft"></div>
+		<div class="class-name">.Corflaticon-guillemotleft</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-guillemotright"></div>
+		<div class="class-name">.Corflaticon-guillemotright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ellipsis"></div>
+		<div class="class-name">.Corflaticon-ellipsis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/ellipsis-three-vertical-squares-menu-interface-symbol_39422">Freepik</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-uni00A0"></div>
+		<div class="class-name">.Corflaticon-uni00A0</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Agrave"></div>
+		<div class="class-name">.Corflaticon-Agrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Atilde"></div>
+		<div class="class-name">.Corflaticon-Atilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Otilde"></div>
+		<div class="class-name">.Corflaticon-Otilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-OE"></div>
+		<div class="class-name">.Corflaticon-OE</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-oe"></div>
+		<div class="class-name">.Corflaticon-oe</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-endash"></div>
+		<div class="class-name">.Corflaticon-endash</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="Corflaticon-emdash"></div>
+		<div class="class-name">.Corflaticon-emdash</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quotedblleft"></div>
+		<div class="class-name">.Corflaticon-quotedblleft</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quotedblright"></div>
+		<div class="class-name">.Corflaticon-quotedblright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quoteleft"></div>
+		<div class="class-name">.Corflaticon-quoteleft</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quoteright"></div>
+		<div class="class-name">.Corflaticon-quoteright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-divide"></div>
+		<div class="class-name">.Corflaticon-divide</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/divide-symbol_2693">Stephen Hutchings</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-lozenge"></div>
+		<div class="class-name">.Corflaticon-lozenge</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ydieresis"></div>
+		<div class="class-name">.Corflaticon-ydieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ydieresis"></div>
+		<div class="class-name">.Corflaticon-Ydieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-fraction"></div>
+		<div class="class-name">.Corflaticon-fraction</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Euro"></div>
+		<div class="class-name">.Corflaticon-Euro</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-guilsinglleft"></div>
+		<div class="class-name">.Corflaticon-guilsinglleft</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-guilsinglright"></div>
+		<div class="class-name">.Corflaticon-guilsinglright</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-uniFB01"></div>
+		<div class="class-name">.Corflaticon-uniFB01</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-uniFB02"></div>
+		<div class="class-name">.Corflaticon-uniFB02</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-daggerdbl"></div>
+		<div class="class-name">.Corflaticon-daggerdbl</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-periodcentered"></div>
+		<div class="class-name">.Corflaticon-periodcentered</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quotesinglbase"></div>
+		<div class="class-name">.Corflaticon-quotesinglbase</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-quotedblbase"></div>
+		<div class="class-name">.Corflaticon-quotedblbase</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-perthousand"></div>
+		<div class="class-name">.Corflaticon-perthousand</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Acircumflex"></div>
+		<div class="class-name">.Corflaticon-Acircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ecircumflex"></div>
+		<div class="class-name">.Corflaticon-Ecircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Aacute"></div>
+		<div class="class-name">.Corflaticon-Aacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Edieresis"></div>
+		<div class="class-name">.Corflaticon-Edieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Egrave"></div>
+		<div class="class-name">.Corflaticon-Egrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Iacute"></div>
+		<div class="class-name">.Corflaticon-Iacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Icircumflex"></div>
+		<div class="class-name">.Corflaticon-Icircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Idieresis"></div>
+		<div class="class-name">.Corflaticon-Idieresis</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Igrave"></div>
+		<div class="class-name">.Corflaticon-Igrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Oacute"></div>
+		<div class="class-name">.Corflaticon-Oacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ocircumflex"></div>
+		<div class="class-name">.Corflaticon-Ocircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ograve"></div>
+		<div class="class-name">.Corflaticon-Ograve</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Uacute"></div>
+		<div class="class-name">.Corflaticon-Uacute</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ucircumflex"></div>
+		<div class="class-name">.Corflaticon-Ucircumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-Ugrave"></div>
+		<div class="class-name">.Corflaticon-Ugrave</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-dotlessi"></div>
+		<div class="class-name">.Corflaticon-dotlessi</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-circumflex"></div>
+		<div class="class-name">.Corflaticon-circumflex</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-tilde"></div>
+		<div class="class-name">.Corflaticon-tilde</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/tilde_4031">Adam Whitcroft</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-macron"></div>
+		<div class="class-name">.Corflaticon-macron</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-breve"></div>
+		<div class="class-name">.Corflaticon-breve</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-dotaccent"></div>
+		<div class="class-name">.Corflaticon-dotaccent</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ring"></div>
+		<div class="class-name">.Corflaticon-ring</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/ring-commitment-wedding_10488">Austin Andrews</a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-cedilla"></div>
+		<div class="class-name">.Corflaticon-cedilla</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-hungarumlaut"></div>
+		<div class="class-name">.Corflaticon-hungarumlaut</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-ogonek"></div>
+		<div class="class-name">.Corflaticon-ogonek</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-exclam"></div>
+		<div class="class-name">.Corflaticon-exclam</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div><div class="glyph">
+		<div class="glyph-icon Corflaticon-exclam"></div>
+		<div class="class-name">.Corflaticon-exclam</div><div class="author-name">Author: <a href="http://www.Corflaticon.com/free-icon/_"></a></div></div></section>
+
+<section class="attribution">
+
+	<div class="usetitle">License and attribution:</div><div class="attrDiv">Font generated by <a href="http://www.Corflaticon.com">Corflaticon.com</a>
+ under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY</a>. The authors are: <a href="http://"></a>, <a href="http://www.templarian.com">Austin Andrews</a>, <a href="http://www.freepik.com">Freepik</a>, <a href="http://www.adamwhitcroft.com">Adam Whitcroft</a>, <a href="http://www.icons8.com">Icons8</a>, <a href="http://vecree.com">Vecree</a>, <a href="http://www.typicons.com">Stephen Hutchings</a>, <a href="http://www.scottdejonge.com">Scott de Jonge</a>, <a href="http://www.icomoon.io">Icomoon</a>, <a href="http://www.danielbruce.se">Daniel Bruce</a>.</div><div class="usetitle">Copy the Attribution License:</div>
+
+<textarea onclick="this.focus();this.select();">Font generated by &lt;a href=&quot;http://www.Corflaticon.com&quot;&gt;Corflaticon.com&lt;/a&gt;
+ under &lt;a href=&quot;http://creativecommons.org/licenses/by/3.0/&quot;&gt;CC BY&lt;/a&gt;. The authors are: &lt;a href=&quot;http://&quot;&gt;&lt;/a&gt;, &lt;a href=&quot;http://www.templarian.com&quot;&gt;Austin Andrews&lt;/a&gt;, &lt;a href=&quot;http://www.freepik.com&quot;&gt;Freepik&lt;/a&gt;, &lt;a href=&quot;http://www.adamwhitcroft.com&quot;&gt;Adam Whitcroft&lt;/a&gt;, &lt;a href=&quot;http://www.icons8.com&quot;&gt;Icons8&lt;/a&gt;, &lt;a href=&quot;http://vecree.com&quot;&gt;Vecree&lt;/a&gt;, &lt;a href=&quot;http://www.typicons.com&quot;&gt;Stephen Hutchings&lt;/a&gt;, &lt;a href=&quot;http://www.scottdejonge.com&quot;&gt;Scott de Jonge&lt;/a&gt;, &lt;a href=&quot;http://www.icomoon.io&quot;&gt;Icomoon&lt;/a&gt;, &lt;a href=&quot;http://www.danielbruce.se&quot;&gt;Daniel Bruce&lt;/a&gt;.</textarea>
+
+</section>
+
+<section class="iconsuse">
+    	<div class="usetitle">Examples:</div>
+		<div class="image"><p>&lt;i class=&quot;Corflaticon-.notdef&quot;&gt;&lt;/i&gt; <i class="Corflaticon-.notdef"></i></p><p>&lt;i class=&quot;Corflaticon-quotedbl&quot;&gt;&lt;/i&gt; <i class="Corflaticon-quotedbl"></i></p><p>&lt;i class=&quot;Corflaticon-numbersign&quot;&gt;&lt;/i&gt; <i class="Corflaticon-numbersign"></i></p><p>&lt;i class=&quot;Corflaticon-dollar&quot;&gt;&lt;/i&gt; <i class="Corflaticon-dollar"></i></p><p>&lt;i class=&quot;Corflaticon-percent&quot;&gt;&lt;/i&gt; <i class="Corflaticon-percent"></i></p></div><div class="image"><p>&lt;span class=&quot;Corflaticon-ampersand&quot;&gt;&lt;/span&gt; <span class="Corflaticon-ampersand"></span></p><p>&lt;span class=&quot;Corflaticon-quotesingle&quot;&gt;&lt;/span&gt; <span class="Corflaticon-quotesingle"></span></p><p>&lt;span class=&quot;Corflaticon-parenleft&quot;&gt;&lt;/span&gt; <span class="Corflaticon-parenleft"></span></p><p>&lt;span class=&quot;Corflaticon-parenright&quot;&gt;&lt;/span&gt; <span class="Corflaticon-parenright"></span></p><p>&lt;span class=&quot;Corflaticon-asterisk&quot;&gt;&lt;/span&gt; <span class="Corflaticon-asterisk"></span></p></div><div class="image"><p>&lt;span class=&quot;Corflaticon-plus&quot;&gt;&lt;/span&gt; <span class="Corflaticon-plus"></span></p><p>&lt;i class=&quot;Corflaticon-comma&quot;&gt;&lt;/i&gt; <i class="Corflaticon-comma"></i></p><p>&lt;i class=&quot;Corflaticon-hyphen&quot;&gt;&lt;/i&gt; <i class="Corflaticon-hyphen"></i></p><p>&lt;i class=&quot;Corflaticon-period&quot;&gt;&lt;/i&gt; <i class="Corflaticon-period"></i></p><p>&lt;i class=&quot;Corflaticon-slash&quot;&gt;&lt;/i&gt; <i class="Corflaticon-slash"></i></p></div><div class="image"><p>&lt;span class=&quot;Corflaticon-zero&quot;&gt;&lt;/span&gt; <span class="Corflaticon-zero"></span></p><p>&lt;span class=&quot;Corflaticon-one&quot;&gt;&lt;/span&gt; <span class="Corflaticon-one"></span></p><p>&lt;span class=&quot;Corflaticon-two&quot;&gt;&lt;/span&gt; <span class="Corflaticon-two"></span></p><p>&lt;span class=&quot;Corflaticon-three&quot;&gt;&lt;/span&gt; <span class="Corflaticon-three"></span></p><p>&lt;span class=&quot;Corflaticon-four&quot;&gt;&lt;/span&gt; <span class="Corflaticon-four"></span></p></div><div class="image"></div>
+</section>
+<div id="footer">
+    <div>Generated by <a href="http://www.Corflaticon.com">Corflaticon.com</a>
+    </div>
+</div>
+	</body>
+</html>

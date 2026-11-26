@@ -1,0 +1,684 @@
+@font-face {
+	font-family: "Corflaticon";
+	src: url('Corflaticon.eot');
+	src: url('Corflaticon.eot?#iefix') format('embedded-opentype'),
+	url('Corflaticon.woff') format('woff'),
+	url('Corflaticon.ttf') format('truetype'),
+	url('Corflaticon.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+[class^="Corflaticon-"]:before, [class*=" Corflaticon-"]:before,
+[class^="Corflaticon-"]:after, [class*=" Corflaticon-"]:after {   
+	font-family: Corflaticon;
+        font-size: 20px;
+font-style: normal;
+margin-left: 20px;
+}.Corflaticon-.notdef:before {
+	content: "\e01e";
+}
+.Corflaticon-quotedbl:before {
+	content: "\22";
+}
+.Corflaticon-numbersign:before {
+	content: "\23";
+}
+.Corflaticon-dollar:before {
+	content: "\24";
+}
+.Corflaticon-percent:before {
+	content: "\25";
+}
+.Corflaticon-ampersand:before {
+	content: "\26";
+}
+.Corflaticon-quotesingle:before {
+	content: "\27";
+}
+.Corflaticon-parenleft:before {
+	content: "\28";
+}
+.Corflaticon-parenright:before {
+	content: "\29";
+}
+.Corflaticon-asterisk:before {
+	content: "\2a";
+}
+.Corflaticon-plus:before {
+	content: "\2b";
+}
+.Corflaticon-comma:before {
+	content: "\2c";
+}
+.Corflaticon-hyphen:before {
+	content: "\2d";
+}
+.Corflaticon-period:before {
+	content: "\2e";
+}
+.Corflaticon-slash:before {
+	content: "\2f";
+}
+.Corflaticon-zero:before {
+	content: "\30";
+}
+.Corflaticon-one:before {
+	content: "\31";
+}
+.Corflaticon-two:before {
+	content: "\32";
+}
+.Corflaticon-three:before {
+	content: "\33";
+}
+.Corflaticon-four:before {
+	content: "\34";
+}
+.Corflaticon-five:before {
+	content: "\35";
+}
+.Corflaticon-six:before {
+	content: "\36";
+}
+.Corflaticon-seven:before {
+	content: "\37";
+}
+.Corflaticon-eight:before {
+	content: "\38";
+}
+.Corflaticon-nine:before {
+	content: "\39";
+}
+.Corflaticon-colon:before {
+	content: "\3a";
+}
+.Corflaticon-semicolon:before {
+	content: "\3b";
+}
+.Corflaticon-less:before {
+	content: "\3c";
+}
+.Corflaticon-equal:before {
+	content: "\3d";
+}
+.Corflaticon-greater:before {
+	content: "\3e";
+}
+.Corflaticon-question:before {
+	content: "\3f";
+}
+.Corflaticon-at:before {
+	content: "\40";
+}
+.Corflaticon-A:before {
+	content: "\41";
+}
+.Corflaticon-B:before {
+	content: "\42";
+}
+.Corflaticon-C:before {
+	content: "\43";
+}
+.Corflaticon-D:before {
+	content: "\44";
+}
+.Corflaticon-E:before {
+	content: "\45";
+}
+.Corflaticon-F:before {
+	content: "\46";
+}
+.Corflaticon-G:before {
+	content: "\47";
+}
+.Corflaticon-H:before {
+	content: "\48";
+}
+.Corflaticon-I:before {
+	content: "\49";
+}
+.Corflaticon-J:before {
+	content: "\4a";
+}
+.Corflaticon-K:before {
+	content: "\4b";
+}
+.Corflaticon-L:before {
+	content: "\4c";
+}
+.Corflaticon-M:before {
+	content: "\4d";
+}
+.Corflaticon-N:before {
+	content: "\4e";
+}
+.Corflaticon-O:before {
+	content: "\4f";
+}
+.Corflaticon-P:before {
+	content: "\50";
+}
+.Corflaticon-Q:before {
+	content: "\51";
+}
+.Corflaticon-R:before {
+	content: "\52";
+}
+.Corflaticon-S:before {
+	content: "\53";
+}
+.Corflaticon-T:before {
+	content: "\54";
+}
+.Corflaticon-U:before {
+	content: "\55";
+}
+.Corflaticon-V:before {
+	content: "\56";
+}
+.Corflaticon-W:before {
+	content: "\57";
+}
+.Corflaticon-X:before {
+	content: "\58";
+}
+.Corflaticon-Y:before {
+	content: "\59";
+}
+.Corflaticon-Z:before {
+	content: "\5a";
+}
+.Corflaticon-bracketleft:before {
+	content: "\5b";
+}
+.Corflaticon-backslash:before {
+	content: "\5c";
+}
+.Corflaticon-bracketright:before {
+	content: "\5d";
+}
+.Corflaticon-asciicircum:before {
+	content: "\5e";
+}
+.Corflaticon-underscore:before {
+	content: "\5f";
+}
+.Corflaticon-grave:before {
+	content: "\60";
+}
+.Corflaticon-a:before {
+	content: "\61";
+}
+.Corflaticon-b:before {
+	content: "\62";
+}
+.Corflaticon-c:before {
+	content: "\63";
+}
+.Corflaticon-d:before {
+	content: "\64";
+}
+.Corflaticon-e:before {
+	content: "\65";
+}
+.Corflaticon-f:before {
+	content: "\66";
+}
+.Corflaticon-g:before {
+	content: "\67";
+}
+.Corflaticon-h:before {
+	content: "\68";
+}
+.Corflaticon-i:before {
+	content: "\69";
+}
+.Corflaticon-j:before {
+	content: "\6a";
+}
+.Corflaticon-k:before {
+	content: "\6b";
+}
+.Corflaticon-l:before {
+	content: "\6c";
+}
+.Corflaticon-m:before {
+	content: "\6d";
+}
+.Corflaticon-n:before {
+	content: "\6e";
+}
+.Corflaticon-o:before {
+	content: "\6f";
+}
+.Corflaticon-p:before {
+	content: "\70";
+}
+.Corflaticon-q:before {
+	content: "\71";
+}
+.Corflaticon-r:before {
+	content: "\72";
+}
+.Corflaticon-s:before {
+	content: "\73";
+}
+.Corflaticon-t:before {
+	content: "\74";
+}
+.Corflaticon-u:before {
+	content: "\75";
+}
+.Corflaticon-v:before {
+	content: "\76";
+}
+.Corflaticon-w:before {
+	content: "\77";
+}
+.Corflaticon-x:before {
+	content: "\78";
+}
+.Corflaticon-y:before {
+	content: "\79";
+}
+.Corflaticon-z:before {
+	content: "\7a";
+}
+.Corflaticon-braceleft:before {
+	content: "\7b";
+}
+.Corflaticon-bar:before {
+	content: "\7c";
+}
+.Corflaticon-braceright:before {
+	content: "\7d";
+}
+.Corflaticon-asciitilde:before {
+	content: "\7e";
+}
+.Corflaticon-Adieresis:before {
+	content: "\c4";
+}
+.Corflaticon-Aring:before {
+	content: "\c5";
+}
+.Corflaticon-Ccedilla:before {
+	content: "\c7";
+}
+.Corflaticon-Eacute:before {
+	content: "\c9";
+}
+.Corflaticon-Ntilde:before {
+	content: "\d1";
+}
+.Corflaticon-Odieresis:before {
+	content: "\d6";
+}
+.Corflaticon-Udieresis:before {
+	content: "\dc";
+}
+.Corflaticon-aacute:before {
+	content: "\e1";
+}
+.Corflaticon-agrave:before {
+	content: "\e0";
+}
+.Corflaticon-acircumflex:before {
+	content: "\e2";
+}
+.Corflaticon-adieresis:before {
+	content: "\e4";
+}
+.Corflaticon-atilde:before {
+	content: "\e3";
+}
+.Corflaticon-aring:before {
+	content: "\e5";
+}
+.Corflaticon-ccedilla:before {
+	content: "\e7";
+}
+.Corflaticon-eacute:before {
+	content: "\e9";
+}
+.Corflaticon-egrave:before {
+	content: "\e8";
+}
+.Corflaticon-ecircumflex:before {
+	content: "\ea";
+}
+.Corflaticon-edieresis:before {
+	content: "\eb";
+}
+.Corflaticon-iacute:before {
+	content: "\ed";
+}
+.Corflaticon-igrave:before {
+	content: "\ec";
+}
+.Corflaticon-icircumflex:before {
+	content: "\ee";
+}
+.Corflaticon-idieresis:before {
+	content: "\ef";
+}
+.Corflaticon-ntilde:before {
+	content: "\f1";
+}
+.Corflaticon-oacute:before {
+	content: "\f3";
+}
+.Corflaticon-ograve:before {
+	content: "\f2";
+}
+.Corflaticon-ocircumflex:before {
+	content: "\f4";
+}
+.Corflaticon-odieresis:before {
+	content: "\f6";
+}
+.Corflaticon-otilde:before {
+	content: "\f5";
+}
+.Corflaticon-uacute:before {
+	content: "\fa";
+}
+.Corflaticon-ugrave:before {
+	content: "\f9";
+}
+.Corflaticon-ucircumflex:before {
+	content: "\fb";
+}
+.Corflaticon-udieresis:before {
+	content: "\fc";
+}
+.Corflaticon-dagger:before {
+	content: "\2020";
+}
+.Corflaticon-degree:before {
+	content: "\b0";
+}
+.Corflaticon-cent:before {
+	content: "\a2";
+}
+.Corflaticon-sterling:before {
+	content: "\a3";
+}
+.Corflaticon-section:before {
+	content: "\a7";
+}
+.Corflaticon-bullet:before {
+	content: "\2022";
+}
+.Corflaticon-paragraph:before {
+	content: "\b6";
+}
+.Corflaticon-germandbls:before {
+	content: "\df";
+}
+.Corflaticon-registered:before {
+	content: "\ae";
+}
+.Corflaticon-copyright:before {
+	content: "\a9";
+}
+.Corflaticon-trademark:before {
+	content: "\2122";
+}
+.Corflaticon-acute:before {
+	content: "\b4";
+}
+.Corflaticon-dieresis:before {
+	content: "\a8";
+}
+.Corflaticon-notequal:before {
+	content: "\2260";
+}
+.Corflaticon-AE:before {
+	content: "\c6";
+}
+.Corflaticon-Oslash:before {
+	content: "\d8";
+}
+.Corflaticon-infinity:before {
+	content: "\221e";
+}
+.Corflaticon-plusminus:before {
+	content: "\b1";
+}
+.Corflaticon-lessequal:before {
+	content: "\2264";
+}
+.Corflaticon-greaterequal:before {
+	content: "\2265";
+}
+.Corflaticon-yen:before {
+	content: "\a5";
+}
+.Corflaticon-uni00B5:before {
+	content: "\b5";
+}
+.Corflaticon-partialdiff:before {
+	content: "\2202";
+}
+.Corflaticon-summation:before {
+	content: "\2211";
+}
+.Corflaticon-product:before {
+	content: "\220f";
+}
+.Corflaticon-pi:before {
+	content: "\3c0";
+}
+.Corflaticon-integral:before {
+	content: "\222b";
+}
+.Corflaticon-ordfeminine:before {
+	content: "\aa";
+}
+.Corflaticon-ordmasculine:before {
+	content: "\ba";
+}
+.Corflaticon-Omega:before {
+	content: "\3a9";
+}
+.Corflaticon-ae:before {
+	content: "\e6";
+}
+.Corflaticon-oslash:before {
+	content: "\f8";
+}
+.Corflaticon-questiondown:before {
+	content: "\bf";
+}
+.Corflaticon-exclamdown:before {
+	content: "\a1";
+}
+.Corflaticon-logicalnot:before {
+	content: "\ac";
+}
+.Corflaticon-radical:before {
+	content: "\221a";
+}
+.Corflaticon-florin:before {
+	content: "\192";
+}
+.Corflaticon-approxequal:before {
+	content: "\2248";
+}
+.Corflaticon-Delta:before {
+	content: "\394";
+}
+.Corflaticon-guillemotleft:before {
+	content: "\ab";
+}
+.Corflaticon-guillemotright:before {
+	content: "\bb";
+}
+.Corflaticon-ellipsis:before {
+	content: "\2026";
+}
+.Corflaticon-uni00A0:before {
+	content: "\a0";
+}
+.Corflaticon-Agrave:before {
+	content: "\c0";
+}
+.Corflaticon-Atilde:before {
+	content: "\c3";
+}
+.Corflaticon-Otilde:before {
+	content: "\d5";
+}
+.Corflaticon-OE:before {
+	content: "\152";
+}
+.Corflaticon-oe:before {
+	content: "\153";
+}
+.Corflaticon-endash:before {
+	content: "\2013";
+}
+.Corflaticon-emdash:before {
+	content: "\2014";
+}
+.Corflaticon-quotedblleft:before {
+	content: "\201c";
+}
+.Corflaticon-quotedblright:before {
+	content: "\201d";
+}
+.Corflaticon-quoteleft:before {
+	content: "\2018";
+}
+.Corflaticon-quoteright:before {
+	content: "\2019";
+}
+.Corflaticon-divide:before {
+	content: "\f7";
+}
+.Corflaticon-lozenge:before {
+	content: "\25ca";
+}
+.Corflaticon-ydieresis:before {
+	content: "\ff";
+}
+.Corflaticon-Ydieresis:before {
+	content: "\178";
+}
+.Corflaticon-fraction:before {
+	content: "\2044";
+}
+.Corflaticon-Euro:before {
+	content: "\20ac";
+}
+.Corflaticon-guilsinglleft:before {
+	content: "\2039";
+}
+.Corflaticon-guilsinglright:before {
+	content: "\203a";
+}
+.Corflaticon-uniFB01:before {
+	content: "\fb01";
+}
+.Corflaticon-uniFB02:before {
+	content: "\fb02";
+}
+.Corflaticon-daggerdbl:before {
+	content: "\2021";
+}
+.Corflaticon-periodcentered:before {
+	content: "\b7";
+}
+.Corflaticon-quotesinglbase:before {
+	content: "\201a";
+}
+.Corflaticon-quotedblbase:before {
+	content: "\201e";
+}
+.Corflaticon-perthousand:before {
+	content: "\2030";
+}
+.Corflaticon-Acircumflex:before {
+	content: "\c2";
+}
+.Corflaticon-Ecircumflex:before {
+	content: "\ca";
+}
+.Corflaticon-Aacute:before {
+	content: "\c1";
+}
+.Corflaticon-Edieresis:before {
+	content: "\cb";
+}
+.Corflaticon-Egrave:before {
+	content: "\c8";
+}
+.Corflaticon-Iacute:before {
+	content: "\cd";
+}
+.Corflaticon-Icircumflex:before {
+	content: "\ce";
+}
+.Corflaticon-Idieresis:before {
+	content: "\cf";
+}
+.Corflaticon-Igrave:before {
+	content: "\cc";
+}
+.Corflaticon-Oacute:before {
+	content: "\d3";
+}
+.Corflaticon-Ocircumflex:before {
+	content: "\d4";
+}
+.Corflaticon-Ograve:before {
+	content: "\d2";
+}
+.Corflaticon-Uacute:before {
+	content: "\da";
+}
+.Corflaticon-Ucircumflex:before {
+	content: "\db";
+}
+.Corflaticon-Ugrave:before {
+	content: "\d9";
+}
+.Corflaticon-dotlessi:before {
+	content: "\131";
+}
+.Corflaticon-circumflex:before {
+	content: "\2c6";
+}
+.Corflaticon-tilde:before {
+	content: "\2dc";
+}
+.Corflaticon-macron:before {
+	content: "\af";
+}
+.Corflaticon-breve:before {
+	content: "\2d8";
+}
+.Corflaticon-dotaccent:before {
+	content: "\2d9";
+}
+.Corflaticon-ring:before {
+	content: "\2da";
+}
+.Corflaticon-cedilla:before {
+	content: "\b8";
+}
+.Corflaticon-hungarumlaut:before {
+	content: "\2dd";
+}
+.Corflaticon-ogonek:before {
+	content: "\2db";
+}
+.Corflaticon-exclam:before {
+	content: "\21";
+}
+.Corflaticon-exclam:before {
+	content: "\2c7";
+}
+
+

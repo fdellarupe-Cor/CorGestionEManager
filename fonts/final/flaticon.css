@@ -1,0 +1,358 @@
+@font-face {
+	font-family: "Flaticon";
+	src: url("flaticon.eot");
+	src: url("flaticon.eot#iefix") format("embedded-opentype"),
+	url("flaticon.woff") format("woff"),
+	url("flaticon.ttf") format("truetype"),
+	url("flaticon.svg") format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+[class^="flaticon-"]:before, [class*=" flaticon-"]:before,
+[class^="flaticon-"]:after, [class*=" flaticon-"]:after {   
+	font-family: Flaticon;
+        font-size: 20px;
+font-style: normal;
+margin-left: 20px;
+}.flaticon-uniE000:before {
+	content: "\e000";
+}
+.flaticon-uniE001:before {
+	content: "\e001";
+}
+.flaticon-uniE002:before {
+	content: "\e002";
+}
+.flaticon-uniE003:before {
+	content: "\e003";
+}
+.flaticon-uniE004:before {
+	content: "\e004";
+}
+.flaticon-uniE005:before {
+	content: "\e005";
+}
+.flaticon-uniE006:before {
+	content: "\e006";
+}
+.flaticon-uniE007:before {
+	content: "\e007";
+}
+.flaticon-uniE008:before {
+	content: "\e008";
+}
+.flaticon-uniE009:before {
+	content: "\e009";
+}
+.flaticon-uniE00A:before {
+	content: "\e00a";
+}
+.flaticon-uniE00B:before {
+	content: "\e00b";
+}
+.flaticon-uniE00C:before {
+	content: "\e00c";
+}
+.flaticon-uniE00D:before {
+	content: "\e00d";
+}
+.flaticon-uniE00E:before {
+	content: "\e00e";
+}
+.flaticon-uniE00F:before {
+	content: "\e00f";
+}
+.flaticon-uniE010:before {
+	content: "\e010";
+}
+.flaticon-uniE011:before {
+	content: "\e011";
+}
+.flaticon-uniE012:before {
+	content: "\e012";
+}
+.flaticon-uniE013:before {
+	content: "\e013";
+}
+.flaticon-uniE014:before {
+	content: "\e014";
+}
+.flaticon-uniE015:before {
+	content: "\e015";
+}
+.flaticon-uniE016:before {
+	content: "\e016";
+}
+.flaticon-uniE017:before {
+	content: "\e017";
+}
+.flaticon-uniE018:before {
+	content: "\e018";
+}
+.flaticon-uniE019:before {
+	content: "\e019";
+}
+.flaticon-uniE01A:before {
+	content: "\e01a";
+}
+.flaticon-uniE01B:before {
+	content: "\e01b";
+}
+.flaticon-uniE01C:before {
+	content: "\e01c";
+}
+.flaticon-uniE01D:before {
+	content: "\e01d";
+}
+.flaticon-uniE01E:before {
+	content: "\e01e";
+}
+.flaticon-uniE01F:before {
+	content: "\e01f";
+}
+.flaticon-uniE020:before {
+	content: "\e020";
+}
+.flaticon-uniE021:before {
+	content: "\e021";
+}
+.flaticon-uniE022:before {
+	content: "\e022";
+}
+.flaticon-uniE023:before {
+	content: "\e023";
+}
+.flaticon-uniE024:before {
+	content: "\e024";
+}
+.flaticon-uniE025:before {
+	content: "\e025";
+}
+.flaticon-uniE026:before {
+	content: "\e026";
+}
+.flaticon-uniE027:before {
+	content: "\e027";
+}
+.flaticon-uniE028:before {
+	content: "\e028";
+}
+.flaticon-uniE029:before {
+	content: "\e029";
+}
+.flaticon-uniE02A:before {
+	content: "\e02a";
+}
+.flaticon-uniE02B:before {
+	content: "\e02b";
+}
+.flaticon-uniE02C:before {
+	content: "\e02c";
+}
+.flaticon-uniE02D:before {
+	content: "\e02d";
+}
+.flaticon-uniE02E:before {
+	content: "\e02e";
+}
+.flaticon-uniE02F:before {
+	content: "\e02f";
+}
+.flaticon-uniE030:before {
+	content: "\e030";
+}
+.flaticon-uniE031:before {
+	content: "\e031";
+}
+.flaticon-uniE032:before {
+	content: "\e032";
+}
+.flaticon-uniE033:before {
+	content: "\e033";
+}
+.flaticon-uniE034:before {
+	content: "\e034";
+}
+.flaticon-uniE035:before {
+	content: "\e035";
+}
+.flaticon-uniE036:before {
+	content: "\e036";
+}
+.flaticon-uniE037:before {
+	content: "\e037";
+}
+.flaticon-uniE038:before {
+	content: "\e038";
+}
+.flaticon-uniE039:before {
+	content: "\e039";
+}
+.flaticon-uniE03A:before {
+	content: "\e03a";
+}
+.flaticon-uniE03B:before {
+	content: "\e03b";
+}
+.flaticon-uniE03C:before {
+	content: "\e03c";
+}
+.flaticon-uniE03D:before {
+	content: "\e03d";
+}
+.flaticon-uniE03E:before {
+	content: "\e03e";
+}
+.flaticon-uniE03F:before {
+	content: "\e03f";
+}
+.flaticon-uniE040:before {
+	content: "\e040";
+}
+.flaticon-uniE041:before {
+	content: "\e041";
+}
+.flaticon-uniE042:before {
+	content: "\e042";
+}
+.flaticon-uniE043:before {
+	content: "\e043";
+}
+.flaticon-uniE044:before {
+	content: "\e044";
+}
+.flaticon-uniE045:before {
+	content: "\e045";
+}
+.flaticon-uniE046:before {
+	content: "\e046";
+}
+.flaticon-uniE047:before {
+	content: "\e047";
+}
+.flaticon-uniE048:before {
+	content: "\e048";
+}
+.flaticon-uniE049:before {
+	content: "\e049";
+}
+.flaticon-uniE04A:before {
+	content: "\e04a";
+}
+.flaticon-uniE04B:before {
+	content: "\e04b";
+}
+.flaticon-uniE04C:before {
+	content: "\e04c";
+}
+.flaticon-uniE04D:before {
+	content: "\e04d";
+}
+.flaticon-uniE04E:before {
+	content: "\e04e";
+}
+.flaticon-uniE04F:before {
+	content: "\e04f";
+}
+.flaticon-uniE050:before {
+	content: "\e050";
+}
+.flaticon-uniE051:before {
+	content: "\e051";
+}
+.flaticon-uniE052:before {
+	content: "\e052";
+}
+.flaticon-uniE053:before {
+	content: "\e053";
+}
+.flaticon-uniE054:before {
+	content: "\e054";
+}
+.flaticon-uniE055:before {
+	content: "\e055";
+}
+.flaticon-uniE056:before {
+	content: "\e056";
+}
+.flaticon-uniE057:before {
+	content: "\e057";
+}
+.flaticon-uniE058:before {
+	content: "\e058";
+}
+.flaticon-uniE059:before {
+	content: "\e059";
+}
+.flaticon-uniE05A:before {
+	content: "\e05a";
+}
+.flaticon-uniE05B:before {
+	content: "\e05b";
+}
+.flaticon-uniE05C:before {
+	content: "\e05c";
+}
+.flaticon-uniE05D:before {
+	content: "\e05d";
+}
+.flaticon-uniE05E:before {
+	content: "\e05e";
+}
+.flaticon-uniE05F:before {
+	content: "\e05f";
+}
+.flaticon-uniE060:before {
+	content: "\e060";
+}
+.flaticon-uniE061:before {
+	content: "\e061";
+}
+.flaticon-uniE062:before {
+	content: "\e062";
+}
+.flaticon-uniE063:before {
+	content: "\e063";
+}
+.flaticon-uniE064:before {
+	content: "\e064";
+}
+.flaticon-uniE065:before {
+	content: "\e065";
+}
+.flaticon-uniE066:before {
+	content: "\e066";
+}
+.flaticon-uniE067:before {
+	content: "\e067";
+}
+.flaticon-uniE068:before {
+	content: "\e068";
+}
+.flaticon-uniE069:before {
+	content: "\e069";
+}
+.flaticon-uniE070:before {
+	content: "\e070";
+}
+.flaticon-uniE071:before {
+	content: "\e071";
+}
+.flaticon-uniE072:before {
+	content: "\e072";
+}
+.flaticon-uniE073:before {
+	content: "\e073";
+}
+.flaticon-uniE074:before {
+	content: "\e074";
+}
+.flaticon-uniE075:before {
+	content: "\e075";
+}
+.flaticon-uniE076:before {
+	content: "\e076";
+}
+.flaticon-uniE077:before {
+	content: "\e077";
+}

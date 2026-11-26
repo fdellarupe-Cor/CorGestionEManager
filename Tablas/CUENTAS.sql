@@ -1,0 +1,22 @@
+USE [dbcordatv46_UNIF]
+GO
+
+/****** Object:  Table [dbo].[CUENTAS]    Script Date: 03/28/2018 10:09:22 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[CUENTAS](
+	[objid] [int] IDENTITY(1,1) NOT NULL,
+	[descri] [nvarchar](50) NULL,
+	[numero] [nvarchar](20) NULL,
+ CONSTRAINT [aaaaaCUENTAS_PK] PRIMARY KEY NONCLUSTERED 
+(
+	[objid] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON, FILLFACTOR = 90) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
