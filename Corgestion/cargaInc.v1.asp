@@ -1,0 +1,399 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+shtml = "<html>"
+
+shtml = shtml & "<head>"
+
+shtml = shtml & "<meta charset='utf-8'>"
+shtml = shtml & "<meta name='viewport' content='width=device-width, initial-scale=1'>"
+shtml = shtml & "<title>jQuery test Mauro</title>"
+shtml = shtml & "<link rel='stylesheet' href='assets/css/main2.css' />"
+shtml = shtml & "<link rel='stylesheet' href='//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'>"
+shtml = shtml & "<script type='text/javascript' src='assets/js/jquery.min.js'></script>"
+shtml = shtml & "<script type='text/javascript' src='assets/js/jquery-ui.js'></script>"
+
+shtml = shtml & "<script>"
+
+shtml = shtml & "$( function() {"
+
+'calculo de tamaño
+shtml = shtml & "var ancho = $(window).width() / 2;"
+shtml = shtml & "var alto = $(window).height() / 2;"
+
+'tamaño de las listas
+shtml = shtml & "$('#listas').css('width',ancho);"
+shtml = shtml & "$('#listas').css('height',alto);"
+
+'agarre los elementos con clase lista y los hace sortable
+shtml = shtml & "$('.lista').sortable({"
+
+shtml = shtml & "start: function( event, ui ) {"
+shtml = shtml & "ui.item.addClass('entra');"
+shtml = shtml & "},"
+
+shtml = shtml & "stop: function( event, ui ) {"
+shtml = shtml & "ui.item.removeClass('entra');"
+shtml = shtml & "}"
+
+shtml = shtml & "});"
+
+'todos los eliminables draggables
+shtml = shtml & "$('.eliminable').draggable({"
+shtml = shtml & "});"
+
+'funcion que muestra la lista correspondiente por donde se pasa el mouse
+shtml = shtml & "$( '.mostrar' ).click(function(e) {"
+shtml = shtml & "$( '.lista' ).hide();"
+shtml = shtml & "$('#' + $(e.currentTarget).attr('data-m') ).empty();"
+shtml = shtml & "$.get('listas.asp?param=' + $(e.currentTarget).attr('data-m'), function( data ) { "
+shtml = shtml & "$( '#' + $(e.currentTarget).attr('data-m') ).append( data );"
+shtml = shtml & "$( '#' + $(e.currentTarget).attr('data-m') ).show();"
+shtml = shtml & "$('.prueba').css('border-color','#AAAAAA');"
+shtml = shtml & "});"
+shtml = shtml & "if($(this).text() != 'TITULO' && $(this).text() != 'REQUIERE PRESUP'){"
+shtml = shtml & "$( '.EsferaPrincipal' ).html(""<font style='font-size:15pt;font-weight: bold;'>"" + $(this).text() + ""</font>"");"
+shtml = shtml & "$('#options').show();"
+shtml = shtml & "} else {"
+shtml = shtml & "$( '.lista' ).hide();"
+shtml = shtml & "$('#options').hide();"
+shtml = shtml & "$('.prueba').css('border-color','#FFFFFF');"
+shtml = shtml & "}"
+shtml = shtml & "});"
+
+'update de parametros y a su vez ubica los parametros al lugar a donde corresponden
+shtml = shtml & "$( '#dropzone' ).droppable({"
+shtml = shtml & "drop: function( event, ui ) {"
+shtml = shtml & "var padre = $(ui.draggable).attr('data-padre');"
+shtml = shtml & "switch(padre) {"
+shtml = shtml & "case 'licli':"
+shtml = shtml & "$( '#clidato' ).html('');"
+shtml = shtml & "$( '#clidato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'liaplic':"
+shtml = shtml & "$( '#aplidato' ).html('');"
+shtml = shtml & "$( '#aplidato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'lirg':"
+shtml = shtml & "$( '#rgdato' ).html('');"
+shtml = shtml & "$( '#rgdato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'lirp':"
+shtml = shtml & "$( '#rpdato' ).html('');"
+shtml = shtml & "$( '#rpdato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'livp':"
+shtml = shtml & "$( '#vpdato' ).html('');"
+shtml = shtml & "$( '#vpdato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'librow':"
+shtml = shtml & "$( '#browdato' ).html('');"
+shtml = shtml & "$( '#browdato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'liprio':"
+shtml = shtml & "$( '#priodato' ).html('');"
+shtml = shtml & "$( '#priodato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'lirt':"
+shtml = shtml & "$( '#rtdato' ).html('');"
+shtml = shtml & "$( '#rtdato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "case 'licon':"
+shtml = shtml & "$( '#condato' ).html('');"
+shtml = shtml & "$( '#condato' ).append( '<b>' + ui.draggable.text() + '</b>' );"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=' + $(ui.draggable).attr('data-id') + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "break;"
+shtml = shtml & "default:"
+shtml = shtml & "}"
+shtml = shtml & "}"
+shtml = shtml & "});"
+
+'accion de la cruz para dar de baja incidente
+shtml = shtml & "$( '#eliminar' ).click(function() {"
+shtml = shtml & "$.get('update.asp?tipo=ELIM', function( data ) {"
+shtml = shtml & "document.getElementById('sForm10').submit();"
+shtml = shtml & "});"
+shtml = shtml & "});"
+
+'droppable para blanquear campos ya cargados
+shtml = shtml & "$( '#eliminar' ).droppable({"
+shtml = shtml & "drop: function( event, ui ) {"
+shtml = shtml & "$.get('update.asp?padre=' + $(ui.draggable).attr('data-padre') + '&dato=&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "$( '#' + $(ui.draggable).attr('id') ).html('');"
+shtml = shtml & "}"
+shtml = shtml & "});"
+
+'saca clase al salir del elemento li de la lista en cuestion
+shtml = shtml & "$('ul.lista li').mouseleave(function(e){ "
+shtml = shtml & "$( this ).removeClass( 'entra' )"
+shtml = shtml & "});"
+
+'boton agregar parametro
+shtml = shtml & "$( '#agregar' ).on( 'click', function() {"
+shtml = shtml & "var sdato = $('.EsferaPrincipal').text();"
+shtml = shtml & "$.get('armaCargaParam.asp?param=' + sdato, function( data ) {"
+shtml = shtml & "$( '#dialog' ).dialog({"
+shtml = shtml & "title: sdato,"
+shtml = shtml & "autoOpen: true,"
+shtml = shtml & "resizable: false,"
+shtml = shtml & "buttons: {"
+shtml = shtml & "'Aceptar': function () {"
+shtml = shtml & "$.get('agreParam.asp?param=' + sdato + '&dato1=' + $('#valor1').val() + '&dato2=' + $('#valor2').val(), function( data ) {"
+shtml = shtml & "$('#dialog').dialog('close');"
+shtml = shtml & "});"
+shtml = shtml & "},"
+shtml = shtml & "'Cerrar': function () {"
+shtml = shtml & "$(this).dialog('close');"
+shtml = shtml & "}"
+shtml = shtml & "},"
+shtml = shtml & "show: {"
+shtml = shtml & "effect: 'blind',"
+shtml = shtml & "duration: 100"
+shtml = shtml & "      },"
+shtml = shtml & "hide: {"
+shtml = shtml & "effect: 'blind',"
+shtml = shtml & "duration: 100"
+shtml = shtml & "}"
+shtml = shtml & "});"
+shtml = shtml & "$( '#dialog' ).html(data);"
+shtml = shtml & "$( '#dialog' ).dialog( 'open' );"
+shtml = shtml & "});"
+shtml = shtml & "});"
+
+'update de titulo y detalle
+shtml = shtml & "$( '.inp' ).blur(function() {"
+shtml = shtml & "$.get('update.asp?padre=' + $(this).attr('id') + '&dato=' + $(this).val() + '&tipo=INC', function( data ) {"
+shtml = shtml & "});"
+shtml = shtml & "});"
+
+shtml = shtml & "});"
+
+shtml = shtml & "</script>"
+
+shtml = shtml & "</head>"
+
+
+
+
+
+
+shtml = shtml & "<body style='width:98%;height:97%;'>"
+
+opc = request.querystring("opc")
+
+if opc <> "noact" then
+
+'INSERT DEL NUEVO INCIDENTE
+nFecini = 0
+If nFecini < CLng(CDate("01-01-1900")) Then
+	nFecini = CLng(CDate("01-01-1900"))
+Else
+	nFecini = 0
+End If
+sHoy = CLng(Date) - nFecini
+
+'call Cnn.Execute("sp_cg_Registro_Insertar @Entidad='incidente', @IdCliente=0, @Contacto=0, @IdAplic=0, @Detalles='', @Prioridad=0, @ResponGestion=0, @ResponTec=0, @ReqPresup='', @FechaIngreso=" & sHoy & ", @Browser=0, @ViaPedido=0, @Titulo=''")
+
+
+'session("ID") = getMaxID(cnn,"incidentes")
+session("ID") = 393
+
+end if
+
+set inc = Cnn.Execute("sp_cg_ConsultarEntidad @Entidad='carga', @Modo='incidente', @Id=" & session("ID"))
+
+if not inc.eof then
+	sTit = inc(0)
+	sSolicP = inc(1)
+	sDeta = inc(2)
+	sClien = inc(3)
+	sAplic = inc(4)
+	sRespG = inc(5)
+	sReqPresup = inc(6)
+	sViaPed = inc(7)
+	sBrowser = inc(8)
+	sPriori = inc(9)
+	sRespT = inc(10)
+	sCont = inc(11)
+	if sDeta & "" = "" then sDeta = "Detalle..."
+	if sTit & "" = "" then sTit = "Titulo..."
+end if
+
+shtml = shtml & "<div style='width:100%;height:100%;'>"
+
+'TABLA DATOS
+shtml = shtml & "<table id=dropzone class='tb' cellspacing=0 cellpadding=0 >"
+
+shtml = shtml & "<tr>"
+shtml = shtml & "<td style='width:100%;' colspan=5 align=center><font style='font-size:25pt;'><i>CARGA DE INCIDENTE</i></font></td>"
+shtml = shtml & "</tr>"
+
+shtml = shtml & "<tr>"
+
+shtml = shtml & "<td class='mostrar' data-m='licli' data-id='sCli' style='width:15%;'>CLIENTE</td>"
+shtml = shtml & "<td id=clidato class='eliminable' data-padre='licli' style='width:15%;'><b>" & sClien & "</b></td>"
+
+shtml = shtml & "<td class='mostrar' style='width:35%;' colspan=2>"
+shtml = shtml & "<input id='iTit' class='inp' type='text' value='" & sTit & "' >"
+shtml = shtml & "</td>"
+
+shtml = shtml & "<td style='width:35%;' rowspan=6>"
+shtml = shtml & "<textarea id='iDeta' class='inp'>" & sDeta & "</textarea>"
+shtml = shtml & "</td>"
+
+shtml = shtml & "</tr>"
+
+shtml = shtml & "<tr>"
+
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='liaplic'>APLICACION</td>"
+shtml = shtml & "<td id=aplidato class='eliminable' data-padre='liaplic' style='width:15%;'><b>" & sAplic & "</b></td>"
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='liprio'>PRIORIDAD</td>"
+shtml = shtml & "<td id=priodato class='eliminable' data-padre='liprio' style='width:20%;'><b>" & sPriori & "</b></td>"
+
+shtml = shtml & "</tr>"
+
+shtml = shtml & "<tr>"
+
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='lirg'>RESPON GESTION</td>"
+shtml = shtml & "<td id=rgdato class='eliminable' data-padre='lirg' style='width:15%;'><b>" & sRespG & "</b></td>"
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='lirt'>RESPON TECNICO</td>"
+shtml = shtml & "<td id=rtdato class='eliminable' data-padre='lirt' style='width:20%;'><b>" & sRespT & "</b></td>"
+
+
+shtml = shtml & "</tr>"
+
+shtml = shtml & "<tr>"
+
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='lirp'>REQUIERE PRESUP</td>"
+shtml = shtml & "<td id=rpdato class='eliminable' data-padre='lirp' style='width:15%;'><b>" & sReqPresup & "</b></td>"
+
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='librow'>BROWSER</td>"
+shtml = shtml & "<td id=browdato class='eliminable' data-padre='librow' style='width:20%;'><b>" & sBrowser & "</b></td>"
+
+shtml = shtml & "</tr>"
+
+shtml = shtml & "<tr>"
+
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='livp'>VIA PEDIDO</td>"
+shtml = shtml & "<td id=vpdato class='eliminable' data-padre='livp' style='width:15%;'><b>" & sViaPed & "</b></td>"
+shtml = shtml & "<td class='mostrar' style='width:15%;' data-m='licon'>CONTACTO</td>"
+shtml = shtml & "<td id=condato class='eliminable' data-padre='licon' style='width:20%;'><b>" & sCont & "</b></td>"
+
+
+shtml = shtml & "</tr>"
+
+shtml = shtml & "</table>"
+
+'TABLA PARAMETROS
+shtml = shtml & "<table class='tb1' cellspacing=0 cellpadding=0 >"
+
+shtml = shtml & "<div id='dialog' title='' >"
+shtml = shtml & "</div>"
+
+sLista = "<ul id='options' class='Menu' style='display:none;text-align:center;'>"
+sLista = sLista & "<div class='EsferaPrincipal' align=center style='padding-top:20px;'></div>"
+sLista = sLista & "<li id='agregar' style='font-size:11pt;'><br>Agregar</li>"
+sLista = sLista & "<li id='editar' style='font-size:11pt;'><br>Editar</li>"
+sLista = sLista & "<li style='font-size:11pt;'><br>???</li>"
+sLista = sLista & "</ul>"
+
+shtml = shtml & "<tr>"
+
+shtml = shtml & "<td id='config' style='height:100%;width:20%;'>" & sLista & "</td>"
+
+shtml = shtml & "<td id=listas style='height:100%;width:40%;padding-top:10px;' align=center valign=top>"
+
+shtml = shtml & "<div class='prueba'>"
+
+'LISTAS
+
+'clientes
+shtml = shtml & "<ul class='lista' id='licli' data-sp='spcli'></ul>"
+
+'aplicacion
+shtml = shtml & "<ul class='lista' id='liaplic' data-sp='spapl'></ul>"
+
+'resp gestion
+shtml = shtml & "<ul class='lista' id='lirg' data-sp='sprg'></ul>"
+
+'req presup
+shtml = shtml & "<ul class='lista' id='lirp' data-sp='sprp'></ul>"
+
+'via pedido
+shtml = shtml & "<ul class='lista' id='livp' data-sp='spvp'></ul>"
+
+'browsers
+shtml = shtml & "<ul class='lista' id='librow' data-sp='spbrow'></ul>"
+
+'prioridad
+shtml = shtml & "<ul class='lista' id='liprio' data-sp='sppri'></ul>"
+
+'resp tecnico
+shtml = shtml & "<ul class='lista' id='lirt' data-sp='sprt'></ul>"
+
+'contacto
+shtml = shtml & "<ul class='lista' id='licon' data-sp='spcon'></ul>"
+
+
+shtml = shtml & "</div>"
+
+shtml = shtml & "</td>"
+
+shtml = shtml & "<td style='height:100%;width:40%;' align=center >"
+shtml = shtml & "<table style='width:100%;height:100%;'>"
+shtml = shtml & "<tr>"
+shtml = shtml & "<td id='terminar' align=center >"
+shtml = shtml & "<img src='images/tilde.jpg' width='150px' height='150px' >"
+shtml = shtml & "</td>"
+shtml = shtml & "<td id='eliminar' align=center >"
+shtml = shtml & "<img src='images/eliminar.jpg' width='150px' height='150px' >"
+shtml = shtml & "</td>"
+shtml = shtml & "</tr>"
+shtml = shtml & "</table>"
+shtml = shtml & "</td>"
+
+shtml = shtml & "</tr>"
+
+shtml = shtml & "</table>"
+
+
+shtml = shtml & "</div>"
+
+shtml = shtml & "<form id=sForm10 type='hidden' method='post' action='incidentes.asp?xmenu=9&xtmenu=INICIO'></form>"
+
+shtml = shtml & "</body>"
+
+
+shtml = shtml & "</html>"
+
+response.write shtml
+%>

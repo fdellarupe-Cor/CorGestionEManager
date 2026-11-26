@@ -1,0 +1,334 @@
+/* CorGestion UI layer: overrideable presentation only. */
+:root {
+  --cg-brand: #102a43;
+  --cg-brand-strong: #0b1f33;
+  --cg-accent: #d94f4f;
+  --cg-bg: #f4f7fa;
+  --cg-surface: #ffffff;
+  --cg-border: #d9e2ec;
+  --cg-text: #243b53;
+  --cg-muted: #627d98;
+  --cg-success: #2f855a;
+  --cg-warning: #b7791f;
+  --cg-danger: #c53030;
+  --cg-radius: 8px;
+  --cg-control-height: 40px;
+  --cg-content-width: 1440px;
+  --cg-space-1: 4px;
+  --cg-space-2: 8px;
+  --cg-space-3: 12px;
+  --cg-space-4: 16px;
+  --cg-space-5: 24px;
+  --cg-space-6: 32px;
+}
+
+body.cg-copilot-page {
+  background: var(--cg-bg) !important;
+  color: var(--cg-text) !important;
+  min-height: 100vh !important;
+}
+
+body.cg-copilot-page *, body.cg-copilot-page *::before, body.cg-copilot-page *::after {
+  box-sizing: border-box;
+}
+
+body.cg-copilot-page #wrapper,
+body.cg-copilot-page > #wrapper,
+body.cg-copilot-page .inner {
+  width: 100% !important;
+  max-width: var(--cg-content-width) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body.cg-copilot-page #header,
+body.cg-copilot-page header {
+  background: var(--cg-brand) !important;
+  color: #fff !important;
+  min-height: 64px !important;
+  padding: var(--cg-space-4) var(--cg-space-5) !important;
+}
+
+body.cg-copilot-page #header table,
+body.cg-copilot-page #header tr,
+body.cg-copilot-page #header td {
+  width: auto !important;
+  max-width: 100% !important;
+  border: 0 !important;
+  background: transparent !important;
+  vertical-align: middle !important;
+}
+
+body.cg-copilot-page #header table {
+  width: 100% !important;
+}
+
+body.cg-copilot-page .logo,
+body.cg-copilot-page #header a {
+  color: #fff !important;
+}
+
+body.cg-copilot-page input:not([type="hidden"]),
+body.cg-copilot-page select,
+body.cg-copilot-page textarea {
+  min-height: var(--cg-control-height) !important;
+  max-width: 100% !important;
+  border: 1px solid var(--cg-border) !important;
+  border-radius: 6px !important;
+  background: var(--cg-surface) !important;
+  color: var(--cg-text) !important;
+  padding: 8px 10px !important;
+  font: inherit !important;
+}
+
+body.cg-copilot-page textarea {
+  min-height: 120px !important;
+  resize: vertical !important;
+}
+
+body.cg-copilot-page input:focus,
+body.cg-copilot-page select:focus,
+body.cg-copilot-page textarea:focus {
+  outline: 3px solid rgba(217, 79, 79, .2) !important;
+  border-color: var(--cg-accent) !important;
+}
+
+body.cg-copilot-page input[type="submit"],
+body.cg-copilot-page input[type="button"],
+body.cg-copilot-page button,
+body.cg-copilot-page .bot,
+body.cg-copilot-page .btn-principal {
+  min-height: var(--cg-control-height) !important;
+  border: 1px solid var(--cg-accent) !important;
+  border-radius: 6px !important;
+  background: var(--cg-accent) !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  font-weight: 700 !important;
+  padding: 8px 16px !important;
+}
+
+body.cg-copilot-page input[type="submit"]:hover,
+body.cg-copilot-page input[type="button"]:hover,
+body.cg-copilot-page button:hover,
+body.cg-copilot-page .bot:hover,
+body.cg-copilot-page .btn-principal:hover {
+  filter: brightness(.94) !important;
+}
+
+body.cg-copilot-page table {
+  border-color: var(--cg-border) !important;
+}
+
+body.cg-copilot-page table:not(#header table) {
+  max-width: 100% !important;
+}
+
+body.cg-copilot-page th {
+  background: #edf2f7 !important;
+  color: var(--cg-brand-strong) !important;
+  font-weight: 700 !important;
+}
+
+body.cg-copilot-page td,
+body.cg-copilot-page th {
+  border-color: var(--cg-border) !important;
+}
+
+body.cg-copilot-page .titulo-seccion,
+body.cg-copilot-page .bloque-datos,
+body.cg-copilot-page .panel,
+body.cg-copilot-page .form-section,
+body.cg-copilot-page .detalle-seccion {
+  background: var(--cg-surface) !important;
+  border: 1px solid var(--cg-border) !important;
+  border-radius: var(--cg-radius) !important;
+  box-shadow: 0 8px 22px rgba(16, 42, 67, .07) !important;
+}
+
+body.cg-copilot-page .titulo-seccion,
+body.cg-copilot-page .bloque-header {
+  color: var(--cg-brand-strong) !important;
+}
+
+body.cg-copilot-page label,
+body.cg-copilot-page .dato-label,
+body.cg-copilot-page .field-label,
+body.cg-copilot-page .form-label {
+  color: var(--cg-muted) !important;
+  font-weight: 700 !important;
+}
+
+body.cg-copilot-page .badge,
+body.cg-copilot-page .estado,
+body.cg-copilot-page .prioridad {
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+}
+
+body.cg-copilot-page a {
+  color: var(--cg-accent);
+}
+
+body.cg-copilot-page .cg-page-content {
+  width: 100%;
+  max-width: var(--cg-content-width);
+  margin: 0 auto;
+  padding: var(--cg-space-5);
+}
+
+body.cg-copilot-page .cg-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cg-space-4);
+}
+
+body.cg-copilot-page .cg-field {
+  display: grid;
+  gap: var(--cg-space-2);
+  min-width: 0;
+}
+
+body.cg-copilot-page .cg-field--wide {
+  grid-column: 1 / -1;
+}
+
+body.cg-copilot-page .cg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cg-space-3);
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: var(--cg-space-5);
+}
+
+body.cg-copilot-page .app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cg-space-4);
+}
+
+body.cg-copilot-page .app-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cg-space-3);
+  min-width: 0;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+body.cg-copilot-page .app-header__logo {
+  width: 96px;
+  height: auto;
+  object-fit: contain;
+}
+
+body.cg-copilot-page .app-header__nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+body.cg-copilot-page .app-header__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.cg-copilot-page .page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cg-space-4);
+  padding: var(--cg-space-4) var(--cg-space-5) !important;
+  margin-bottom: var(--cg-space-5);
+}
+
+body.cg-copilot-page .page-header__title,
+body.cg-copilot-page .page-header__title h2 {
+  margin: 0 !important;
+}
+
+body.cg-copilot-page .page-header__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1 1 auto;
+  gap: var(--cg-space-4);
+}
+
+body.cg-copilot-page .toolbar__filters form,
+body.cg-copilot-page .toolbar__filters,
+body.cg-copilot-page .toolbar__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--cg-space-2);
+}
+
+body.cg-copilot-page .toolbar__actions {
+  justify-content: flex-end;
+}
+
+body.cg-copilot-page .form-oculto {
+  display: none !important;
+}
+
+body.cg-copilot-page .cg-form-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+body.cg-copilot-page .cg-form-container .bloque-datos {
+  padding: var(--cg-space-5);
+}
+
+body.cg-copilot-page .cg-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--cg-space-3);
+  padding: var(--cg-space-4) 0;
+  color: var(--cg-muted);
+}
+
+body.cg-copilot-page .legend__key {
+  color: var(--cg-accent);
+}
+
+body.cg-copilot-page .cg-link-test,
+body.cg-copilot-page .cg-link-action {
+  color: var(--cg-accent) !important;
+  font-weight: 700;
+}
+
+body.cg-copilot-page .cg-link-action {
+  margin-top: var(--cg-space-5);
+  cursor: pointer;
+  text-align: center;
+}
+
+body.cg-copilot-page .cg-help-note {
+  color: var(--cg-muted);
+  font-size: 12px;
+  margin: var(--cg-space-4) 0;
+}
+
+@media (max-width: 1050px) {
+  body.cg-copilot-page .cg-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 680px) {
+  body.cg-copilot-page #header { padding: var(--cg-space-3) !important; }
+  body.cg-copilot-page .cg-page-content { padding: var(--cg-space-4); }
+  body.cg-copilot-page .cg-form-grid { grid-template-columns: 1fr; }
+  body.cg-copilot-page .cg-field--wide { grid-column: auto; }
+  body.cg-copilot-page table { display: block; overflow-x: auto; white-space: nowrap; }
+  body.cg-copilot-page .page-header { align-items: stretch; flex-direction: column; }
+  body.cg-copilot-page .toolbar__filters form,
+  body.cg-copilot-page .toolbar__filters,
+  body.cg-copilot-page .toolbar__actions { width: 100%; }
+  body.cg-copilot-page .toolbar__filters select,
+  body.cg-copilot-page .toolbar__actions input { flex: 1 1 100%; }
+  body.cg-copilot-page .cg-legend { align-items: flex-start; flex-direction: column; }
+}

@@ -1,0 +1,559 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<!-- #INCLUDE FILE="IncFile/datosDetalles.inc" -->
+<%
+
+	html = headhtml()
+
+	html = html & "<body>"
+
+	Set Cnn = Server.CreateObject("ADODB.Connection")
+	'Cnn.open "Provider=SQLOLEDB;Data Source=server-2025;Initial Catalog=dbcorgestionv5; user id=sa;password=bb4515$;"
+	Cnn.open scon1
+
+	id = request.querystring("id")
+	opc = request.querystring("opc")
+	tipo = request.querystring("tipo")
+	vuel = request.querystring("vuel")
+	sol = request.querystring("sol")
+	flg = True
+	vl = request.querystring("vl")
+	incid = request.querystring("incid")
+	idproy = request.querystring("idproy")
+	cons = request.querystring("cons")
+	sel = request.querystring("sel")
+	cli = request.querystring("cli")
+	aplic = request.querystring("aplic")
+	xmenu = request.querystring("xmenu")
+	xtmenu = request.querystring("xtmenu")
+	idAplic = request.form("aplic")
+	cantregmover = request.querystring("cantregmover")
+
+		if idAplic & "" = "" then idAplic = request.querystring("aplic")
+
+		if idAplic & "" = "" then idAplic = 0
+
+		idtip = request.form("tip")
+
+
+		if idtip & "" = "" then idtip = request.querystring("tip")
+
+		if idtip & "" = "" then idtip = 0
+
+
+
+	' response.write "idaplic: " & idaplic
+
+		nFecini = 0
+
+		If nFecini < CLng(CDate("01-01-1900")) Then
+			nFecini = CLng(CDate("01-01-1900"))
+		Else
+			nFecini = 0
+		End If
+
+		If request.querystring("id") & "" = "" Then id = request.form("id")
+
+		if id & "" = "" then id = 0
+
+		If tipo = "cons" Then
+
+			If Not ExisteApl(Cnn, id) Then flg = False
+
+		End If
+
+
+
+	html = html & "<div>"
+	html = html & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+	html = html & "<div >"
+
+	html = html & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+	html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+	html = html & "<img src='images/iso_cor.png' style='width:6rem;' >"
+	html = html & "<font style='font-size:15pt;font-family:sans-serif;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+	html = html & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+	html = html & "<nav>"
+	html = html & "<ul>"
+	'html = html & "<li><a href='#menu'></a></li>"
+	html = html & "</ul>"
+	html = html & "</nav>"
+	html = html & "</td>"
+
+	html = html & "</tr></table>"
+
+	html = html & "</div>"
+
+	html = html & "</header>"
+
+
+	If opc = "ver" And flg Then
+
+		xxx = ObjAcc(id,"A",cnn,"D")
+		XXX = SYSLOGON(cnn,"CONSULTA_APL_" & id)
+
+		html = html & "<table style='width:100%;padding:0 2rem;background-color:#e8edff;' >"
+		html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+		apl = getName(cnn,"nombre","apl",id)
+
+		html = html & "<td><font style='font-size:20pt;font-family:sans-serif;color:#000000;letter-spacing:0.2em;'><b>DETALLE - '" & apl & "' (ID:" & id & ")</b></font></td>"
+
+		form9 = "<form id='form9' style='height:70%;' method='post' action='detalles2.asp?cli=" & cli & "&id=" & id & "&opc=act&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&Aplic=" & idAplic & "&tip=" & idtip & "'></form>"
+
+		if getPermisos(xmenu,xtmenu,"MODIF") = 1 then
+			boton9 = "<input class='bot' type='button' value='ACTUALIZAR APL' onclick=""document.getElementById('form9').submit();"">"
+			else
+				boton9 = "<input class='botsp' type='button' value='ACTUALIZAR APL' onclick=""alert('Sin permiso para modificar.');"">"
+		end if
+
+		html = html & "<td>" & boton9 & "</td>"
+
+		If tipo <> "cons" Then
+
+			cli = request.querystring("cli")
+
+			form9x = "<form id='form9x' method='post' action='apl.asp?cli=" & cli & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&Aplic=" & idAplic & "&tip=" & idtip &  "'></form>"
+
+			boton8 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('form9x').submit();""></form>"
+
+			html = html & "<td>" & boton8 & "</td>"
+
+			Else
+
+				cli = request.querystring("cli")
+					if cli & "" = "" then cli = 0
+				IdAplic = request.querystring("aplic")
+					if IdAplic & "" = "" then IdAplic = 0
+				sel = request.querystring("sel")
+					if sel & "" = "" then sel = 0
+
+				asp = request.querystring("busc")
+
+				form8 = "<form id='form8' style='height:70%;' method='post' action='apl.asp?sel=" & sel & "&opc=consi&cli=" & cli & "&idaplic=" & idaplic & "&busc=" & asp & "'>"
+
+				boton8 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='VOLVER' onclick=""document.getElementById('form8').submit();""></form>"
+
+				html = html & "<td>" & form8 & boton8 & "</td>"
+
+		End If
+
+		html = html & "</tr>"
+		html = html & "</table>"
+		html = html & "</div>"
+
+
+		Set rs = ObtenerDetalleApl(Cnn, id)
+
+		If Not rs.eof Then
+
+			html = html & "<div style='width:100%;'>"
+			html = html & "<div id='tabs' style='border-style: none;'>"
+			
+			html = html & "<ul class='nav-tabs'>"
+			html = html & "<li><a class='nav-tab active' style='display: block;' href='#tabs-1'>DATOS</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#tabs-2'>ARREGLOS Y MODULOS</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#tabs-3'>INCIDENTES Y PROYECTOS RELACIONADOS</a></li>"
+			html = html & "</ul>"
+
+		'DATOS
+			html = html & "<div id='tabs-1'>"
+			
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body grid-datos-doble'>"
+
+			html = html & "<div class='dato-label'>ID</div>"
+			html = html & "<div class='dato-value' style='font-weight: 600;'>" & rs(0) & "</div>"
+
+			html = html & "<div class='dato-label'>NOMBRE</div>"
+			html = html & "<div class='dato-value'>" & rs(1) & "</div>"
+
+			html = html & "<div class='dato-label'>CLIENTE</div>"
+			html = html & "<div class='dato-value'>" & rs(2) & "</div>"
+
+			html = html & "<div class='dato-label'>APLICATIVO</div>"
+			html = html & "<div class='dato-value'>" & rs(3) & "</div>"
+
+			html = html & "<div class='dato-label'>RESPONSABLE ENVIO</div>"
+			html = html & "<div class='dato-value'>" & rs(4) & "</div>"
+
+			sFec = Fechador(rs("fecha_creacion") + nFecini)
+			html = html & "<div class='dato-label'>FECHA INGRESO</div>"
+			html = html & "<div class='dato-value'>" & sFec & "</div>"
+
+			sFE = ""
+			if rs(5) <> 0 then
+				sFE = Fechador(rs(5) + nFecini)
+			end if
+
+			html = html & "<div class='dato-label'>FECHA ENVIO</div>"
+			html = html & "<div class='dato-value'>" & sFE & "</div>"
+
+			sFIT = ""
+			if rs(6) <> 0 then
+				sFIT = Fechador(rs(6) + nFecini)
+			end if
+
+			html = html & "<div class='dato-label'>FECHA INSTALACION TEST</div>"
+			html = html & "<div class='dato-value'>" & sFIT & "</div>"
+
+			sFIP = ""
+			if rs(8) <> 0 then
+				sFIP = Fechador(rs(8) + nFecini)
+			end if
+
+			html = html & "<div class='dato-label'>FECHA INSTALACION PROD</div>"
+			html = html & "<div class='dato-value'>" & sFIP & "</div>"
+
+			html = html & "</div>" ' Fin .bloque-body
+			html = html & "</div>" ' Fin .bloque-datos
+			html = html & "</div>" ' Fin #tabs-1
+
+		'DETALLES
+			html = html & "<div id='tabs-2'>"
+
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body'>"
+
+			html = html & "<div class='dato-label' style='margin-bottom: 0.5rem;'>DETALLE DEL ARREGLO/MODULO</div>"
+			html = html & "<div class='dato-value' style='width: 100%;'>" & Replace(rs(7) & "",Chr(13),"<br>") & "</div>"
+
+			html = html & "</div>" ' Fin .bloque-body
+			html = html & "</div>" ' Fin .bloque-datos
+			html = html & "</div>" ' Fin #tabs-2
+
+		'INCIDENTES O PROYECTOS RELACIONADOS
+			html = html & "<div id='tabs-3'>"
+
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body grid-datos-doble'>"
+			html = html & "<div>"
+
+			'Set rz = ObtenerRelacionesApl(Cnn, id, "I")
+			Set rz = ObtenerRelacionesApl(Cnn, id, "I")
+
+			html = html & "<div class='dato-label'>INCIDENTES</div>"
+			html = html & "<div style='display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;'>"
+
+			if not rz.eof then
+
+			do while not rz.eof
+
+				html = html & "<tr>"
+				ref = "<a class='red2' href='detalles.asp?opc=veri&id=" & rz(2) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>" & rz(2) & "</a>"
+				html = html & "<td align=center>" & ref & "</td>"
+				html = html & "</tr>"
+
+			rz.movenext
+			loop
+
+			else
+
+				html = html & "<tr>"
+				html = html & "<td align=center>-----</td>"
+				html = html & "</tr>"
+
+			end if
+
+			html = html & "</table>"
+
+			html = html & "<table style='float:right;border:solid 1px #aaaaaa;' cellspacing=0 cellpadding=3 >"
+
+			'Set rz = ObtenerRelacionesApl(Cnn, id, "P")
+			Set rz = ObtenerRelacionesApl(Cnn, id, "P")
+			
+			html = html & "<tr>"
+			html = html & "<td align=center><font style='font-size:20pt;color:#000000;'>PROYECTOS</font></td>"
+			html = html & "</tr>"
+
+			if not rz.eof then
+
+			do while not rz.eof
+
+				html = html & "<tr>"
+				ref = "<a class='red2' href='detalles.asp?opc=verp&id=" & rz(2) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>" & rz(2) & "</a>"
+				html = html & "<td align=center>" & ref & "</td>"
+				html = html & "</tr>"
+
+			rz.movenext
+			loop
+
+			else
+
+				html = html & "<tr>"
+				html = html & "<td align=center>-----</td>"
+				html = html & "</tr>"
+
+			end if
+		end if
+		html = html & "</table>"
+
+		html = html & "</div>"
+
+		html = html & "</div>"
+
+		html = html & "</div>"
+
+	'End If
+
+	ElseIf opc = "act" And flg Then
+
+		xmenu = request.querystring("xmenu")
+		xtmenu = request.querystring("xtmenu")
+
+		zzz = ObjAcc(id,"A",cnn,"A")
+		XXX = SYSLOGON(cnn,"ACTUALIZA_APL_" & id)
+
+		html = html & "<table style='width:100%;padding:0 2rem;background-color:#e8edff;' >"
+		html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+		html = html & "<tr>"
+		html = html & "<td><font style='margin-left:5%;font-size:20pt;font-family:Serif;color:#000000;letter-spacing:0.2em;'><b>ACTUALIZAR - APL NRO '" & id & "'</b></font></td>"
+
+		cliente = request.querystring("cli")
+		cantregmover = request.querystring("cantregmover")
+
+		form10 = "<form id='form10' style='height:70%;' method='post' action='apl.asp?cli=" & cliente & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&cantregmover=" & cantregmover & "'></form>"
+
+		boton10 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('form10').submit();""></form>"
+
+		html = html & "<td>" & boton10 & "</td>"
+		html = html & "</tr>"
+		html = html & "</table>"
+		html = html & "</div>"
+
+		html = html & "<div>"
+
+		Set rs = ObtenerAplEdicion(Cnn, id)
+
+		If Not rs.eof Then
+
+			' CORRECCIÃ“N 1: Se remueve el style='height:1px;' para permitir que el form tenga dimensiÃ³n completa
+			html = html & "<form id='sForm' method='post' action='actualizar.asp?tabla=apl&id=" & id & "&opt=actapl&cli=" & cli & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=detalles2.asp?opc=act&cantregmover=" & cantregmover & "'>"
+
+			html = html & "<div class='inner' style='padding: 2rem;'>"
+
+			' --- COLUMNA IZQUIERDA ---
+			html = html & "<div style='width: 50%; float: left; padding-right: 1.5rem;'>"
+			
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body grid-datos-doble'>"
+
+			' ID
+			html = html & "<div class='dato-label'>ID</div>"
+			html = html & "<div id='nid' class='dato-value' style='font-weight: 600; padding-left: 0.5rem;'>" & rs(0) & "</div>"
+
+			' NOMBRE
+			html = html & "<div class='dato-label'>NOMBRE</div>"
+			html = html & "<div>"
+			html = html & "<input id='nombre' name='nombre' type='text' class='input-moderno' value='" & rs(1) & "'>"
+			html = html & "</div>"
+
+			' SECUENCIA
+			html = html & "<div class='dato-label'>SECUENCIA</div>"
+			html = html & "<div>"
+			html = html & "<input id='sec' name='sec' type='text' class='input-moderno' autocomplete='off' value='" & rs(11) & "'>"
+			html = html & "</div>"
+
+			' TIPO
+			Set rsTipo = GetListaCombo(Cnn, "TIPO_APL")
+
+			html = html & "<div class='dato-label'>TIPO</div>"
+			html = html & "<div class='dato-value'>"
+			html = html & "<select id='tipo' name='tipo'>"
+			html = html & "<option value=" & rs(12) & " selected>" & rs(13) & "</option>"
+
+			Do While Not rsTipo.EOF
+				html = html & "<option value=" & rsTipo(0) & ">" & rsTipo(1) & "</option>"
+				rsTipo.movenext
+			Loop
+
+			html = html & "</select></div>"
+
+			' CLIENTE
+			html = html & "<div class='dato-label'>CLIENTE</div>"
+			html = html & "<div class='dato-value'>"
+			html = html & ArmarComboHTML(GetListaCombo(Cnn, "CLIENTES"), rs(2), "id_cliente")
+			html = html & "</div>"
+
+			' APLICACION
+			html = html & "<div class='dato-label'>APLICACION</div>"
+			html = html & "<div class='dato-value'>"
+			html = html & ArmarComboHTML(GetListaCombo(Cnn, "APLICATIVOS"), rs(3), "id_aplic")
+			html = html & "</div>"
+
+			' RESPONSABLE ENVIO
+			html = html & "<div class='dato-label'>RESPONSABLE ENVIO</div>"
+			html = html & "<div class='dato-value'>"
+			html = html & ArmarComboHTML(GetListaCombo(Cnn, "RESPONSABLES_FUNC"), rs(4), "respon_envio")
+			html = html & "</div>"
+
+			' FECHA ENVIO
+			sFE = ""
+			if rs(5) <> 0 then
+				sFE = Fechador(rs(5) + nFecini)
+			end if
+
+			html = html & "<div class='dato-label'>FECHA ENVIO</div>"
+			html = html & "<div>"
+			html = html & "<input id='fecha_envio' name='fecha_envio' type='text' class='input-moderno' value='" & sFE & "'>"
+			html = html & "</div>"
+
+			' FECHA TEST
+			sFIT = ""
+			if rs(6) <> 0 then
+				sFIT = Fechador(rs(6) + nFecini)
+			end if
+
+			if rs(5) & "" <> "" then
+				html = html & "<div class='dato-label'>FECHA INSTALACION TEST</div>"
+				html = html & "<div>"
+				html = html & "<input id='fecha_instalacion_test' name='fecha_instalacion_test' type='text' class='input-moderno' value='" & sFIT & "'>"
+				html = html & "</div>"
+			else
+				html = html & "<div class='dato-label'>FECHA INSTALACION TEST</div>"
+				html = html & "<div class='dato-value'>" & sFIT & "</div>"
+			end if
+
+			' FECHA PROD
+			sFIP = ""
+			if rs(8) <> 0 then
+				sFIP = Fechador(rs(8) + nFecini)
+			end if
+
+			if rs(6) & "" <> "" then
+				html = html & "<div class='dato-label'>FECHA INSTALACION PROD</div>"
+				html = html & "<div>"
+				html = html & "<input id='fecha_instalacion_prod' name='fecha_instalacion_prod' type='text' class='input-moderno' value='" & sFIP & "'>"
+				html = html & "</div>"
+			else
+				html = html & "<div class='dato-label'>FECHA INSTALACION PROD</div>"
+				html = html & "<div class='dato-value'>" & sFIP & "</div>"
+			end if
+
+			' BOTON AGREGAR
+			html = html & "<div style='grid-column: 1 / -1; text-align: center; margin-top: 1.5rem;'>"
+			html = html & "<span id='sAgre' style='color:#FF0000; cursor:pointer; font-weight:600; text-transform:uppercase;'>AGREGAR INC O PROY</span>"
+			html = html & "</div>"
+
+			html = html & "</div>" ' Fin .bloque-body
+			html = html & "</div>" ' Fin .bloque-datos
+
+			html = html & "</div>" ' Fin columna izquierda
+
+			' --- COLUMNA DERECHA ---
+			html = html & "<div style='width: 50%; float: right; padding-left: 1.5rem;'>"
+
+			html = html & "<div class='bloque-datos'>"
+
+			html = html & "<div class='bloque-header'>ARREGLOS QUE IMPLICA</div>"
+
+			html = html & "<div class='bloque-body'>"
+			
+			html = html & "<textarea id='motivo_apl' name='motivo_apl' class='input-moderno' style='height: 400px; resize: vertical;'>" & rs(7) & "</textarea>"
+			
+			html = html & "<div style='text-align: center; margin-top: 1rem;'>"
+			html = html & "<input class='btn-principal' type='button' value='ACTUALIZAR' onclick=""actualizar('sForm');"">"
+			html = html & "</div>"		
+			html = html & "</div>" ' Fin .bloque-body
+			html = html & "</div>" ' Fin .bloque-datos
+
+			html = html & "</div>" ' Fin columna derecha
+
+			html = html & "<div style='clear: both;'></div>"
+			html = html & "</div>" ' Fin .inner
+
+			' CORRECCIÃ“N 2: Cierre de formulario antes de insertar el contenedor del Modal Dialog
+			html = html & "</form>"
+
+			' El modal se ubica independiente del formulario
+			html = html & "<div id='dialog' title=''></div>"
+
+		End If
+
+	End If
+
+' CORRECCIÃ“N 3: ImportaciÃ³n de script JS antes de la inicializaciÃ³n jQuery
+html = html & "<script src='assets/js/relaciones.js'></script>"
+
+html = html & "<script type='text/javascript'>"
+html = html & " function actualizar(formu){ "
+html = html & " var r = confirm('Desea actualizar apl?'); "
+html = html & " if (r){ "
+html = html & " document.getElementById(formu).submit(); "
+html = html & " }else{ "
+html = html & " return false;"
+html = html & " }} "
+html = html & "</script>"
+
+html = html & "<script>"
+html = html & "  $( function() {"
+
+html = html & "$.datepicker.regional['es'] = {"
+html = html & "closeText: 'Cerrar',"
+html = html & "prevText: '< Ant',"
+html = html & "nextText: 'Sig >',"
+html = html & "currentText: 'Hoy',"
+html = html & "monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],"
+html = html & "monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],"
+html = html & "dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],"
+html = html & "dayNamesShort: ['Dom','Lun','Mar','Mi','Juv','Vie','Sab'],"
+html = html & "dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sa'],"
+html = html & "weekHeader: 'Sm',"
+html = html & "dateFormat: 'dd/mm/yy',"
+html = html & "firstDay: 1,"
+html = html & "isRTL: false,"
+html = html & "showMonthAfterYear: false,"
+html = html & "yearSuffix: ''"
+html = html & "};"
+html = html & "$.datepicker.setDefaults($.datepicker.regional['es']);"
+
+html = html & "    $( ""#fecha_envio"" ).datepicker();"
+html = html & "    $( ""#fecha_instalacion_test"" ).datepicker();"
+html = html & "    $( ""#fecha_instalacion_prod"" ).datepicker();"
+html = html & "  } );"
+
+html = html & "$( '#tabs' ).tabs();"
+
+html = html & "$( '#dialog' ).dialog({"
+html = html & "title: 'Agregar relacion',"
+html = html & "autoOpen: false,"
+html = html & "resizable: false,"
+html = html & "buttons: {"
+html = html & "'Aceptar': function () {"
+html = html & "capturarYProcesar();"
+html = html & "$(this).dialog('close');"
+html = html & "},"
+html = html & "'Cerrar': function () {"
+html = html & "$(this).dialog('close');"
+html = html & "}"
+html = html & "},"
+html = html & "show: {"
+html = html & "effect: 'blind',"
+html = html & "duration: 100"
+html = html & "      },"
+html = html & "hide: {"
+html = html & "effect: 'blind',"
+html = html & "duration: 100"
+html = html & "}"
+html = html & "});"
+
+' CORRECCIÃ“N 4: Captura delegada del evento click en $(document)
+html = html & "$(document).on('click', '#sAgre', function() {"
+html = html & "    $.get('armaCargaParam.asp?param=IOP', function( data ) {"
+html = html & "        $( '#dialog' ).html(data);"
+html = html & "        if (typeof inicializarRelaciones === 'function') {"
+html = html & "            inicializarRelaciones();"
+html = html & "        }"
+html = html & "    });"
+html = html & "    $( '#dialog' ).dialog( 'open' );"
+html = html & "});"
+
+html = html & "</script>"
+
+html = html & form9x & form9 & form10 & "</body>"
+html = html & "</html>"
+
+
+response.write html
+%>

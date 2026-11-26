@@ -1,0 +1,207 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+
+html = "<html>"
+html = html & "<head>"
+
+html = html & "<title>Cor Gestion</title>"
+html = html & "<meta charset='utf-8' />"
+html = html & "<meta name='viewport' content='width=device-width, initial-scale=1' />"
+html = html & "<link rel='stylesheet' href='assets/css/main.css' />"
+
+html = html & "</head>"
+html = html & "<body>"
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+sel = request.querystring("sel")
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+XXX = SYSLOGON(cnn,"CONSULTA_INCxPROY")
+
+nFecini = 0
+
+If nFecini < CLng(CDate("01-01-1900")) Then
+	nFecini = CLng(CDate("01-01-1900"))
+Else
+	nFecini = 0
+End If
+
+html = html & "<div>"
+
+html = html & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+html = html & "<div >"
+
+html = html & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+html = html & "<img src='images/iso_cor.png' style='width:6rem;' >"
+html = html & "<font style='font-size:15pt;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+html = html & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+html = html & "<nav>"
+html = html & "<ul>"
+'html = html & "<li><a href='#menu'></a></li>"
+html = html & "</ul>"
+html = html & "</nav>"
+html = html & "</td>"
+
+html = html & "</tr></table>"
+
+html = html & "</div>"
+
+html = html & "</header>"
+
+html = html & "<table class='titulo-seccion' >"
+html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+html = html & "<td><h2>INCIDENTES RELACIONADOS X PROYECTO</h2></td>"
+
+formx2 = "<form id='formx2' style='height:70%;' method='post' action='consultas.asp?sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+botonx2 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('formx2').submit();"">"
+html = html & "<td style='width:10%;' align=center>" & botonx2 & "</td>"
+
+html = html & "</tr>"
+
+html = html & "</table>"
+
+html = html & "</div>"
+
+' --- INICIO NORMALIZACION: LISTADO DE PROYECTOS E INCIDENTES RELACIONADOS ---
+
+'html = html & "<div style='height:75%;width:100%;'>"
+html = html & "<div class='inner' style='padding: 2rem;'>"
+' Centramos la vista y limitamos el ancho para que la lista sea fácil de leer
+html = html & "<div class='bloque-datos table-responsive' style='max-width: 800px; margin: 0 auto;'>"
+
+sql = "sp_cg_ProyectosRelacionados @Modo='listar'"
+
+cliente = request.form("cli")
+if cliente & "" = "" then cliente = request.querystring("cli")
+estado = request.form("est")
+if estado & "" = "" then estado = request.querystring("est")
+aplic = request.form("apli")
+if aplic & "" = "" then aplic = request.querystring("apli")
+fecha = request.form("fec")
+if fecha & "" = "" then fecha = request.querystring("fec")
+
+'where cliente
+if cliente <> 0 then
+	sql = sql & ", @Cli=" & cliente
+else
+	sql = sql & ", @Cli=0"
+end if
+
+'where estado
+if estado <> 0 then
+	sql = sql & ", @Estado=" & estado
+else
+	sql = sql & ", @Estado=0"
+end if
+
+'where aplicativo
+if aplic <> 0 then
+	sql = sql & ", @Aplic=" & aplic
+else
+	sql = sql & ", @Aplic=0"
+end if
+
+'where fecha
+if fecha & "" <> "" then
+	fecha = clng(cdate(fecha)) - nFecini
+	sql = sql & ", @Fec=" & fecha
+end if
+
+Set rs = Exec(Cnn, sql)
+
+'html = html & "<table style='width:50%;' align=center>"
+html = html & "<table class='tabla-moderna' style='width: 100%; border-collapse: collapse;'>"
+
+html = html & "<tbody>"
+
+if not rs.eof then
+
+	do while not rs.eof
+
+		'TITULO DEL PROYECTO CON INCIDENTES RELACIONADOS
+		'html = html & "<tr>"
+		html = html & "<tr>"
+		
+		'html = html & "<td class='fil' style='font-size:12pt;' colspan=2><b>-PROYECTO: " & rs(1) & " - " & rs(2) & "</b></td>"
+		' Le damos un fondo sutil a la fila del proyecto para que actúe como un separador/encabezado claro
+		html = html & "<th colspan='2' class='bloque-header'>&#128194; PROYECTO: " & rs(1) & " - " & rs(2) & "</th>"
+		
+		'html = html & "</tr>"
+		html = html & "</tr>"
+
+		sql = "sp_cg_ProyectosRelacionados @Modo='incidentes', @Id=" & rs(0)
+		Set rx = Exec(Cnn, sql)
+
+		cont = 1
+
+		do while not rx.eof
+
+			'html = html & "<tr>"
+			html = html & "<tr>"
+			
+			'html = html & "<td style='width:5%;'></td>"
+			' Cambiamos la celda vacía por un indicador visual de sub-ítem
+			html = html & "<td style='width: 40px; text-align: right; padding-right: 1rem; color: #94a3b8; font-size: 1.2rem;'>&#8627;</td>"
+			
+			'html = html & "<td class='regis' style='width:45%;'><a class='red' href='detalles.asp?id=" & rx(0) & "&opc=veri&sel=" & sel & "&tipo=incxp&" & REQUEST.FORM & "'>>INCIDENTE: " & rx(0) & " - " & rx(1) & "</a></td>"
+			' Aplicamos el color azul estándar para enlaces como acordamos
+			html = html & "<td style='padding: 0.75rem 0;'><a class='col-link' href='detalles.asp?id=" & rx(0) & "&opc=veri&sel=" & sel & "&tipo=incxp&" & REQUEST.FORM & "'>INCIDENTE: " & rx(0) & " - " & rx(1) & "</a></td>"
+			
+			'html = html & "</tr>"
+			html = html & "</tr>"
+
+			cont = cont + 1
+
+		rx.movenext
+		loop
+
+	rs.movenext
+	loop
+
+else
+
+	'html = html & "<tr>"
+	html = html & "<tr>"
+	
+	'html = html & "<td style='border:solid 2px #FF0000;'><b>NO SE ENCONTRARON PROYECTOS CON INCIDENTES RELACIONADOS PARA ESTA BUSQUEDA</b></td>"
+	html = html & "<td colspan='2' style='text-align: center; padding: 3rem; color: #64748b; font-style: italic; background-color: #f8fafc; border-radius: 8px;'>No se encontraron proyectos con incidentes relacionados para esta búsqueda.</td>"
+	
+	'html = html & "</tr>"
+	html = html & "</tr>"
+
+end if
+
+html = html & "</tbody>"
+
+'html = html & "</table>"
+html = html & "</table>"
+
+'html = html & "</div>"
+html = html & "</div>" ' Cierre de .bloque-datos
+html = html & "</div>" ' Cierre de .inner
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+
+html = html & formx2 & "</body>"
+html = html & "</html>"
+
+response.write html
+%>

@@ -1,0 +1,39 @@
+<%
+'==============================================================================
+' IncFile/datosEliminar.inc
+' Capa de ACCESO A DATOS para eliminar.asp. Toda la logica de baja/borrado
+' (logica vs fisico, chequeos de uso, cascadas) vive ahora en dbo.sp_cg_Eliminar.
+'
+' EliminarRegistro devuelve True/False. False significa que el SP disparo un
+' RAISERROR (por ejemplo, "el registro esta en uso") -- el ASP decide que
+' mensaje mostrar segun el opc, igual que hacia el archivo original.
+'==============================================================================
+
+Function EliminarRegistro(cn, opt, id, usuario)
+	Dim cmd
+	On Error Resume Next
+
+	Err.Clear
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4 ' adCmdStoredProc
+	cmd.CommandText = "dbo.sp_cg_Registro_Eliminar"
+	cmd.Parameters.Append cmd.CreateParameter("@Opt", 200, 1, 20, opt)
+	cmd.Parameters.Append cmd.CreateParameter("@Id", 3, 1, 4, CLng(id))
+	If usuario = "" Then
+		cmd.Parameters.Append cmd.CreateParameter("@usuario", 200, 1, 50, Null)
+	Else
+		cmd.Parameters.Append cmd.CreateParameter("@usuario", 200, 1, 50, usuario)
+	End If
+	cmd.Execute
+
+	If Err.Number <> 0 Then
+		EliminarRegistro = False
+		Err.Clear
+	Else
+		EliminarRegistro = True
+	End If
+
+	On Error Goto 0
+End Function
+%>

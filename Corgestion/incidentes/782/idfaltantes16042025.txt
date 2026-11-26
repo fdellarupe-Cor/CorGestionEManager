@@ -1,0 +1,13 @@
+Soliciudes que sigue viendo:
+
+Codigo=22497  tipo POLGDP
+
+Codigo=23790 TIPO POLGDP
+
+PEDIDO=10879  TIPO PDCORXY 
+ 
+Codigo=22939 TIPO FORM1
+
+Codigo=22662   TIPO FORM1
+
+Codigo=22720   TIPO FORM1

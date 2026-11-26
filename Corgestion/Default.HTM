@@ -1,0 +1,29 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<html>
+
+<head>
+<style>
+</style>
+<title>COR GESTION</title>
+</head>
+
+<body>
+
+<%
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.open scon1
+
+XXX = SYSLOGON(cnn)
+
+cnn.close
+%>
+
+<FORM name='init' method='post'  ACTION='index.asp' >
+<INPUT TYPE='SUBMIT' VALUE='INICIAR' style='display:none;' >
+</FORM>
+
+</body>
+<script language="javascript" >
+   document.all.init.submit();
+</script>
+</html>

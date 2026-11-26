@@ -1,0 +1,671 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+xhtml = "<html>"
+xhtml = xhtml & "<head>"
+
+xhtml = xhtml & "<title>Cor Gestion</title>"
+xhtml = xhtml & "<meta charset='utf-8' />"
+xhtml = xhtml & "<meta name='viewport' content='width=device-width, initial-scale=1' />"
+xhtml = xhtml & "<link rel='stylesheet' href='assets/css/main.css' />"
+xhtml = xhtml & "<link rel='stylesheet' href='assets/js/jquery-ui.css'>"
+xhtml = xhtml & "<script src='assets/js/jquery.min.js'></script>"
+xhtml = xhtml & "<script src='assets/js/jquery-ui.js'></script>"
+xhtml = xhtml & "<script src='assets/js/skel.min.js'></script>"
+xhtml = xhtml & "<script src='assets/js/util.js'></script>"
+xhtml = xhtml & "<script src='assets/js/main.js'></script>"
+xhtml = xhtml & "</head>"
+xhtml = xhtml & "<body>"
+
+opc = request.querystring("opc")
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+RESPONSE.WRITE REQUEST.QUERYSTRING
+CantRegMostrar = 15
+CantRegMover = CDbl(Request.querystring("CantRegMover"))
+if CantRegMover < 0 then CantRegMover = 0
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.open "Provider=SQLOLEDB;Data Source=server-2025;Initial Catalog=dbcorgestionv5; user id=sa;password=bb4515$;"
+
+if request.querystring("opc2") & "" <> "" then opc = request.querystring("opc2")
+
+xhtml = xhtml & "<div>"
+
+xhtml = xhtml & "<header id='header' style='height:11%'>"
+
+xhtml = xhtml & "<div>"
+
+xhtml = xhtml & "<table style='width:100%;'><tr>"
+
+xhtml = xhtml & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+xhtml = xhtml & "<img src='images/logocorP4.gif' width='10%' >"
+xhtml = xhtml & "<font style='margin-left:100px;font-size:30pt;align:center;valign:center;font-family:Serif;color:#000000;'>Cor Consulting</font>"
+xhtml = xhtml & "</a></td>"
+
+xhtml = xhtml & "</tr></table>"
+
+xhtml = xhtml & "</header>"
+
+xhtml = xhtml & "</div>"
+
+xhtml = xhtml & "<div style='height:8%;width:100%;border-top:solid 5px #FF3D3D;border-bottom:double 6px #001BFF;'>"
+
+xhtml = xhtml & "<table style='height:100%;width:100%;'>"
+
+xhtml = xhtml & "<tr>"
+
+if opc = "" then
+	xhtml = xhtml & "<td><font style='margin-left:5%;font-size:20pt;font-family:Serif;color:#000000;letter-spacing:0.2em;'><b>RECORDATORIOS</b></font></td>"
+else
+	xhtml = xhtml & "<td><font style='margin-left:5%;font-size:20pt;font-family:Serif;color:#000000;letter-spacing:0.2em;'><b>AGENDA</b></font></td>"
+end if
+
+if opc = "" then
+	xform = "<form id='xform' style='height:70%;' method='post' action='index.asp'></form>"
+else
+	xform = "<form id='xform' style='height:70%;' method='post' action='agenda.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+end if
+
+xboton = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('xform').submit();"">"
+
+if opc <> "cargar" and opc <> "det" then
+
+	xforma = "<form id='xformA' style='height:70%;' method='post' action='agenda.asp?opc=cargar&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+	if getPermisos(xmenu,xtmenu,"ALTA") = 1 then
+		xbotona = "<input class='bot' type='button' value='CARGAR RECORDATORIO' onclick=""document.getElementById('xformA').submit();"">"
+	else
+		xbotona = "<input class='botsp' type='button' value='CARGAR RECORDATORIO' onclick=""alert('Sin permiso para agregar.');"">"
+	end if
+	xhtml = xhtml & "<td align=right>" & xbotona & xboton & "</td>"
+
+end if
+
+if opc = "cargar" or opc = "det" then
+
+	xformb = "<form id='xformB' style='height:70%;' method='post' action='agenda.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+	xbotonb = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('xformB').submit();"">"
+	xhtml = xhtml & "<td align=right>" & xbotonb & "</td>"
+
+end if
+
+xhtml = xhtml & "</tr>"
+
+xhtml = xhtml & "</table>"
+
+xhtml = xhtml & "</div><br>"
+
+if opc = "cargar" then
+
+resp = request.form("resp")
+if resp & "" = "" then resp = 0
+
+xhtml = xhtml & "<br><form id='xformu' method='post' action='agenda.asp?opc=cargar&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+xhtml = xhtml & "<table class='tabl' style='width:35%;' align=center cellspacing=0 cellpadding=3 >"
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='fil' style='font-size:12pt;' colspan=2 align=center><u><b>NUEVO RECORDATORIO</b></u></td>"
+
+xhtml = xhtml & "</tr>"
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td colspan=2 >&nbsp;</td>"
+
+xhtml = xhtml & "</tr>"
+
+'RESPON
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='fil' >RESPONSABLE</td>"
+xhtml = xhtml & "<td class='fil' >"
+xhtml = xhtml & getName(cnn,"","cor_responsables",session("usuario"))
+xhtml = xhtml & "</td>"
+
+xhtml = xhtml & "</tr>"
+
+
+'ASUNTO
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='fil' >ASUNTO</font></td>"
+xhtml = xhtml & "<td class='fil' ><input class='xxinpu' style='width:80%;' id='asun' name='asun' type='text' /></td>"
+
+xhtml = xhtml & "</tr>"
+
+'MENSAJE
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='fil' >MENSAJE</font></td>"
+xhtml = xhtml & "<td class='fil' ><TEXTAREA class='xxinpu' Xstyle='width:80%;' id='MENSAJE' name='MENSAJE' rows=10 cols=50 /></textarea></td>"
+
+xhtml = xhtml & "</tr>"
+
+'DIA
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='fil' >AVISAR DIA</td>"
+xhtml = xhtml & "<td class='fil' ><input class='inpu' style='width:80%;' id='datepicker' name='datepicker' type='text'></td>"
+
+xhtml = xhtml & "</tr>"
+
+'ESPACIO
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td colspan=2>&nbsp;</td>"
+
+xhtml = xhtml & "</tr>"
+
+'AVISAR A
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='fil' colspan=2>ENVIAR COPIA A:</td>"
+
+xhtml = xhtml & "</tr>"
+
+Set rx = Exec(cnn, "sp_cg_Responsables @Modo='listar_activos_sin', @ExcluirId=" & session("usuario"))
+
+	do while not rx.eof
+
+		chkbx = ""
+		xhtml = xhtml & "<tr>"
+		xhtml = xhtml & "<td class='fil' >" & UCASE(rx(1) + " "  + RX(2)) & "</td>"
+		sel = "<select class='selec' style='width:30%;' name='u" & rx(0) & "'  >"
+		sel = sel & "<option value='0'>NO</option>"
+		sel = sel & "<option value='1'>SI</option>"
+		sel = sel & "</select>"
+		xhtml = xhtml & "<td class='fil'>" & sel & "</td>"
+		xhtml = xhtml & "</tr>"
+
+	rx.movenext
+	loop
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td  colspan=2>&nbsp;</td>"
+
+xhtml = xhtml & "</tr>"
+
+xhtml = xhtml & "<tr>"
+
+xboton = "<input class='bot' type='button' value='Cargar' onclick=""ejecutar('xformu','Insertar','ins');"" />"
+
+xhtml = xhtml & "<td class='fil' colspan=2 align=center>" & xboton & "</td>"
+
+xhtml = xhtml & "</tr>"
+
+xhtml = xhtml & "</table>"
+
+xhtml = xhtml & "</form>"
+
+elseif opc = "modif" then
+
+id = request.querystring("id")
+idresp = request.querystring("idresp")
+ccs = request.querystring("ccs")
+
+ExecNonQuery Cnn, "sp_cg_Agenda @Modo='actualizar_asunto', @Id=" & id & ", @Asunto='" & request.form("asun") & "'"
+
+xhtml = xhtml & "<FORM name='initx' method='post'  ACTION='agenda.asp?opc=det&id=" & id & "&idresp=" & idresp & "&ccs=" & ccs & "' >"
+xhtml = xhtml & "<INPUT TYPE='SUBMIT' VALUE='INICIAR' style='display:none;' >"
+xhtml = xhtml & "</FORM>"
+
+xhtml = xhtml & "<script type='text/javascript'>"
+xhtml = xhtml & " alert('Actualizado exitosamente');"
+xhtml = xhtml & " document.all.initx.submit();"
+xhtml = xhtml & "</script>"
+
+elseif opc = "insertar" then
+
+set rz = Cnn.Execute("sp_cg_Responsables @Modo='listar_ids_activos_sin', @ExcluirId=" & session("usuario"))
+
+copias = ""
+sep = ""
+
+do while not rz.eof
+
+	num = rz(0)
+
+	if request.form("u" & num) = 1 then
+		copias = copias & sep & rz(0)
+		sep = ","
+	end if
+
+rz.movenext
+loop
+
+sDiaAviso = clng(CDATE(request.form("datepicker"))) - CLng(CDate("01-01-1900"))
+sFecHoy = clng(date) - CLng(CDate("01-01-1900"))
+
+MENSAJE=request.form("MENSAJE") &""
+ExecNonQuery Cnn, "sp_cg_Agenda @Modo='insertar', @Asunto='" & request.form("asun") & "', @DiaAviso=" & sDiaAviso & ", @IdRespon=" & session("usuario") & ", @Copias='" & copias & "', @FecCarga=" & sFecHoy & ", @Mensaje='" & MENSAJE & "'"
+
+XXX = SYSLOGON(cnn,"AGREGA_REC")
+
+xhtml = xhtml & "<FORM name='init' method='post'  ACTION='agenda.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "' >"
+xhtml = xhtml & "<INPUT TYPE='SUBMIT' VALUE='INICIAR' style='display:none;' >"
+xhtml = xhtml & "</FORM>"
+
+xhtml = xhtml & "<script type='text/javascript'>"
+xhtml = xhtml & " alert('Agregado exitosamente');"
+xhtml = xhtml & " document.all.init.submit();"
+xhtml = xhtml & "</script>"
+
+elseif opc = "det" then
+
+id = request.querystring("id")
+idresp = request.querystring("idresp")
+idagre = request.querystring("idagre")
+ccs = request.querystring("ccs")
+xopt = request.querystring("xopt")
+
+set rp = Cnn.Execute("sp_cg_Agenda @Modo='obtener_new', @Id=" & id)
+
+puede = 1
+
+if not rp.eof then
+	if rp(0) = "SI" then puede = 0
+end if
+
+if xopt = "agre" then
+
+if ccs & "" <> "" then
+
+ExecNonQuery Cnn, "sp_cg_Agenda @Modo='actualizar_copias', @Id=" & id & ", @Copias='" & ccs & "," & idagre & "'"
+
+ccs = ccs & "," & idagre
+
+else
+
+ExecNonQuery Cnn, "sp_cg_Agenda @Modo='actualizar_copias', @Id=" & id & ", @Copias='" & idagre & "'"
+
+ccs = idagre
+
+end if
+
+end if
+
+xhtml = xhtml & "<div style='height:70%;' align=center >"
+
+xhtml = xhtml & "<table style='width:30%;color:#000000;font-family:Serif;text-align:center;' cellspacing=5 align=center >"
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='encabe' style='width:1%;' colspan=2><b>RECORDATORIO " & id & "</b></td>"
+
+xhtml = xhtml & "</tr>"
+
+if ccs & "" <> "" then
+
+set rf = Cnn.Execute("sp_cg_Responsables @Modo='nombre_id_in', @Ids='" & ccs & "'")
+
+xfrm = ""
+
+do while not rf.eof
+
+if puede = 1 then
+	xfrm = xfrm & "<form id='elim" & rf(1) & "' method='post' action='agenda.asp?opc=elim&idag=" & id & "&ccs=" & ccs & "&idresp=" & idresp & "&idelim=" & rf(1) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "' ></form>"
+end if
+
+if getPermisos(xmenu,xtmenu,"ELIM") = 1 then
+	xinput = "<input class='bot' type='button' value='X' onclick=""document.getElementById('elim" & rf(1) & "').submit();"">"
+else
+	xinput = "<input class='botsp' type='button' value='X' onclick=""alert('Sin permiso para eliminar.');"">"
+end if
+
+xhtml = xhtml & "<tr>"
+
+if cstr(idresp) = cstr(session("USUARIO")) then
+	xhtml = xhtml & "<td class='regis'>" & xinput & "</td>"
+else
+	xhtml = xhtml & "<td class='regis'>&nbsp;</td>"
+end if
+xhtml = xhtml & "<td class='regis'>-" & rf(0) & "</td>"
+
+xhtml = xhtml & "</tr>"
+
+rf.movenext
+loop
+
+else
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='regis' colspan=2>NO REGISTRA COPIAS</td>"
+
+xhtml = xhtml & "</tr>"
+
+end if
+
+xhtml = xhtml & "</table><br>"
+
+if ccs & "" <> "" then
+
+set rm = Cnn.Execute("sp_cg_Responsables @Modo='listar_not_in_act', @Ids='" & ccs & "', @ExcluirId=" & idresp)
+
+else
+
+set rm = Cnn.Execute("sp_cg_Responsables @Modo='id_nombre_act_sin', @ExcluirId=" & idresp)
+
+end if
+
+xhtml = xhtml & "<table style='width:30%;color:#000000;font-family:Serif;text-align:center;' cellspacing=5 align=center >"
+
+xhtml = xhtml & "<tr>"
+xhtml = xhtml & "<td class='encabe'>AGREGAR USUARIO PARA ENVIAR COPIA</td>"
+xhtml = xhtml & "</tr>"
+
+if not rm.eof then
+
+do while not rm.eof
+
+xhtml = xhtml & "<tr>"
+
+if puede = 1 then
+
+	if cstr(idresp) = cstr(session("USUARIO")) then
+		ref = "<a class='red' href='agenda.asp?opc=det&xopt=agre&id=" & id & "&ccs=" & ccs & "&idresp=" & idresp & "&idagre=" & rm(0) & "'>" & rm(1) & "</a>"
+	else
+		ref = rm(1)
+	end if
+
+else
+	ref = rm(1)
+end if
+
+xhtml = xhtml & "<td class='regis'>" & ref & "</td>"
+xhtml = xhtml & "</tr>"
+
+rm.movenext
+loop
+
+else
+
+xhtml = xhtml & "<tr>"
+xhtml = xhtml & "<td class='regis'>SIN USUARIOS DISPONIBLES</td>"
+xhtml = xhtml & "</tr>"
+
+end if
+
+xhtml = xhtml & "</table><br>"
+
+if puede = 1 then
+
+xhtml = xhtml & "<form id='act' method='post' action='agenda.asp?opc=modif&id=" & id & "&ccs=" & ccs & "&idresp=" & idresp  & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu  & "'>"
+
+xhtml = xhtml & "<table style='width:30%;color:#000000;font-family:Serif;text-align:center;' cellspacing=5 align=center >"
+
+xhtml = xhtml & "<tr>"
+xhtml = xhtml & "<td class='encabe' >MODIFICAR ASUNTO</td>"
+xhtml = xhtml & "</tr>"
+xhtml = xhtml & "<tr>"
+
+if cstr(idresp) = cstr(session("USUARIO")) then
+	xhtml = xhtml & "<td style='width:100%;'><input id='asun' name='asun' class='inpu' style='width:90%;' type='text' value='" & rp(1) & "' onblur=""document.getElementById('act').submit()""></td>"
+else
+	xhtml = xhtml & "<td style='width:100%;'>" & rp(1) & "</td>"
+end if
+
+xhtml = xhtml & "</tr>"
+
+xhtml = xhtml & "<tr>"
+xhtml = xhtml & "<td class='encabe' >MODIFICAR MENSAJE</td>"
+xhtml = xhtml & "</tr>"
+xhtml = xhtml & "<tr>"
+
+if cstr(idresp) = cstr(session("USUARIO")) then
+	xhtml = xhtml & "<td style='width:100%;'><TEXTAREA ROWS=10 COLS=50 id='MENSAJE' name='MENSAJE' class='SSinpu' style='width:90%;'  onblur=""document.getElementById('act').submit()"" /> "  &   rp("MENSAJE") & "</TEXTAREA></td>"
+else
+	xhtml = xhtml & "<td style='width:100%;'>" & rp(1) & "</td>"
+end if
+
+xhtml = xhtml & "</tr>"
+
+
+xhtml = xhtml & "</table>"
+
+xhtml = xhtml & "</form>"
+
+end if
+
+xhtml = xhtml & "</div>"
+
+elseif opc = "elim" then
+
+idresp = request.querystring("idresp")
+idelim = request.querystring("idelim")
+idag = request.querystring("idag")
+
+set rt = Cnn.Execute("sp_cg_Agenda @Modo='obtener_copias', @Id=" & idag)
+
+if not rt.eof then
+
+xcopy = split(rt(0),",")
+xcopyx = ""
+sep = ""
+
+for i=0 to ubound(xcopy)
+
+	if xcopy(i) <> idelim then
+		xcopyx = xcopyx & sep & xcopy(i)
+		sep = ","
+	end if
+
+next
+
+rt.close
+
+ExecNonQuery Cnn, "sp_cg_Agenda @Modo='actualizar_copias', @Id=" & idag & ", @Copias='" & xcopyx & "'"
+
+set rt = Cnn.Execute("sp_cg_Agenda @Modo='obtener_copias', @Id=" & idag)
+
+ccs = ""
+
+if not rt.eof then ccs = rt(0)
+
+xhtml = xhtml & "<FORM name='init' method='post'  ACTION='agenda.asp?opc=det&id=" & idag & "&ccs=" & ccs & "&idresp=" & idresp & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "' >"
+xhtml = xhtml & "<INPUT TYPE='SUBMIT' VALUE='INICIAR' style='display:none;' >"
+xhtml = xhtml & "</FORM>"
+
+xhtml = xhtml & "<script type='text/javascript'>"
+xhtml = xhtml & " document.all.init.submit();"
+xhtml = xhtml & "</script>"
+
+end if
+
+else 'listado de recordatorios
+
+XXX = SYSLOGON(cnn,"MENU_AGENDA")
+
+xhtml = xhtml & "<div style='height:70%;' align=center >"
+
+xhtml = xhtml & "<table style='width:62%;color:#000000;font-family:Serif;text-align:center;' cellspacing=0 align=center >"
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='encabe' style='width:1%;'>*</td>"
+'xhtml = xhtml & "<td class='encabe' style='width:1%;'>ID</td>"
+xhtml = xhtml & "<td class='encabe' style='width:20%;'>RESPONSABLE</td>"
+xhtml = xhtml & "<td class='encabe' style='width:20%;'>ASUNTO</td>"
+xhtml = xhtml & "<td class='encabe' style='width:10%;'>DIA</td>"
+xhtml = xhtml & "<td class='encabe' style='width:10%;'>AVISADO</td>"
+xhtml = xhtml & "<td class='encabe' style='width:10%;'>COPIAS</td>"
+
+xhtml = xhtml & "</tr>"
+
+set rs = Cnn.Execute("sp_cg_Agenda @Modo='listar'")
+
+formx1 = ""
+
+if not rs.eof then rs.Move (CantRegMover)
+
+PosReg = 0
+sColor = "#FFFFFF"
+
+Do While (Not rs.eof) And (PosReg < CantRegMostrar)
+
+formx1 = formx1 & "<form id='formx1" & rs(0) & "' style='height:1px;' method='post' action='eliminar.asp?opc=rec&id=" & rs(0) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=agenda.asp'></form>"
+if getPermisos(xmenu,xtmenu,"ELIM") = 1 then
+	botonx1 = "<input class='bot' type='button' value='X' onclick=""ejecutar('formx1" & rs(0) & "','Borrar','borra');"">"
+else
+	botonx1 = "<input class='botsp' type='button' value='X' onclick=""alert('Sin permiso para eliminar.');"">"
+end if
+
+resp = getName(Cnn,"","cor_responsables",rs(3))
+
+if rs(4) = "SI" then
+	aviso = "<font style='color:#088A08;'>SI</font>"
+elseif rs(4) = "NO" then
+	aviso = "<font style='color:#FF0000;'>NO</font>"
+end if
+
+SFECHA = ""
+IF RS(2) <> 0 THEN
+	SFECHA = CDATE(rs(2)) + CLng(CDate("01-01-1900"))
+END IF
+
+xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td class='fil'>" & botonx1 & "</td>"
+'xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'>" & rs(0) & "</td>"
+xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'>" & resp & "</td>"
+xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";' title='" & rs(1) & "'>" & left(rs(1),30) & ".." & "</td>"
+xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'>" & sFECHA & "</td>"
+xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'>" & aviso & "</td>"
+if getPermisos(xmenu,xtmenu,"ELIM") = 1 then
+	xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'><a href='agenda.asp?opc=det&id=" & rs(0) & "&ccs=" & rs(6) & "&idresp=" & rs(3) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'><font style='color:#FF0000;'>VER/MODIF</font></a></td>"
+else
+	xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'><a onclick=""alert('Sin permiso para modificar.');""><font style='color:#FF0000;'>VER/MODIF</font></a></td>"
+end if
+
+xhtml = xhtml & "</tr>"
+
+if sColor = "#FFFFFF" then
+	sColor = "#ECECEC"
+elseif sColor = "#ECECEC" then
+	sColor = "#FFFFFF"
+end if
+
+PosReg = PosReg + 1
+
+rs.movenext
+loop
+
+xhtml = xhtml & "</table>"
+
+xhtml = xhtml & "</div>"
+
+
+shtml =  "<div id=btn style='top:85px;left:750px;position:absolute;'><table align=right><tr>"
+
+if cantregmover <> 0 then
+	formx22 = "<form id='formx22' style='height:1px;' method='post' action='agenda.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&cantregmover=" & (cantregmover - cantregmostrar) & "'></form>"
+	botonx22 = "<input class='bot' type='button' value='ATRAS' onclick=""document.getElementById('formx22').submit();"">"
+else
+	botonx22 = "<input style='border-radius:7px;' type='button' value='ATRAS'>"
+end if
+
+if not rs.eof then
+	formx23 = "<form id='formx23' style='height:1px;' method='post' action='agenda.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&cantregmover=" & (cantregmover + cantregmostrar) & "'></form>"
+	botonx23 = "<input class='bot' type='button' value='SIGUIENTE' onclick=""document.getElementById('formx23').submit();"">"
+else
+	botonx23 = "<input style='border-radius:7px;' type='button' value='SIGUIENTE'>"
+end if
+
+	shtml = shtml & "<td>" & botonx22 & "</td>"
+	shtml = shtml & "<td>" & botonx23 & "</td>"
+	shtml = shtml & "</tr></table></div><br><br>"
+
+
+
+end if
+
+xhtml = xhtml & "<script type='text/javascript'>"
+xhtml = xhtml & " function ejecutar(formu,dsc,acc){ "
+xhtml = xhtml & " var r = confirm(dsc); "
+xhtml = xhtml & " if (r){ "
+xhtml = xhtml & " if (acc == 'ins') {document.getElementById(formu).action=document.getElementById(formu).action + '&opc2=insertar';}"
+xhtml = xhtml & " document.getElementById(formu).submit(); "
+xhtml = xhtml & " }else{ "
+xhtml = xhtml & " return false;"
+xhtml = xhtml & " }} "
+xhtml = xhtml & "</script>"
+
+xhtml = xhtml & "<script type='text/javascript'>"
+xhtml = xhtml & " $( function() {"
+xhtml = xhtml & "$.datepicker.regional['es'] = {"
+xhtml = xhtml & "closeText: 'Cerrar',"
+xhtml = xhtml & "prevText: '< Ant',"
+xhtml = xhtml & "nextText: 'Sig >',"
+xhtml = xhtml & "currentText: 'Hoy',"
+xhtml = xhtml & "monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],"
+xhtml = xhtml & "monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],"
+xhtml = xhtml & "dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],"
+xhtml = xhtml & "dayNamesShort: ['Dom','Lun','Mar','Mi�','Juv','Vie','S�b'],"
+xhtml = xhtml & "dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sa'],"
+xhtml = xhtml & "weekHeader: 'Sm',"
+xhtml = xhtml & "dateFormat: 'dd/mm/yy',"
+xhtml = xhtml & "firstDay: 1,"
+xhtml = xhtml & "isRTL: false,"
+xhtml = xhtml & "showMonthAfterYear: false,"
+xhtml = xhtml & "yearSuffix: ''"
+xhtml = xhtml & "};"
+xhtml = xhtml & "$.datepicker.setDefaults($.datepicker.regional['es']);"
+xhtml = xhtml & "});"
+
+xhtml = xhtml & "$( function() { "
+xhtml = xhtml & "$( '#datepicker' ).datepicker(); "
+xhtml = xhtml & "} ); "
+xhtml = xhtml & "</script>"
+
+
+
+
+xhtml = xhtml & xform & xforma & xformu & formx1 & formx2 & xfrm & xagregar & shtml & formx22 & formx23 & xformb & "</body></html>"
+
+response.write xhtml
+
+Function armaCombo(sql,cn,clave,valor,texto,comboid)
+
+	Set nrs = Exec(cn, sql)
+
+	if comboid = "resp" then
+		html = html & "<select style='font-size:12pt;height:80%;color:#000000;border:solid 1px #000000;' id='" & comboid & "' name='" & comboid & "' onchange=""document.getElementById('xformu').submit();"" disabled>"
+	else
+		html = html & "<select style='font-size:12pt;height:80%;color:#000000;border:solid 1px #000000;' id='" & comboid & "' name='" & comboid & "' onchange=""document.getElementById('xformu').submit();"">"
+	end if
+
+	if comboid = "resp" then
+
+	Set rf = Exec(cn, "sp_cg_Responsables @Modo='id_nombre', @Id=" & session("usuario"))
+
+		if not rf.eof then html = html & "<option value='" & rf(0) & "'>" & rf(1) & "</option>"
+
+	else
+
+		html = html & "<option value='0'>S / D</option>"
+
+		Do While Not nrs.eof
+
+			If cstr(clave) = cstr(nrs(valor)) Then
+
+				html = html & "<option value='" & nrs(valor) & "' selected>" & nrs(texto) & "</option>"
+
+			Else
+
+				html = html & "<option value='" & nrs(valor) & "'>" & nrs(texto) & "</option>"
+
+			End If
+
+			nrs.movenext
+		Loop
+
+	end if
+
+	armaCombo = html & "</select>"
+
+End Function
+
+%>

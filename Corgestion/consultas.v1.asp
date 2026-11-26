@@ -1,0 +1,863 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+
+html = headhtml()
+html = html & "<body>"
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+XXX = SYSLOGON(cnn,"MENU_CONSULTA")
+
+If request.form("sel") & "" = "" Then
+	sel = request.querystring("sel")
+Else
+	sel = request.form("sel")
+End If
+
+If sel & "" = "" Then sel = 0
+
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+
+html = html & "<div>"
+
+html = html & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+html = html & "<div >"
+
+html = html & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+html = html & "<img src='images/iso_cor.png' style='width:6rem;' >"
+html = html & "<font style='font-size:15pt;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+html = html & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+html = html & "<nav>"
+html = html & "<ul>"
+'html = html & "<li><a href='#menu'></a></li>"
+html = html & "</ul>"
+html = html & "</nav>"
+html = html & "</td>"
+
+html = html & "</tr></table>"
+
+html = html & "</div>"
+
+html = html & "</header>"
+
+'html = html & "<div style='height:9%;width:100%;border-top:solid 5px #FF3D3D;border-bottom:double 6px #001BFF;'>"
+
+html = html & "<table class='titulo-seccion' >"
+html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+html = html & "<td><h2>CONSULTAS</h2></td>"
+
+html = html & "<td>"
+
+html = html & "<div>"
+
+html = html & "<form id='sform' style='height:100%;width:100%;' method='post' action='consultas.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "' >"
+
+html = html & "<select id='sel' name='sel' onchange=""document.getElementById('sform').submit();"" >"
+
+If sel = 0 Then
+	html = html & "<option value='0' selected >INCIDENTES</option>"
+Else
+	html = html & "<option value='0' >INCIDENTES</option>"
+End If
+
+If sel = 1 Then
+	html = html & "<option value='1' selected >PROYECTOS</option>"
+Else
+	html = html & "<option value='1'>PROYECTOS</option>"
+End If
+
+If sel = 2 Then
+	html = html & "<option value='2' selected >APL</option>"
+Else
+	html = html & "<option value='2'>APL</option>"
+End If
+
+If sel = 3 Then
+	html = html & "<option value='3' selected >PROYECTOS C/ INCIDENTES</option>"
+Else
+	html = html & "<option value='3'>PROYECTOS C/ INCIDENTES</option>"
+End If
+
+If sel = 4 Then
+	html = html & "<option value='4' selected >INC Y PROY POR RESPONSABLE</option>"
+Else
+	html = html & "<option value='4'>INC Y PROY POR RESPONSABLE</option>"
+End If
+
+html = html & "</select>"
+
+html = html & "</form>"
+
+html = html & "</div>"
+
+html = html & "</td>"
+
+formx04 = "<form id='formx04' method='post' action='index.asp'></form>"
+botonx04 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('formx04').submit();"">"
+'html = html & "<td class='fil' align=center >" & botonx04 & "</td>"
+html = html & "<td>" & botonx04 & "</td>"
+
+html = html & "</tr>"
+
+html = html & "</table>"
+
+html = html & "</div><br>"
+
+'DIV QUE SE RELLENA DEPENDE LO QUE QUIERA CONSULTAR ELEGIDO EN EL COMBO
+
+If sel = 0 Then 'INCIDENTES
+
+	' --- INICIO NORMALIZACION: FILTRO DE INCIDENTES ---
+
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div class='inner' style='padding: 2rem;'>"
+
+	'html = html & "<form id='xForm' method='post' action='incidentes.asp?opc=consi&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+	html = html & "<form id='xForm' method='post' action='incidentes.asp?opc=consi&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' style='height:50%;width:40%;' align=center cellspacing=0>"
+	html = html & "<div class='bloque-datos' style='max-width: 600px; margin: 0 auto;'>"
+
+	'ref = "<a class='red' href='incidentes.asp'>INCIDENTES</a>"
+	' Ajustamos el enlace para que siga siendo rojo pero sin romper la est�tica moderna del header
+	ref = "<a class='col-link' href='incidentes.asp'>INCIDENTES</a>"
+	
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' colspan=2 align=center valign=center>FILTRAR " & ref & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header' style='text-align: center; text-transform: uppercase;'>FILTRAR " & ref & "</div>"
+
+	html = html & "<div class='bloque-body'>"
+	html = html & "<div class='grid-datos'>"
+
+	''CLIENTE
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>CLIENTE</td>"
+	html = html & "<div class='dato-label'>CLIENTE</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from clientes",cnn,request.form("cli"),0,1,"cli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='clientes'",cnn,request.form("cli"),0,1,"cli") & "</div>"
+
+	''DESCRI
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>DESCRIPCION</td>"
+	html = html & "<div class='dato-label'>DESCRIPCION</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input class='inpu' id='desc' name='desc' style='width:70%;' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div><input class='input-moderno' id='desc' name='desc' type='text' /></div>"
+
+	''ESTADO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>ESTADO</td>"
+	html = html & "<div class='dato-label'>ESTADO</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from CG_ESTADOS",cnn,request.form("est"),0,1,"est")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='estados'",cnn,request.form("est"),0,1,"est") & "</div>"
+
+	''APLIC
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>APLICACION</td>"
+	html = html & "<div class='dato-label'>APLICACION</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from aplicativos",cnn,request.form("apli"),0,1,"apli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='aplicativos'",cnn,request.form("apli"),0,1,"apli") & "</div>"
+
+	''FECHA
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>FECHA INGRESO</td>"
+	html = html & "<div class='dato-label'>FECHA INGRESO</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input class='inpu' id='fec' name='fec' style='width:70%;' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div><input class='input-moderno' id='fec' name='fec' type='text' /></div>"
+
+	'html = html & "<tr>"
+	'html = html & "<td style='height:10%;width:50%;' colspan=2 align=center>"
+	' Abrimos el contenedor Flexbox para el bot�n centrado rompiendo la grilla
+	html = html & "<div style='grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 1.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input class='bot' type='button' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input class='btn-principal' type='button' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input class='botsp' type='button' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input class='btn-principal btn-accion-deshabilitado' type='button' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>" ' Cierre de contenedor flexbox del bot�n
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Cierre de .grid-datos
+	html = html & "</div>" ' Cierre de .bloque-body
+	html = html & "</div>" ' Cierre de .bloque-datos
+
+	'html = html & "</form>"
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Cierre de .inner
+
+ElseIf sel = 1 Then 'PROYECTOS
+
+	' --- INICIO NORMALIZACION: FILTRO DE PROYECTOS ---
+
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div class='inner' style='padding: 2rem;'>"
+
+	'html = html & "<form id='xForm' method='post' action='proyectos.asp?opc=consi&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+	html = html & "<form id='xForm' method='post' action='proyectos.asp?opc=consi&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' style='height:50%;width:40%;' align=center cellspacing=0>"
+	html = html & "<div class='bloque-datos' style='max-width: 600px; margin: 0 auto;'>"
+
+	'ref = "<a class='red' href='proyectos.asp'>PROYECTO</a>"
+	ref = "<a class='col-link' href='proyectos.asp'>PROYECTO</a>"
+	
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' colspan=2 align=center valign=center>FILTRAR " & ref & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header' style='text-align: center; text-transform: uppercase;'>FILTRAR " & ref & "</div>"
+
+	html = html & "<div class='bloque-body'>"
+	html = html & "<div class='grid-datos'>"
+
+	''CLIENTE
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>CLIENTE</td>"
+	html = html & "<div class='dato-label'>CLIENTE</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from clientes",cnn,request.form("cli"),0,1,"cli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='clientes'",cnn,request.form("cli"),0,1,"cli") & "</div>"
+
+	''DESCRI
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>DESCRIPCION</td>"
+	html = html & "<div class='dato-label'>DESCRIPCION</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input class='inpu' id='desc' name='desc' style='width:70%;' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div><input class='input-moderno' id='desc' name='desc' type='text' /></div>"
+
+	''ESTADO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>ESTADO</td>"
+	html = html & "<div class='dato-label'>ESTADO</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from CG_ESTADOS",cnn,request.form("est"),0,1,"est")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='estados'",cnn,request.form("est"),0,1,"est") & "</div>"
+
+	''APLIC
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>APLICACION</td>"
+	html = html & "<div class='dato-label'>APLICACION</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from aplicativos",cnn,request.form("apli"),0,1,"apli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='aplicativos'",cnn,request.form("apli"),0,1,"apli") & "</div>"
+
+	''FECHA
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>FECHA INGRESO</td>"
+	html = html & "<div class='dato-label'>FECHA INGRESO</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input class='inpu' id='fec' name='fec' style='width:70%;' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div><input class='input-moderno' id='fec' name='fec' type='text' /></div>"
+
+	'html = html & "<tr>"
+	'html = html & "<td style='height:10%;width:50%;' colspan=2 align=center>"
+	' Abrimos el contenedor Flexbox para el bot�n centrado
+	html = html & "<div style='grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 1.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input type='button' class='bot' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input class='btn-principal' type='button' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input type='button' class='botsp' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input class='btn-principal btn-accion-deshabilitado' type='button' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>" ' Cierre de contenedor flexbox del bot�n
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Cierre de .grid-datos
+	html = html & "</div>" ' Cierre de .bloque-body
+	html = html & "</div>" ' Cierre de .bloque-datos
+
+	'html = html & "</form>"
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Cierre de .inner
+
+ElseIf sel = 2 Then 'APL
+
+	' --- INICIO NORMALIZACION: FILTRO DE APLs ---
+
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div class='inner' style='padding: 2rem;'>"
+
+	'html = html & "<form id='xForm' method='post' action='apl.asp?opc=consi&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+	html = html & "<form id='xForm' method='post' action='apl.asp?opc=consi&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' style='height:50%;width:40%;' align=center cellspacing=0>"
+	html = html & "<div class='bloque-datos' style='max-width: 600px; margin: 0 auto;'>"
+
+	'ref = "<a class='red' href='apl.asp'>APLs</a>"
+	' Mantenemos tu directiva del color azul para la referencia
+	ref = "<a class='col-link' href='apl.asp'>APLs</a>"
+	
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' colspan=2 align=center valign=center>FILTRAR " & ref & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header' style='text-align: center; text-transform: uppercase;'>FILTRAR " & ref & "</div>"
+
+	html = html & "<div class='bloque-body'>"
+	html = html & "<div class='grid-datos'>"
+
+	''CLIENTE
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>CLIENTE</td>"
+	html = html & "<div class='dato-label'>CLIENTE</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from clientes",cnn,request.form("cli"),0,1,"cli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='clientes'",cnn,request.form("cli"),0,1,"cli") & "</div>"
+
+	''APLIC
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>APLICACION</td>"
+	html = html & "<div class='dato-label'>APLICACION</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from aplicativos",cnn,request.form("apli"),0,1,"apli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='aplicativos'",cnn,request.form("apli"),0,1,"apli") & "</div>"
+
+	''FECHA
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>FECHA CREACION</td>"
+	html = html & "<div class='dato-label'>FECHA CREACION</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input class='inpu' id='fec' name='fec' style='width:70%;' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div><input class='input-moderno' id='fec' name='fec' type='text' /></div>"
+
+	''BUSCADOR POR TEXTO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>NOMBRE ASP</td>"
+	html = html & "<div class='dato-label'>NOMBRE ASP</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input class='inpu' style='width:70%;' id='busc' name='busc' type='text'>"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div><input class='input-moderno' id='busc' name='busc' type='text'></div>"
+
+	'html = html & "<tr>"
+	'html = html & "<td style='height:10%;width:50%;' colspan=2 align=center>"
+	' Contenedor Flexbox para centrar el bot�n rompiendo la grilla
+	html = html & "<div style='grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 1.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input class='bot' type='button' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input class='btn-principal' type='button' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input class='botsp' type='button' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input class='btn-principal btn-accion-deshabilitado' type='button' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>" ' Cierre de contenedor flexbox
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Cierre de .grid-datos
+	html = html & "</div>" ' Cierre de .bloque-body
+	html = html & "</div>" ' Cierre de .bloque-datos
+
+	'html = html & "</form>"
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Cierre de .inner
+
+ElseIf sel = 3 Then 'PROYECTOS C/ INCIDENTES
+
+	' --- INICIO NORMALIZACION: FILTRO DE PROYECTOS C/ INCIDENTES ---
+
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div class='inner' style='padding: 2rem;'>"
+
+	'html = html & "<form id='xForm' method='post' action='proyRelac.asp?sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+	html = html & "<form id='xForm' method='post' action='proyRelac.asp?sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' style='height:50%;width:40%;' align=center cellspacing=0>"
+	html = html & "<div class='bloque-datos' style='max-width: 600px; margin: 0 auto;'>"
+
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' colspan=2 align=center valign=center><b>PROYECTOS C/ INCIDENTES</b></td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header' style='text-align: center; text-transform: uppercase;'>PROYECTOS C/ INCIDENTES</div>"
+
+	html = html & "<div class='bloque-body'>"
+	html = html & "<div class='grid-datos'>"
+
+	''CLIENTE
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>CLIENTE</td>"
+	html = html & "<div class='dato-label'>CLIENTE</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from clientes",cnn,request.form("cli"),0,1,"cli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='clientes'",cnn,request.form("cli"),0,1,"cli") & "</div>"
+
+	''ESTADO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>ESTADO</td>"
+	html = html & "<div class='dato-label'>ESTADO</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from CG_ESTADOS",cnn,request.form("est"),0,1,"est")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='estados'",cnn,request.form("est"),0,1,"est") & "</div>"
+
+	''APLIC
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>APLICACION</td>"
+	html = html & "<div class='dato-label'>APLICACION</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & armaCombo("select id,descripcion from aplicativos",cnn,request.form("apli"),0,1,"apli")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Catalogo_Listar @Catalogo='aplicativos'",cnn,request.form("apli"),0,1,"apli") & "</div>"
+
+	''FECHA
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=center valign=center>FECHA INGRESO</td>"
+	html = html & "<div class='dato-label'>FECHA INGRESO</div>"
+
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input class='inpu' id='fec' name='fec' style='width:70%;' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div><input class='input-moderno' id='fec' name='fec' type='text' /></div>"
+
+	'html = html & "<tr>"
+	'html = html & "<td style='height:10%;width:50%;' colspan=2 align=center>"
+	' Contenedor Flexbox para centrar el bot�n rompiendo la grilla
+	html = html & "<div style='grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 1.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input class='bot' type='button' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input class='btn-principal' type='button' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input class='botsp' type='button' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input class='btn-principal btn-accion-deshabilitado' type='button' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>" ' Cierre de contenedor flexbox
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Cierre de .grid-datos
+	html = html & "</div>" ' Cierre de .bloque-body
+	html = html & "</div>" ' Cierre de .bloque-datos
+
+	'html = html & "</form>"
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Cierre de .inner
+
+ElseIf sel = 4 Then 'INC Y PROY POR RESPONSABLE
+
+	' --- INICIO NORMALIZACION: FILTRO DE INC Y PROY POR RESPONSABLE ---
+
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div class='inner' style='padding: 2rem;'>"
+
+	'html = html & "<form id='xForm' method='post' action='consultas.asp?sel=5&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+	html = html & "<form id='xForm' method='post' action='consultas.asp?sel=5&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' style='height:30%;width:30%;' align=center cellspacing=0>"
+	html = html & "<div class='bloque-datos' style='max-width: 600px; margin: 0 auto;'>"
+
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' colspan=2 align=center valign=center><b>INC Y PROY POR RESPONSABLE</b></td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header' style='text-align: center; text-transform: uppercase;'>INC Y PROY POR RESPONSABLE</div>"
+
+	html = html & "<div class='bloque-body'>"
+	html = html & "<div class='grid-datos'>"
+
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' valign=center align=center>RESPONSABLE</td>"
+	html = html & "<div class='dato-label'>RESPONSABLE</div>"
+
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,nombre + ' ' + apellido,funcion from CG_COR_RESPONSABLES",Cnn,request.form("uau"),0,1,"uau")
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-value'>" & armaCombo("sp_cg_Responsables @Modo='combo_todos'",Cnn,request.form("uau"),0,1,"uau") & "</div>"
+
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' colspan=2 align=center>"
+	' Contenedor Flexbox para centrar el bot�n rompiendo la grilla
+	html = html & "<div style='grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 1.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input class='bot' type='submit' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input class='btn-principal' type='submit' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input class='botsp' type='submit' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input class='btn-principal btn-accion-deshabilitado' type='submit' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>" ' Cierre de contenedor flexbox
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Cierre de .grid-datos
+	html = html & "</div>" ' Cierre de .bloque-body
+	html = html & "</div>" ' Cierre de .bloque-datos
+
+	'html = html & "</form>"
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Cierre de .inner
+
+ElseIf sel = 5 Then
+
+idResp = request.form("uau")
+
+if Trim(idResp & "") = "0" Or Trim(idResp & "") = "" then 'POR TODOS
+
+Set rt = Exec(Cnn, "sp_cg_Responsables @Modo='id_funcion'")
+
+' --- INICIO NORMALIZACION: TABLA DE RESULTADOS (TODOS) ---
+html = html & "<div class='inner' style='padding: 2rem;'>"
+html = html & "<div class='bloque-datos table-responsive'>"
+
+'html = html & "<table class='tabl' style='width:40%;color:#000000;' align=center cellspacing=0 cellpadding=0>"
+html = html & "<table class='tabla-moderna'>"
+
+html = html & "<thead>"
+'html = html & "<tr>"
+html = html & "<tr>"
+	
+'html = html & "<td style='border-bottom: solid 1px #aaaaaa;' align=center>*</td>"
+html = html & "<th>RESPONSABLE</th>"
+	
+'html = html & "<td style='border-bottom: solid 1px #aaaaaa;' align=center>INCIDENTES</td>"
+html = html & "<th style='text-align: center;'>INCIDENTES</th>"
+	
+'html = html & "<td style='border-bottom: solid 1px #aaaaaa;' align=center>PROYECTOS</td>"
+html = html & "<th style='text-align: center;'>PROYECTOS</th>"
+	
+'html = html & "</tr>"
+html = html & "</tr>"
+html = html & "</thead>"
+
+html = html & "<tbody>"
+
+totInc = 0
+totProy = 0
+
+do while not rt.eof
+
+	'html = html & "<tr>"
+	html = html & "<tr>"
+		
+	'html = html & "<td align=center>" & getResp(cnn,rt(0)) & "</td>"
+	html = html & "<td>" & getResp(cnn,rt(0)) & "</td>"
+		
+	'html = html & "<td align=center>" & getCantInc(cnn,rt(0),rt(1)) & "</td>"
+	html = html & "<td style='text-align: center;'>" & getCantInc(cnn,rt(0),rt(1)) & "</td>"
+		
+	'html = html & "<td align=center>" & getCantProy(cnn,rt(0),rt(1)) & "</td>"
+	html = html & "<td style='text-align: center;'>" & getCantProy(cnn,rt(0),rt(1)) & "</td>"
+		
+	'html = html & "</tr>"
+	html = html & "</tr>"
+
+	totInc = totInc + getCantInc(cnn,rt(0),rt(1))
+	totProy = totProy + getCantProy(cnn,rt(0),rt(1))
+
+rt.movenext
+loop
+
+	'html = html & "<tr>"
+	' Agregamos un fondo sutil y negrita a la fila de totales para destacarla sin usar bordes quemados
+	html = html & "<tr style='font-weight: bold; background-color: #f8fafc;'>"
+	
+	'html = html & "<td style='border-top: solid 1px #aaaaaa;' align=center>TOTAL</td>"
+	html = html & "<td style='text-align: right; padding-right: 1rem;'>TOTAL</td>"
+	
+	'html = html & "<td style='border-top: solid 1px #aaaaaa;' align=center>" & totInc & "</td>"
+	html = html & "<td style='text-align: center;'>" & totInc & "</td>"
+	
+	'html = html & "<td style='border-top: solid 1px #aaaaaa;' align=center>" & totProy & "</td>"
+	html = html & "<td style='text-align: center;'>" & totProy & "</td>"
+	
+	'html = html & "</tr>"
+	html = html & "</tr>"
+
+	'html = html & "</table>"
+	html = html & "</tbody>"
+	html = html & "</table>"
+	html = html & "</div>"
+	html = html & "</div>"
+
+else 'POR UN RESP
+
+Set rj = Exec(Cnn, "sp_cg_Responsables @Modo='id_funcion_id', @IdSeg=" & SqlStr(idResp))
+
+if not rj.eof then
+
+	' --- INICIO NORMALIZACION: TABLA DE RESULTADOS (UN RESPONSABLE) ---
+	html = html & "<div class='inner' style='padding: 2rem;'>"
+	html = html & "<div class='bloque-datos table-responsive'>"
+
+	'html = html & "<table class='tabl' style='width:40%;color:#000000;' align=center cellspacing=0 cellpadding=0>"
+	html = html & "<table class='tabla-moderna'>"
+
+	html = html & "<thead>"
+	'html = html & "<tr>"
+	html = html & "<tr>"
+		
+	'html = html & "<td style='border-bottom: solid 1px #aaaaaa;' align=center>*</td>"
+	html = html & "<th>RESPONSABLE</th>"
+		
+	'html = html & "<td style='border-bottom: solid 1px #aaaaaa;' align=center>INCIDENTES</td>"
+	html = html & "<th style='text-align: center;'>INCIDENTES</th>"
+		
+	'html = html & "<td style='border-bottom: solid 1px #aaaaaa;' align=center>PROYECTOS</td>"
+	html = html & "<th style='text-align: center;'>PROYECTOS</th>"
+		
+	'html = html & "</tr>"
+	html = html & "</tr>"
+	html = html & "</thead>"
+
+	html = html & "<tbody>"
+
+	'html = html & "<tr>"
+	html = html & "<tr>"
+		
+	'html = html & "<td align=center>" & getResp(cnn,rj(0)) & "</td>"
+	html = html & "<td>" & getResp(cnn,rj(0)) & "</td>"
+		
+	'html = html & "<td align=center>" & getCantInc(cnn,rj(0),rj(1)) & "</td>"
+	html = html & "<td style='text-align: center;'>" & getCantInc(cnn,rj(0),rj(1)) & "</td>"
+	
+	'html = html & "<td align=center>" & getCantProy(cnn,rj(0),rj(1)) & "</td>"
+	html = html & "<td style='text-align: center;'>" & getCantProy(cnn,rj(0),rj(1)) & "</td>"
+		
+	'html = html & "</tr>"
+	html = html & "</tr>"
+
+sTotal = getCantInc(cnn,rj(0),rj(1)) + getCantProy(cnn,rj(0),rj(1))
+
+'html = html & "<tr>"
+html = html & "<tr style='font-weight: bold; background-color: #f8fafc;'>"
+		
+'html = html & "<td style='border-top: solid 1px #aaaaaa;' align=center>TOTAL</td>"
+html = html & "<td style='text-align: right; padding-right: 1rem;'>TOTAL GENERAL</td>"
+		
+'html = html & "<td align=center style='border-top: solid 1px #aaaaaa;' colspan=2>" & sTotal & "</td>"
+html = html & "<td style='text-align: center;' colspan='2'>" & sTotal & "</td>"
+		
+'html = html & "</tr>"
+html = html & "</tr>"
+
+'html = html & "</table>"
+html = html & "</tbody>"
+html = html & "</table>"
+html = html & "</div>"
+html = html & "</div>"
+
+end if
+
+end if
+
+End If
+
+html = html & "<script type='text/javascript'>"
+html = html & " function modificar(formu){ "
+html = html & " document.getElementById(formu).submit();"
+html = html & " alert('Descripcion actualizada');} "
+html = html & "</script>"
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+html = html & "<script src='assets/js/jquery-ui.js'></script>"
+
+html = html & "<script>"
+html = html & "  $( function() {"
+
+html = html & "$.datepicker.regional['es'] = {"
+html = html & "closeText: 'Cerrar',"
+html = html & "prevText: '< Ant',"
+html = html & "nextText: 'Sig >',"
+html = html & "currentText: 'Hoy',"
+html = html & "monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],"
+html = html & "monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],"
+html = html & "dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],"
+html = html & "dayNamesShort: ['Dom','Lun','Mar','Mi�','Juv','Vie','S�b'],"
+html = html & "dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sa'],"
+html = html & "weekHeader: 'Sm',"
+html = html & "dateFormat: 'dd/mm/yy',"
+html = html & "firstDay: 1,"
+html = html & "isRTL: false,"
+html = html & "showMonthAfterYear: false,"
+html = html & "yearSuffix: ''"
+html = html & "};"
+html = html & "$.datepicker.setDefaults($.datepicker.regional['es']);"
+
+html = html & "    $( ""#fec"" ).datepicker();"
+
+html = html & "  } );"
+html = html & "  </script>"
+
+html = html & formx04 & "</body>"
+html = html & "</html>"
+
+response.write html
+
+Function armaCombo(sql,cn,clave,valor,texto,comboid)
+
+	Set nrs = Exec(cn, sql)
+
+	xhtml = xhtml & "<select class='selec' style='width:70%;' id='" & comboid & "' name='" & comboid & "'>"
+
+	if comboid = "uau" then
+		xhtml = xhtml & "<option value='0' selected>TODOS</option>"
+	else
+		xhtml = xhtml & "<option value='0' selected>SIN DATOS</option>"
+	end if
+
+	Do While Not nrs.eof
+
+		If clave = nrs(valor) Then
+
+			xhtml = xhtml & "<option value='" & nrs(valor) & "' selected>" & nrs(texto) & "</option>"
+
+		Else
+
+			xhtml = xhtml & "<option value='" & nrs(valor) & "'>" & nrs(texto) & "</option>"
+
+		End If
+
+		nrs.movenext
+	Loop
+
+	xhtml = xhtml & "</select>"
+
+	armaCombo = xhtml
+
+End Function
+
+Function getResp(cn,xid)
+
+	Set irs = Exec(cn, "sp_cg_Responsables @Modo='nombre_id', @IdSeg=" & SqlStr(xid))
+
+	xResp = ""
+	if not irs.eof then
+		xResp = irs(0)
+	else
+		xResp = "TODOS"
+	end if
+	getResp = xResp
+
+End Function
+
+Function getCantInc(cn,sid,stipo)
+
+	if stipo = "TEC" then
+		Set xi = Exec(cn, "sp_cg_Registro_Contar @Tabla='incidentes', @Campo='respon_tec', @IdRespon=" & SqlStr(sid))
+	elseif stipo = "FUNC" then
+		Set xi = Exec(cn, "sp_cg_Registro_Contar @Tabla='incidentes', @Campo='respon_gestion', @IdRespon=" & SqlStr(sid))
+	end if
+
+	sCantInc = ""
+	if not xi.eof then sCantInc = xi(0)
+
+	getCantInc = sCantInc
+
+End Function
+
+Function getCantProy(cn,sid,stipo)
+
+	if stipo = "TEC" then
+		Set xp = Exec(cn, "sp_cg_Registro_Contar @Tabla='proyectos', @Campo='respon_tec', @IdRespon=" & SqlStr(sid))
+	elseif stipo = "FUNC" then
+		Set xp = Exec(cn, "sp_cg_Registro_Contar @Tabla='proyectos', @Campo='respon_gestion', @IdRespon=" & SqlStr(sid))
+	end if
+
+	sCantProy = ""
+	if not xp.eof then sCantProy = xp(0)
+
+	getCantProy = sCantProy
+
+End Function
+
+%>

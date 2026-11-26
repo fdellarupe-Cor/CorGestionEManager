@@ -1,0 +1,131 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+Response.Write headhtml()
+html = html & "<body>"
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+
+'XXX = SYSLOGON(cnn,"PARAM_APLIC")
+
+
+html = html & "<div>"
+
+html = html & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+html = html & "<div >"
+
+html = html & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+html = html & "<img src='images/iso_cor.png' style='width:6rem;' >"
+html = html & "<font style='font-size:15pt;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+html = html & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+html = html & "<nav>"
+html = html & "<ul>"
+'html = html & "<li><a href='#menu'></a></li>"
+html = html & "</ul>"
+html = html & "</nav>"
+html = html & "</td>"
+
+html = html & "</tr></table>"
+
+html = html & "</div>"
+
+html = html & "</header>"
+
+html = html & "<table class='titulo-seccion' >"
+html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+html = html & "<td><h2>SEGURIDAD</h2></td>"
+
+html = html & "</tr>"
+
+html = html & "</table>"
+
+html = html & "</div>"
+
+'html = html & "<div style='height:5%;width:100%;'>"
+
+'html = html & "</div>"
+
+'html = html & "<div style='height:57%;width:100%;float:left;overflow:auto;'>"
+html = html & "<div class='inner' style='padding: 2rem;'>"
+
+' Fijate que en tu código original ya tenía una "x" adelante (xclass='tabl'), o sea que ya estaba anulada. La volamos.
+'html = html & "<table xclass='tabl' style='width:30%;heigth:80%;font-family:Serif;text-align:center;' cellspacing=0 cellpadding=5 align=center border>"
+html = html & "<div class='bloque-datos' style='max-width: 600px; margin: 0 auto;'>"
+
+Set rs = Exec(Cnn, "sp_cg_Responsables @Modo='listar'")
+
+'sImg = "<img src='images/llave.png' alt='Los Tejos' width='13' height='13' />"
+sImg = "<img src='images/llave.png' alt='Llave' width='13' height='13'>"
+
+Do While Not rs.eof
+
+	'sLink = "<font style='font-size:15pt;'><b>" & rs(1) & "&nbsp;" & rs(2) & "&nbsp;</b></font><font style='font-size:12pt;'>(" & rs(3) & ")</font>"
+	sLink = "<span>" & rs(1) & " " & rs(2) & " (" & rs(3) & ")</span>"
+	
+	'html = html & "<tr>"
+	html = html & "<div class='bloque-header'>"
+	
+	' Reemplazamos regis y el color fijo por nuestra clase moderna
+	'html = html & "<td class='regis' style='background-color:#BCBDCA;' colspan=2>" & sLink & "</td>"
+	html = html & "<a colspan='2'>" & sLink & "</a>"
+	
+	'html = html & "</tr>"
+	html = html & "</div>"
+
+	' Volamos la clase 'red' y los espacios manuales. Le aplicamos 'bot' para que los enlaces se vean como botones.
+	'sLinkIni = "<a class='red' href='permisosDet.asp?idusr=" & Server.URLEncode(rs(4) & "") & "&tipousr=" & rs(3) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&tipomenu=INICIO'>INICIO&nbsp;&nbsp;&nbsp;" & sImg & "</a>"
+	sLinkIni = "<a class='col-link' style='display:flex;gap:1rem;align-items:center;' href='permisosDet.asp?idusr=" & Server.URLEncode(rs(4) & "") & "&tipousr=" & rs(3) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&tipomenu=INICIO'>" & sImg & "INICIO</a>"
+	
+	'sLinkPar = "<a class='red' href='permisosDet.asp?idusr=" & rs(0) & "&tipousr=" & rs(3) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&tipomenu=PARAM'>PARAMETROS&nbsp;&nbsp;&nbsp;" & sImg & "</a>"
+	sLinkPar = "<a class='col-link' style='display:flex;gap:1rem;align-items:center;' href='permisosDet.asp?idusr=" & rs(0) & "&tipousr=" & rs(3) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&tipomenu=PARAM'>" & sImg & "PARAMETROS</a>"
+
+	'html = html & "<tr>"
+	html = html & "<div class='bloque-body'>"
+	html = html & "<div style='display:flex;'>"
+	
+	' Limpiamos los td de la clase vieja regis y los estilos fijos
+	'html = html & "<td class='regis' style='width:50%;' >" & sLinkIni & "</td>"
+	html = html & "<div style='width:50%'>" & sLinkIni & "</div>"
+	
+	'html = html & "<td class='regis' style='width:50%;' >" & sLinkPar & "</td>"
+	html = html & "<div style='width:50%'>" & sLinkPar & "</div>"
+	
+	'html = html & "</tr>"
+	html = html & "</div>"
+	html = html & "</div>"
+
+rs.movenext
+Loop
+
+'html = html & "</table>"
+html = html & "</div>"
+
+'html = html & "</div>"
+html = html & "</div>"
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+
+html = html & "</body>"
+html = html & "</html>"
+
+response.write html
+%>

@@ -1,0 +1,352 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+
+html = headhtml()
+html = html & "<body>"
+
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+opc = request.querystring("opc")
+id = request.querystring("id")
+cli = request.form("cli")
+if cli & "" = "" then cli = request.querystring("cli")
+if cli = "" then cli = 0
+
+CantRegMostrar = 10
+CantRegMover = CDbl(Request.querystring("CantRegMover"))
+if CantRegMover < 0 then CantRegMover = 0
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+XXX = SYSLOGON(cnn,"PARAM_CONTACT")
+
+If opc = "act" Then
+
+	id = request.querystring("id")
+
+	Dim cmdUpd
+	Set cmdUpd = Server.CreateObject("ADODB.Command")
+	With cmdUpd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Contactos"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "actualizar")
+		.Parameters.Append .CreateParameter("@Id", 3, 1, 4, CLng(id))
+		.Parameters.Append .CreateParameter("@IdCliente", 3, 1, 4, CLng(request.form("cli")))
+		.Parameters.Append .CreateParameter("@Nombre", 200, 1, 100, CStr(request.form("nom")))
+		.Parameters.Append .CreateParameter("@Apellido", 200, 1, 100, CStr(request.form("ape")))
+		.Parameters.Append .CreateParameter("@Telefono", 200, 1, 50, CStr(request.form("tel")))
+		.Parameters.Append .CreateParameter("@Mail", 200, 1, 100, CStr(request.form("mail")))
+		.Parameters.Append .CreateParameter("@Tipo", 3, 1, 4, NULL )
+	End With
+
+	On Error Resume Next
+	cmdUpd.Execute
+	If Err.Number <> 0 Then
+		html = html & "<div style='background:#fee2e2; color:#991b1b; border:1px solid #fecaca; padding:1rem; margin:1rem 2rem; border-radius:6px; font-family:monospace;'>"
+		html = html & "<strong>ERROR al guardar contacto (ID " & Server.HTMLEncode(id & "") & "):</strong><br>"
+		html = html & "Nro: " & Err.Number & " - " & Server.HTMLEncode(Err.Description & "") & "<br>"
+		html = html & "<small>SP: sp_cg_Contactos @Modo='actualizar' @Id=" & Server.HTMLEncode(id & "") & "</small>"
+		html = html & "</div>"
+		html = html & "<script>alert('Error al guardar: " & Replace(Err.Description, "'", "\'") & " (" & Err.Number & ")');</script>"
+		Err.Clear
+	Else
+		html = html & "<script>alert('Registro actualizado!');</script>"
+	End If
+	On Error Goto 0
+	Set cmdUpd = Nothing
+
+end if
+
+html = html & cabecera()
+
+html = html & "<div class='titulo-seccion ui-page-header' style='padding: 1rem 2rem;'>"
+html = html & "<div class='ui-toolbar' style='display:flex;align-items:center;justify-content:space-between;'>"
+
+html = html & "<div><h2>CONTACTOS</h2></div>"
+
+html = html & "<form id='xfrm' method='post' action='contactos.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+html = html & "<div class='ui-toolbar__filters'>"
+
+html = html & "<select class='ui-select' id='cli' name='cli' onchange=""document.getElementById('xfrm').submit();"">"
+
+set rs = Cnn.Execute("sp_cg_Catalogo_Listar @Catalogo='clientes'")
+
+html = html & "<option value='0' >FILTRO CLIENTE</option>"
+
+do while not rs.eof
+
+	if cstr(cli) = cstr(rs(0)) then
+		html = html & "<option value='" & rs(0) & "' selected>" & Server.HTMLEncode(rs(1) & "") & "</option>"
+	else
+		html = html & "<option value='" & rs(0) & "'>" & Server.HTMLEncode(rs(1) & "") & "</option>"
+	end if
+
+rs.movenext
+loop
+
+html = html & "</select>"
+html = html & "</div>" ' Fin ui-toolbar__filters
+html = html & "</form>"
+
+formx = "<form id='formx' class='form-oculto' method='post' action='agregar1.asp?tipo=CO&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+if getPermisos(xmenu,xtmenu,"ALTA") = 1 then
+	botonx = "<input class='bot ui-button ui-button--primary' type='button' value='AGREGAR CONTACTO' onclick=""document.getElementById('formx').submit();"">"
+else
+	botonx = "<input class='botsp ui-button' type='button' value='AGREGAR CONTACTO' onclick=""alert('Sin permiso para agregar.');"">"
+end if
+
+html = html & "<div class='ui-toolbar__actions'>[BOTONERA_PAGINACION]" & botonx & "</div>"
+
+html = html & "</div>" ' Fin ui-toolbar
+html = html & "</div>" ' Fin titulo-seccion
+
+'html1 = html1 & "<div style='height:57%;width:100%;'>"
+html1 = html1 & "<div class='inner ui-main' style='padding:2rem;'>"
+html1 = html1 & "<div class='bloque-datos table-responsive ui-table-wrap'>"
+
+'html1 = html1 & "<table style='width:90%;heigth:80%;font-family:Serif;text-align:center;' cellspacing=0 cellpadding=3 align=center>"
+html1 = html1 & "<table class='tabla-moderna ui-table'>"
+
+html1 = html1 & "<thead>"
+'html1 = html1 & "<tr>"
+html1 = html1 & "<tr>"
+
+'html1 = html1 & "<td class='encabe' style='width:1%;' align=center>*</td>"
+html1 = html1 & "<th style='width: 40px;'>&nbsp;</th>"
+
+'html1 = html1 & "<td class='encabe' style='width:1%;' align=center>ID</td>"
+html1 = html1 & "<th style='width: 5%;'>ID</th>"
+
+'html1 = html1 & "<td class='encabe' style='width:18%;' align=center>NOMBRE</td>"
+html1 = html1 & "<th style='width: 18%;'>NOMBRE</th>"
+
+'html1 = html1 & "<td class='encabe' style='width:18%;' align=center>APELLIDO</td>"
+html1 = html1 & "<th style='width: 18%;'>APELLIDO</th>"
+
+'html1 = html1 & "<td class='encabe' style='width:18%;' align=center>TELEFONO</td>"
+html1 = html1 & "<th style='width: 15%;'>TELEFONO</th>"
+
+'html1 = html1 & "<td class='encabe' style='width:22%;' align=center>MAIL</td>"
+html1 = html1 & "<th style='width: 22%;'>MAIL</th>"
+
+'html1 = html1 & "<td class='encabe' style='width:17%;' align=center>CLIENTE</td>"
+html1 = html1 & "<th style='width: 17%;'>CLIENTE</th>"
+html1 = html1 & "<th style='width: 8%;'></th>"
+
+'html1 = html1 & "</tr>"
+html1 = html1 & "</tr>"
+html1 = html1 & "</thead>"
+
+if cli <> 0 and opc <> "act" then
+	Set rs = Exec(Cnn, "sp_cg_Contactos @Modo='listar', @IdCliente=" & cli)
+else
+	Set rs = Exec(Cnn, "sp_cg_Contactos @Modo='listar'")
+end if
+
+formx1 = ""
+
+if not rs.eof then rs.Move (CantRegMover)
+
+PosReg = 0
+
+html1 = html1 & "<tbody>"
+
+Do While (Not rs.eof) And (PosReg < CantRegMostrar)
+
+	xFlg = ""
+	' Generamos las pills dinámicas modernas con sus colores específicos por cliente
+	if rs(5) = 1 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #ea580c; background-color: #ffedd5; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>GAL</span>"
+	elseif rs(5) = 2 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #16a34a; background-color: #dcfce7; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>PAT</span>"
+	elseif rs(5) = 33 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #2563eb; background-color: #dbeafe; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>CIU</span>"
+	elseif rs(5) = 4 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #92400e; background-color: #fef3c7; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>PET</span>"
+	elseif rs(5) = 35 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #15803d; background-color: #dcfce7; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>VAL</span>"
+	elseif rs(5) = 32 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #854d0e; background-color: #fef08a; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>BPN</span>"
+	elseif rs(5) = 36 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #dc2626; background-color: #fee2e2; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>CFA</span>"
+	elseif rs(5) = 37 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #475569; background-color: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>COR</span>"
+	elseif rs(5) = 38 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #92400e; background-color: #fef3c7; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>BER</span>"
+	elseif rs(5) = 39 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #92400e; background-color: #fef3c7; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>BSJ</span>"
+	elseif rs(5) = 40 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #92400e; background-color: #fef3c7; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>BSC</span>"
+	elseif rs(5) = 41 then
+		xFlg = "<span style='font-size: 0.75rem; font-weight: bold; color: #92400e; background-color: #fef3c7; padding: 0.2rem 0.4rem; border-radius: 4px; white-space: nowrap;'>BSF</span>"
+	end if
+
+	formx1 = formx1 & "<form id='form" & rs(0) & "' class='form-oculto' method='post' action='eliminar.asp?opc=con&id=" & rs(0) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=contactos.asp'></form>"
+	
+	if getPermisos(xmenu,xtmenu,"ELIM") = 1 then
+		botonx1 = "<input class='btn-accion btn-accion-peligro ui-button ui-button--icon ui-button--danger' type='button' value='X' onclick=""borrar('form" & rs(0) & "');"">"
+	else
+		botonx1 = "<input class='btn-accion btn-accion-deshabilitado ui-button ui-button--icon' type='button' value='X' onclick=""alert('Sin permiso para eliminar.');"">"
+	end if
+
+	html1 = html1 & "<tr>"
+	html1 = html1 & "<td>" & botonx1 & "</td>"
+	html1 = html1 & "<td>" & rs(0) & "</td>"
+
+	html1 = html1 & "<form id='iform" & rs(0) & "' class='form-linea' method='post' action='contactos.asp?opc=act&id=" & rs(0) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	' --- CELDA DEL NOMBRE CON LA PILL ALINEADA ---
+	html1 = html1 & "<td>"
+	if getPermisos(xmenu,xtmenu,"MODIF") = 1 then
+		' Envolvemos la pill y el input en un flex container con alineación centrada y una separación (gap)
+		html1 = html1 & "<div style='display: flex; align-items: center; gap: 0.5rem;'>" & xFlg & "<input class='input-moderno ui-input' style='width: 100%;' name='nom' type='text' value='" & Server.HTMLEncode(rs(1) & "") & "' readonly></div>"
+	else
+		html1 = html1 & "<div style='display: flex; align-items: center; gap: 0.5rem;'>" & xFlg & "<input class='input-moderno input-deshabilitado ui-input' style='width: 100%;' name='nom' type='text' value='" & Server.HTMLEncode(rs(1) & "") & "' onblur=""alert('Sin permiso para modificar.');"" readonly></div>"
+	end if
+	html1 = html1 & "</td>"
+
+	'html1 = html1 & "<td class='fil' >"
+	html1 = html1 & "<td>"
+	if getPermisos(xmenu,xtmenu,"MODIF") = 1 then
+		'html1 = html1 & "<input class='inpu' style='width:90%;font-size:10pt;' id='ape' name='ape' type='text' value='" & rs(2) & "' onblur=""document.getElementById('iform" & rs(0) & "').submit();"" >"
+		html1 = html1 & "<input class='input-moderno ui-input' name='ape' type='text' value='" & Server.HTMLEncode(rs(2) & "") & "' readonly>"
+	else
+		'html1 = html1 & "<input class='inpu' style='width:90%;font-size:10pt;' id='ape' name='ape' type='text' value='" & rs(2) & "' onblur=""alert('Sin permiso para modificar.');"" >"
+		html1 = html1 & "<input class='input-moderno input-deshabilitado ui-input' name='ape' type='text' value='" & Server.HTMLEncode(rs(2) & "") & "' onblur=""alert('Sin permiso para modificar.');"" readonly>"
+	end if
+	html1 = html1 & "</td>"
+
+	'html1 = html1 & "<td class='fil' >"
+	html1 = html1 & "<td>"
+	if getPermisos(xmenu,xtmenu,"MODIF") = 1 then
+		'html1 = html1 & "<input class='inpu' style='width:90%;font-size:10pt;' id='tel' name='tel' type='text' value='" & rs(3) & "' onblur=""document.getElementById('iform" & rs(0) & "').submit();"" >"
+		html1 = html1 & "<input class='input-moderno ui-input' name='tel' type='text' value='" & Server.HTMLEncode(rs(3) & "") & "' readonly>"
+	else
+		'html1 = html1 & "<input class='inpu' style='width:90%;font-size:10pt;' id='tel' name='tel' type='text' value='" & rs(3) & "' onblur=""alert('Sin permiso para modificar.');"" >"
+		html1 = html1 & "<input class='input-moderno input-deshabilitado ui-input' name='tel' type='text' value='" & Server.HTMLEncode(rs(3) & "") & "' onblur=""alert('Sin permiso para modificar.');"" readonly>"
+	end if
+	html1 = html1 & "</td>"
+
+	'html1 = html1 & "<td class='fil' >"
+	html1 = html1 & "<td>"
+	if getPermisos(xmenu,xtmenu,"MODIF") = 1 then
+		'html1 = html1 & "<input class='inpu' style='width:100%;font-size:10pt;' id='mail' name='mail' type='text' value='" & rs(4) & "' onblur=""document.getElementById('iform" & rs(0) & "').submit();"" >"
+		html1 = html1 & "<input class='input-moderno ui-input' name='mail' type='text' value='" & Server.HTMLEncode(rs(4) & "") & "' readonly>"
+	else
+		'html1 = html1 & "<input class='inpu' style='width:100%;font-size:10pt;' id='mail' name='mail' type='text' value='" & rs(4) & "' onblur=""alert('Sin permiso para modificar.');"" >"
+		html1 = html1 & "<input class='input-moderno input-deshabilitado ui-input' name='mail' type='text' value='" & Server.HTMLEncode(rs(4) & "") & "' onblur=""alert('Sin permiso para modificar.');"" readonly>"
+	end if
+	html1 = html1 & "</td>"
+
+	'html1 = html1 & "<td class='fil' align=center>"
+	html1 = html1 & "<td>"
+	if getPermisos(xmenu,xtmenu,"MODIF") = 1 then
+		'html1 = html1 & "<select class='selec' style='width:95%;font-size:10pt;' id='cli' name='cli' onchange=""document.getElementById('iform" & rs(0) & "').submit();"" >"
+		html1 = html1 & "<select class='input-moderno ui-select' name='cli' disabled>"
+	else
+		'html1 = html1 & "<select class='selec' style='width:95%;font-size:10pt;' id='cli' name='cli' onchange=""alert('Sin permiso para modificar.');"" >"
+		html1 = html1 & "<select class='input-moderno input-deshabilitado ui-select' name='cli' onchange=""alert('Sin permiso para modificar.');"" disabled>"
+	end if
+
+	Set rx = Exec(Cnn, "sp_cg_Catalogo_Listar @Catalogo='clientes'")
+
+	Do While Not rx.eof
+
+		If rx(0) = rs(5) Then
+			html1 = html1 & "<option value='" & rx(0) & "' selected>" & Server.HTMLEncode(rx(1) & "") & "</option>"
+		Else
+			html1 = html1 & "<option value='" & rx(0) & "'>" & Server.HTMLEncode(rx(1) & "") & "</option>"
+		End If
+
+		rx.movenext
+	Loop
+
+	html1 = html1 & "</select>"
+	html1 = html1 & "</td>"
+	html1 = html1 & "<td>" & HtmlBotonEditarFila("iform" & rs(0), getPermisos(xmenu,xtmenu,"MODIF") = 1) & "</td>"
+
+	html1 = html1 & "</form>"
+
+	'html1 = html1 & "</tr>"
+	html1 = html1 & "</tr>"
+
+	PosReg = PosReg + 1
+
+	rs.movenext
+Loop
+
+html1 = html1 & "</tbody>"
+
+'html1 = html1 & "</table>"
+html1 = html1 & "</table>"
+
+'html1 = html1 & "</div>"
+html1 = html1 & "</div>" ' Cierra .bloque-datos table-responsive
+'html1 = html1 & "</div>"
+html1 = html1 & "</div>" ' Cierra .inner
+
+
+'xdiv =  "<td><div id=btn xstyle='top:85px;left:750px;position:absolute;'><table align=right><tr>"
+' Transformamos la maraña de tablas en un simple contenedor con clase para la paginación
+misBotones = ""
+
+if cantregmover <> 0 then
+	formx22 = "<form id='formx22' class='form-oculto' method='post' action='contactos.asp?cantregmover=" & (cantregmover - cantregmostrar) & "&cli=" & cli & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+	'botonx22 = "<input class='bot' type='button' value='ATRAS' onclick=""document.getElementById('formx22').submit();"">"
+	botonx22 = "<input class='bot ui-button' type='button' value='ATRAS' onclick=""document.getElementById('formx22').submit();"">"
+else
+	formx22 = ""
+	'botonx22 = "<input style='border-radius:7px;' type='button' value='ATRAS'>"
+	botonx22 = "<input class='botsp ui-button' type='button' value='ATRAS' disabled>"
+end if
+
+if not rs.eof then
+	formx23 = "<form id='formx23' class='form-oculto' method='post' action='contactos.asp?cantregmover=" & (cantregmover + cantregmostrar) & "&cli=" & cli & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+	'botonx23 = "<input class='bot' type='button' value='SIGUIENTE' onclick=""document.getElementById('formx23').submit();"">"
+	botonx23 = "<input class='bot ui-button' type='button' value='SIGUIENTE' onclick=""document.getElementById('formx23').submit();"">"
+else
+	formx23 = ""
+	'botonx23 = "<input style='border-radius:7px;' type='button' value='SIGUIENTE'>"
+	botonx23 = "<input class='botsp ui-button' type='button' value='SIGUIENTE' disabled>"
+end if
+
+'xdiv = xdiv & "<td>" & botonx22 & "</td>"
+'xdiv = xdiv & "<td>" & botonx23 & "</td>"
+'xdiv = xdiv & "</tr></table></div></td>"
+misBotones = "<div class='ui-pagination' style='display: flex; gap: 0.5rem;'>" & formx22 & botonx22 & formx23 & botonx23 & "</div>"
+
+html = Replace(html, "[BOTONERA_PAGINACION]", misBotones)
+
+html = html & "<script type='text/javascript'>"
+html = html & " function borrar(formu){ "
+html = html & " var r = confirm('Desea eliminar contacto?'); "
+html = html & " if (r){ "
+html = html & " document.getElementById(formu).submit(); "
+html = html & " }else{ "
+html = html & " return false;"
+html = html & " }} "
+html = html & "</script>"
+
+html = html & ScriptEdicionCatalogo()
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+
+html = html & xdiv & html1 & formx1 & shtml & formx22 & formx23 & formx & "</body>"
+html = html & "</html>"
+
+response.write html
+%>

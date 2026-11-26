@@ -1,0 +1,369 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<!-- #INCLUDE FILE="IncFile/datosDetalles.inc" --> 
+<!-- #INCLUDE FILE="IncFile/datosAgregar.inc" -->
+<%
+' [CG] Control de usuario E-Manager (igual que CorEManager/Acciones.asp)
+cgOk = ofv.CheckUsuario()
+If cgOk <> "Y" Then
+	cgUv = ofv.uv
+	If cgUv = "NO" Then cgOk = ofv.ValidarUsuario
+	Response.Write cgOk
+	Response.End
+End If
+ 
+Response.CharSet = "utf-8" ' Buena práctica
+
+' --- INICIALIZACION DE CONEXION (Requerido por backend) ---
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.Open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+' --- CAPTURA DE PARAMETROS (Lógica de Control) ---
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+opc = request.querystring("opc")
+IsConsulta = (opc = "consi") ' Booleano para saber qué vista renderizar
+
+' Paginación
+CantRegMostrar = 12
+CantRegMover = Request.querystring("CantRegMover")
+if not IsNumeric(CantRegMover) or CantRegMover < 0 then CantRegMover = 0
+
+' Filtros Comunes
+cliente = request.form("cli")
+if cliente & "" = "" then cliente = request.querystring("cli")
+if not IsNumeric(cliente) then cliente = 0
+
+aplicativos = request.form("apli")
+if aplicativos & "" = "" then aplicativos = request.querystring("apli")
+if not IsNumeric(aplicativos) then aplicativos = 0
+
+tit = request.form("tit") '-- En consulta se usa 'desc', unificamos a 'tit' en el SP
+if tit & "" = "" then tit = request.querystring("tit")
+if tit & "" = "" then tit = request.form("desc") '-- compatibilidad con form consulta
+
+ord = request.querystring("ord")
+
+' ' Filtros específicos de Consulta
+estadoFiltro = request.form("est")
+if not IsNumeric(estadoFiltro) then estadoFiltro = 0
+
+fechaFiltro = request.form("fec")' -- Asumimos formato fecha dd/mm/aaaa
+
+' ' --- SEGURIDAD Y LOGS (Mismo comportamiento original) ---
+If IsConsulta Then
+    XXX = SYSLOGON(cnn,"CONSULTA_PROYECTOS")
+Else
+    XXX = SYSLOGON(cnn,"MENU_PROYECTOS")
+End If
+usuario = userlogon()
+' [CG] Filtro por responsable: por defecto los registros del usuario de la sesion; "*" = todos. En consulta (consi) no se filtra.
+If IsConsulta Then cgResp = "*" Else cgResp = CgRespSeleccionado()
+
+' --- CARGA DE DATOS (Llamadas al Backend) ---
+Dim rsClientes, rsApli, rsGrid
+
+' 1. Cargar combos (siempre necesarios)
+'Set rsClientes = GetListaCombo(Cnn,"CLIENTES")
+' Set rsApli = GetListaCombo(Cnn,"APLICATIVOS")
+Set rsClientes = ObtenerClientes(Cnn)
+Set rsApli = ObtenerAplicativos(Cnn)
+
+' ' 2. Cargar Grilla principal llamando al SP mediante el backend
+' ' Pasamos los parámetros capturados. El SP unifica la lógica de filtros de ambas vistas.
+ Set rsGrid = GetProyectosListado(scon1 , cliente, aplicativos, tit, estadoFiltro, fechaFiltro, ord, CantRegMover, CantRegMostrar, CgRespParam(cgResp))
+
+' ' Determinar si hay registros y si hay página siguiente (usando COUNT(*) OVER() del SP)
+Dim TotalRegistrosTotal, HayRegistros, TieneSiguiente
+HayRegistros = Not rsGrid.EOF
+If HayRegistros Then
+    TotalRegistrosTotal = rsGrid("TotalRegistros")
+    ' Es un Recordset desconectado de solo CantRegMostrar, no podemos usar rsGrid.EOF para 'Siguiente'
+    ' Calculamos matemáticamente
+    TieneSiguiente = (CDbl(CantRegMover) + CantRegMostrar) < TotalRegistrosTotal
+Else
+    TotalRegistrosTotal = 0
+    TieneSiguiente = False
+End If
+
+
+' ==============================================================================
+' INICIO DE RENDERIZADO (HTML)
+' ==============================================================================
+html = headhtml()
+html = html & "<body>"
+html = html & "<div>"
+
+' --- ENCABEZADO (Común) ---
+html = html & cabecera()
+
+' --- TITULO SECCION Y BOTONERA SUPERIOR ---
+html = html & "<table class='titulo-seccion ui-page-header'>"
+html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+If IsConsulta Then
+    html = html & "<td><h2>CONSULTA PROYECTOS</h2></td>"
+    ' Botón Volver específico de consulta
+    formx10 = "<form id='formx10' class='form-oculto' method='post' action='consultas.asp?sel=" & request.querystring("sel") & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+    botonVolver = "<input class='bot ui-button' type='button' value='VOLVER' onclick=""document.getElementById('formx10').submit();"">"
+    html = html & "<td>" & formx10 & botonVolver & "</td>"
+Else
+    html = html & "<td><h2>PROYECTOS</h2></td>"
+
+    ' Form Filtro Cliente
+    html = html & "<td><form id='xForm' method='post' action='proyectos.asp?ord=" & ord & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&apli=" & aplicativos & "&resp=" & Server.URLEncode(cgResp) & "'>"
+    html = html & "<select class='ui-select' onchange=""document.getElementById('xForm').submit();"" id='cli' name='cli'>"
+    html = html & "<option value='0' >CLIENTE: TODOS</option>"
+    Do While Not rsClientes.EOF
+        selected = ""
+        if cstr(rsClientes(0)) = cstr(cliente) then selected = "selected"
+        html = html & "<option value='" & rsClientes(0) & "' " & selected & " >" & Server.HTMLEncode(rsClientes(1) & "") & "</option>"
+        rsClientes.movenext
+    Loop
+    html = html & "</select></form></td>"
+
+    ' Form Filtro Aplicativo
+    html = html & "<td><form id='xFormApli' method='post' action='proyectos.asp?ord=" & ord & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&cli=" & cliente & "&resp=" & Server.URLEncode(cgResp) & "'>"
+    html = html & "<select class='ui-select' onchange=""document.getElementById('xFormApli').submit();"" id='apli' name='apli'>"
+    html = html & "<option value='0' >APLICATIVO: TODOS</option>"
+    Do While Not rsApli.EOF
+        selected = ""
+        If cstr(rsApli(0)) = cstr(aplicativos) Then selected = "selected"
+        html = html & "<option value='" & rsApli(0) & "' " & selected & " >" & Server.HTMLEncode(rsApli(1) & "") & "</option>"
+        rsApli.MoveNext
+    Loop
+    html = html & "</select></form></td>"
+
+    ' [CG] Form Filtro Responsable (por defecto: usuario de la sesion)
+    html = html & "<td><form id='xFormResp' method='post' action='proyectos.asp?ord=" & ord & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&cli=" & cliente & "&apli=" & aplicativos & "'>" & CgComboResponsable(Cnn, cgResp, "xFormResp") & "</form></td>"
+
+    ' Botón Nuevo (Manejo de Permisos original)
+    if session("FUNC") = "FUNC" or session("FUNC") = "TEC"  then
+        formx19 = "<form id='formx1' class='form-oculto' method='post' action='agregar2.asp?tipo=PROY&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+        if CStr(getPermisosAtrm("CG_PROYECTOS", "ALTA")) = "1" then
+            botonx1 = "<input class='bot ui-button ui-button--primary' type='button' value='NUEVO PROYECTO' onclick=""document.getElementById('formx1').submit();"">"
+        else
+            botonx1 = "<input class='botsp ui-button' type='button' value='CARGAR NUEVO PROYECTO' disabled title='Sin permiso para agregar.'>"
+        end if
+        html = html & "<td>" & formx19 & botonx1 & "</td>"
+    else
+        html = html & "<td>&nbsp;</td>"
+    end if
+
+    ' Placeholder Paginación
+    html = html & "<td>[BOTONERA_PAGINACION]</td>"
+
+    ' Botón Volver estándar
+    formx29 = "<form id='formx2' class='form-oculto' method='post' action='index.asp'></form>"
+    botonx2 = "<input class='bot ui-button' type='button' value='VOLVER' onclick=""document.getElementById('formx2').submit();"">"
+    html = html & "<td>" & formx29 & botonx2 & "</td>"
+End If
+
+html = html & "</tr>"
+html = html & "</table>"
+html = html & "<div style='visibility:hidden;height:5px;'>&nbsp;</div>"
+
+
+' ==============================================================================
+' GRILLA DE DATOS (UNIFICADA)
+' ==============================================================================
+html = html & "<div class='inner ui-main' style='padding:2rem'>"
+html = html & "<div class='bloque-datos table-responsive ui-table-wrap'>"
+html = html & "<table class='tabla-moderna ui-table'>"
+
+' --- ENCABEZADOS ---
+html = html & "<thead><tr>"
+
+' Columnas de acción (solo vista normal)
+If Not IsConsulta Then
+    html = html & "<th></th>" ' Eliminar
+    html = html & "<th></th>" ' Actualizar
+End If
+html = html & "<th></th>"     ' Detalle
+
+' Columnas de datos con ordenamiento
+UrlBaseParams = "&cli=" & cliente & "&apli=" & aplicativos & "&resp=" & Server.URLEncode(cgResp) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu
+if IsConsulta then UrlBaseParams = UrlBaseParams & "&opc=consi"
+
+html = html & "<th>ID</th>"
+html = html & "<th>SOLICITUD</th>"
+html = html & "<th><a class='col-link' href='proyectos.asp?ord=titulo" & UrlBaseParams & "'>TITULO</a></th>"
+html = html & "<th><a class='col-link' href='proyectos.asp?ord=cliente" & UrlBaseParams & "'>CLIENTE</a></th>"
+
+' Columnas extra específicas
+If Not IsConsulta Then
+    html = html & "<th>PRIORIDAD</th>"
+End If
+
+html = html & "<th>DESARROLLO</th>"
+html = html & "<th>FUNCIONAL</th>"
+html = html & "<th>FEC INGRESO</th>"
+html = html & "<th><a class='col-link' href='proyectos.asp?ord=aplicativos" & UrlBaseParams & "'>APLICATIVO</a></th>"
+
+html = html & "</tr></thead>"
+html = html & "<tbody>"
+
+' --- DETALLE (BUCLE) ---
+formsAccion = "" ' Acumulador de formularios ocultos
+
+If Not HayRegistros Then
+    cols = 10
+    if IsConsulta then cols = 7
+    html = html & "<tr><td colspan='" & cols & "' align='center'>No se encontraron proyectos con los filtros seleccionados.</td></tr>"
+Else
+    ' Reutilizamos Recordset rsGrid cargado al principio
+    Do While Not rsGrid.EOF
+        
+        ' 1. Preparar Badges y Datos (usando funciones del backend)
+        prioBadge = ""
+        If Not IsConsulta Then prioBadge = GetBadgePrioridad(rsGrid("prioridad_desc"))
+        
+        estDesaBadge = GetBadgeEstado(rsGrid("estado_desa_desc"), rsGrid("respon_tec_nombre"))
+        estFuncBadge = GetBadgeEstado(rsGrid("estado_func_desc"), rsGrid("respon_gestion_nombre"))
+        
+        ' Fecha (asumimos que el SP devuelve DateTime, formateamos en vista si es necesario)
+        sFec = rsGrid("fecha_ingreso") -- CDate(rsGrid("fecha_ingreso"))
+
+	'xformx = xformx & "<form id='xformx" & rs(0) & "' style='margin: 0; padding: 0;' method='post' action='detalles.asp?id=" & rs(0) & "&opc=verp&tipo=cons&" & request.form & "'></form>"
+	
+        ' URL Detalle común
+        UrlDetalle = "detalles.asp?id=" & rsGrid("id") & "&sol=" & rsGrid("solic_nro") & _
+                     "&cli=" & cliente & "&opc=verp" & "&tit=" & server.URLEncode(tit)  & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu
+        If IsConsulta Then UrlDetalle = UrlDetalle & "&opc=verp&tipo=cons&" & request.form
+
+        ' Evento click en fila
+        JsClickFila = "onclick=""document.location='" & UrlDetalle & "'"" style='cursor:pointer;'"
+
+        html = html & "<tr>"
+        
+        ' 2. Renderizado de Columnas de Acción (Vista Normal)
+        If Not IsConsulta Then
+            ' Boton Eliminar
+            formsAccion = formsAccion & "<form id='formElim" & rsGrid("id") & "' class='form-oculto' method='post' action='eliminar.asp?opc=proy&id=" & rsGrid("id") & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=proyectos.asp'></form>"
+            if CStr(getPermisosAtrm("CG_PROYECTOS", "ELIM")) = "1" then
+                botonx1 = "<input class='btn-accion btn-accion-peligro ui-button ui-button--icon ui-button--danger' type='button' value='X' onclick=""borrar('formElim" & rsGrid("id") & "');"">"
+            else
+                botonx1 = "<input class='btn-accion btn-accion-deshabilitado ui-button ui-button--icon' type='button' value='X' disabled title='Sin permiso para eliminar.'>"
+            end if
+            html = html & "<td style='text-align:center;'>" & botonx1 & "</td>"
+
+            ' Boton Actualizar
+            formsAccion = formsAccion & "<form id='formAct" & rsGrid("id") & "' class='form-oculto' method='post' action='detalles.asp?id=" & rsGrid("id") & "&sol=" & rsGrid("solic_nro") & "&opc=actp&cli=" & cliente & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+            ' Nota: Validación USUARIO original comentada, se mantiene igual.
+            botonx2 = "<input class='btn-accion btn-accion-primario ui-button ui-button--icon ui-button--primary' type='button' value='A' onclick=""document.getElementById('formAct" & rsGrid("id") & "').submit();"">"
+            html = html & "<td style='text-align:center;'>" & botonx2 & "</td>"
+
+            ' Boton Detalle (D) - En vista normal es redundante con click en fila pero se mantiene
+            botonx3 = "<input class='btn-accionbtn-accion-secundario ui-button ui-button--icon' style='color:#008520;' type='button' value='D' onclick=""document.location='" & UrlDetalle & "' "">"
+            html = html & "<td style='text-align:center;'>" & botonx3 & "</td>"
+
+        Else
+            ' Boton Detalle (D) - Vista Consulta (con permisos fijos 10,INICIO original)
+            formsAccion = formsAccion & "<form id='formGridCons" & rsGrid("id") & "' class='form-oculto' method='post' action='" & UrlDetalle & "'></form>"
+            if getPermisosAtrm("CG_PROYECTOS", "CONS") = 1 then
+                xbotonx = "<input class='btn-accion ui-button ui-button--icon' style='background-color: #e0e7ff; color: #4338ca;' type='button' value='D' onclick=""document.getElementById('formGridCons" & rsGrid("id") & "').submit();"">"
+            else
+                xbotonx = "<input class='btn-accion btn-accion-deshabilitado ui-button ui-button--icon' type='button' value='D' disabled title='Sin permiso para consultar.'>"
+            end if
+            html = html & "<td style='text-align: center;'>" & xbotonx & "</td>"
+        End If
+
+
+        ' 3. Renderizado de Datos (Comun)
+        html = html & "<td " & JsClickFila & ">" & rsGrid("id") & "</td>"
+        html = html & "<td " & JsClickFila & " style='text-align:center;'>" & rsGrid("solic_nro") & "</td>"
+        
+        ' Titulo (Trunco original)
+        DescTrunca = rsGrid("titulo") & ""
+        if Len(DescTrunca) > 30 then DescTrunca = left(UCASE(DescTrunca),30) & "..."
+        html = html & "<td " & JsClickFila & " style='text-align:left;'>" & Server.HTMLEncode(DescTrunca) & "</td>"
+
+        html = html & "<td " & JsClickFila & ">" & Server.HTMLEncode(rsGrid("cliente_desc") & "") & "</td>"
+
+        If Not IsConsulta Then
+            html = html & "<td " & JsClickFila & ">" & prioBadge & "</td>"
+        End If
+
+        html = html & "<td " & JsClickFila & ">" & estDesaBadge & "</td>"
+        html = html & "<td " & JsClickFila & ">" & estFuncBadge & "</td>"
+        html = html & "<td " & JsClickFila & ">" & sFec & "</td>"
+        html = html & "<td " & JsClickFila & ">" & Server.HTMLEncode(rsGrid("aplicativo_desc") & "") & "</td>"
+
+        html = html & "</tr>"
+
+        rsGrid.movenext
+    Loop
+End If
+
+html = html & "</tbody></table></div></div>" ' Cierre grilla
+
+
+' ==============================================================================
+' PAGINACION (Solo vista normal) Y SCRIPTS
+' ==============================================================================
+If Not IsConsulta Then
+    misBotones = "<div class='ui-pagination' style='display: flex; gap: 0.5rem;'>"
+    UrlPagiBase = "proyectos.asp?ord=" & ord & "&cli=" & cliente & "&apli=" & aplicativos & "&resp=" & Server.URLEncode(cgResp) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu
+
+    ' Boton ATRAS
+    if cantregmover <> 0 then
+        formsAccion = formsAccion & "<form id='formAtras' class='form-oculto' method='post' action='" & UrlPagiBase & "&cantregmover=" & (cantregmover - cantregmostrar) & "'></form>"
+        botonx22 = "<input class='bot ui-button' type='button' value='ATRAS' onclick=""document.getElementById('formAtras').submit();"">"
+    else
+        botonx22 = "<input class='botsp ui-button' type='button' value='ATRAS' disabled>"
+    end if
+
+    ' Boton SIGUIENTE
+    if TieneSiguiente then
+        formsAccion = formsAccion & "<form id='formSigue' class='form-oculto' method='post' action='" & UrlPagiBase & "&cantregmover=" & (cantregmover + cantregmostrar) & "'></form>"
+        botonx23 = "<input class='bot ui-button' type='button' value='SIGUIENTE' onclick=""document.getElementById('formSigue').submit();"">"
+    else
+        botonx23 = "<input class='botsp ui-button' type='button' value='SIGUIENTE' disabled>"
+    end if
+
+    misBotones = misBotones & botonx22 & botonx23 & "</div>"
+    ' Reemplazar placeholder
+    html = Replace(html, "[BOTONERA_PAGINACION]", misBotones)
+End If
+
+html = html & "</div>" ' Cierre div principal
+
+' --- SCRIPTS JS ---
+html = html & "<script type='text/javascript'>"
+html = html & " function borrar(formu){ "
+html = html & " var r = confirm('Desea eliminar proyecto?'); "
+html = html & " if (r){ "
+html = html & " document.getElementById(formu).submit(); "
+html = html & " }else{ "
+html = html & " return false;"
+html = html & " }} "
+html = html & "</script>"
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+
+' Inyección de formularios ocultos acumulados
+html = html & formsAccion
+html = html & "</body></html>"
+
+' --- CIERRE DE CONEXION ---
+Cnn.Close
+Set Cnn = Nothing
+' If HayRegistros Then rsGrid.Close : 
+Set rsGrid = Nothing
+Set rsClientes = Nothing
+Set rsApli = Nothing
+
+Response.Write html
+%>

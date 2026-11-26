@@ -1,0 +1,2169 @@
+<%
+'DIM RUTA
+'dim shttp
+
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+ruta=server.mappath(request.servervariables("script_name"))
+pos=InStrRev(ruta,"\")
+ruta=Mid(ruta,1,pos)
+'Dim scon1
+scon1 = "Provider=SQLOLEDB;Data Source=server-2025;Initial Catalog=Dbcordatv48_UNIF485; user id=sa;password=bb4515$;"
+
+shttp= "http://" & request.servervariables("SERVER_NAME") & request.servervariables("SCRIPT_NAME")
+pos = instrrev(shttp, "/")
+shttp = MID(shttp, 1, pos)
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Function GTFechadorsh(GTWfecha)
+
+	If CStr(GTWfecha & "") = "0" Or CStr(GTWfecha & "") = "" Then
+
+		GTFechadorSH  = "-----"
+
+	Else
+
+
+		GTwfec = CDate(GTWfecha + CLng(CDate("01-01-1900")))
+
+		GTWFDIAB = CStr(Day(GTwfec))
+		GTWFMESB = CStr(Month(GTwfec))
+
+		If Len(GTWFDIAB) = 1 Then GTWFDIAB = "0" & GTWFDIAB
+		If Len(GTWFMESB) = 1 Then GTWFMESB = "0" & GTWFMESB
+
+		GTwFechash = GTWFDIAB & "/" & GTWFMESB & "/" & Year(GTwfec)
+		GTFechadorSH  = UCase(GTwFechash)
+
+	End If
+
+End Function
+
+Function GETtime()
+
+
+
+	sh = DatePart("h",Time())
+	sm = DatePart("n",Time())
+	ss = DatePart("s",Time())
+
+	XLHORDAT = (CInt(sh)*3600) + (CInt(sm)*60) + CInt(ss)
+	''   XLHORDAT = TIME()
+
+
+	GETtime = XLHORDAT
+
+
+End Function
+
+
+Function GETtimeHMS(XITIME)
+
+	If Not IsNumeric(XITIME & "") Then
+
+		GETGLBHMS = "000005"
+
+	Else
+		''response.write "-" & XITIME & "-" & "<br>"
+		XITIME=CLng("0" & Replace(CStr(XITIME & ""),"-",""))
+		GLBbb = XITIME Mod 3600
+		GLBbC = (GLBBB) Mod 60
+		GLBbD = (GLBBC) Mod 1
+
+		GLBSH = (XITIME - GLBBB) / 3600
+		GLBSM = (GLBBB - GLBBC) / 60
+		GLBSS = GLBBC / 1
+
+		If GLBSH > 0 Then XOSH = GLBSH & "h&nbsp;"
+		If GLBSM > 0 Then XOSM = GLBSM & "m&nbsp;"
+		If GLBSS > 0 Then XOSS = GLBSS & "s&nbsp;"
+
+
+		GETtimeHMS = XOSH & XOSM & XOSS
+
+	End If
+
+End Function
+
+function headhtml()
+
+' El archivo (y el texto que devuelve SQL Server) esta en ANSI (Windows-1252),
+' no UTF-8. Si Response no declara la misma codificacion que el <meta>, el
+' navegador interpreta mal los acentos/enes y se ve como mojibake (p.ej.
+' "CORRECCIA"N" en vez de "CORRECCION"). Fijar ambos en Windows-1252.
+Response.CharSet = "windows-1252"
+Response.CodePage = 1252
+
+xhtmlh  ="<html><head>"
+
+xhtmlh = xhtmlh & "<title>Cor Gestion</title>"
+xhtmlh = xhtmlh & "<meta charset='windows-1252' />"
+xhtmlh = xhtmlh & "<meta name='viewport' content='width=device-width, initial-scale=1' />"
+xhtmlh = xhtmlh & "<link rel='stylesheet' href='assets/css/main.css?v=20261019' />"
+' [UI] jquery-ui.css desconectado: su .ui-button chocaba con el del sistema y alteraba el hover de los botones.
+'[UI-ANT] xhtmlh = xhtmlh & "<link rel='stylesheet' href='assets/js/jquery-ui.css'>"
+xhtmlh = xhtmlh & "<link rel='stylesheet' href='assets/css/corgestion-ui.css?v=20261019' />"
+xhtmlh = xhtmlh & "<script src='assets/js/jquery.min.js'></script>"
+xhtmlh = xhtmlh & "<script src='assets/js/jquery-ui.js'></script>"
+xhtmlh = xhtmlh & "<script src='assets/js/skel.min.js'></script>"
+xhtmlh = xhtmlh & "<script src='assets/js/util.js'></script>"
+xhtmlh = xhtmlh & "<script src='assets/js/main.js'></script>"
+
+xhtmlh = xhtmlh & "</head>"
+headhtml=xhtmlh
+end function
+
+' =========================================================================
+' Función: cabecera
+' Header comun a TODAS las pantallas: barra azul marino con el logo y el
+' nombre del sistema. Unica fuente de verdad para este bloque -- no
+' duplicar este markup en los .asp individuales, llamar a esta funcion.
+' Usa estilos inline (en vez de depender de .app-header/.app-header-brand
+' de main.css) porque es el patron que ya se verifico visualmente correcto
+' en pantallas como proyectos.asp/agregar2.asp.
+' =========================================================================
+Function cabecera()
+    ' Dim xcab
+    ' xcab = "<header id=""header"" class=""app-header ui-toolbar"" style=""background:#E8EDFF;padding:1rem 0;"">" & vbCrLf
+    ' xcab = xcab & "    <div class=""ui-toolbar"" style=""width:100%;padding:0 1rem;"">" & vbCrLf
+    ' xcab = xcab & "        <a href=""index.asp"" class=""logo"" style="""">" & vbCrLf
+    ' xcab = xcab & "            <img src=""images/logo-corconsulting.png"" style=""width:14rem;"">" & vbCrLf
+    ' xcab = xcab & "        </a>" & vbCrLf
+    ' xcab = xcab & "    </div>" & vbCrLf
+    ' xcab = xcab & "</header>" & vbCrLf
+    ' cabecera = xcab
+End Function
+
+' =========================================================================
+' Función: GetListaComboExtended
+' Unica fuente para cargar catalogos (clientes, aplicativos, tipo_apl,
+' browsers, estados, prioridades, via_pedido) para combos de filtro.
+' Reemplaza a ObtenerCatalogo() (antes local a incidentes.asp) y a la
+' version anterior de esta misma funcion (antes en IncFile/datosApl.inc) --
+' ambas llamaban, directa o indirectamente, al mismo SP sp_cg_Catalogo_Listar.
+' No arma whitelist propia en ASP: el SP ya valida @Catalogo con su
+' cadena IF/ELSE, asi que cualquier catalogo soportado por el SP funciona
+' aca sin tener que tocar este archivo.
+' Devuelve un recordset con columnas (id, descripcion); el llamador debe
+' aplicar Server.HTMLEncode sobre "descripcion" antes de imprimirla.
+' =========================================================================
+Function GetListaComboExtended(cn, tabla)
+    Dim cmd
+    Set cmd = Server.CreateObject("ADODB.Command")
+    cmd.ActiveConnection = cn
+    cmd.CommandType = 4 ' adCmdStoredProc
+    cmd.CommandText = "sp_cg_Catalogo_Listar"
+
+    cmd.Parameters.Append cmd.CreateParameter("@Catalogo", 200, 1, 30, LCase(tabla))
+
+    On Error Resume Next
+    Set GetListaComboExtended = cmd.Execute()
+    If Err.Number <> 0 Then
+        Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+        Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+        Response.Write "Contexto: GetListaComboExtended (tabla=" & Server.HTMLEncode(tabla) & ")<br>"
+        Response.Write "Codigo: " & Err.Number & "<br>"
+        Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+        Response.End
+    End If
+    On Error Goto 0
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+function UserLogon()
+
+   User=REQUEST.servervariables("LOGON_USER")
+
+   	User=mid(User,instr(1,User,"\")+1)
+   	UserLogon=User
+   	'	UserLogon="CGARCIA"
+
+end function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Session("SMTPServer")="127.0.0.1"
+Session("SMTPPort")=25
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Function UsrAcc(idseg, tipo, cn, acc)
+
+    Dim xid, sEsta, xModo, cmd
+
+    xid = dameId(idseg, cn)
+    sEsta = Esta(xid, tipo, cn)
+
+    If sEsta = 0 Then
+        xModo = "insertar"
+    Else
+        xModo = "actualizar"
+    End If
+
+    Set cmd = Server.CreateObject("ADODB.Command")
+    With cmd
+        .ActiveConnection = cn
+        .CommandText = "sp_cg_Estadisticas"
+        .CommandType = 4
+        .Parameters.Append .CreateParameter("@Modo",       200, 1, 20, xModo)
+        .Parameters.Append .CreateParameter("@Tipo",       200, 1, 10, "U")
+        .Parameters.Append .CreateParameter("@Id",           3, 1,  4, CLng(xid))
+        .Parameters.Append .CreateParameter("@CantAcc",      3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@UltAcc",     200, 1, 1000, CStr(Now()))
+        .Parameters.Append .CreateParameter("@UltAccUsr",  200, 1, 100, Null)
+        .Parameters.Append .CreateParameter("@UltTipoAcc", 200, 1, 1000, Null)
+        .Parameters.Append .CreateParameter("@Acc",        200, 1, 1000, CStr(acc))
+        .Parameters.Append .CreateParameter("@Cli",          3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@Uau",        200, 1, 100, Null)
+        .Parameters.Append .CreateParameter("@Uta",        200, 1, 1000, Null)
+        .Parameters.Append .CreateParameter("@Fcd",         3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@Fch",         3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@Fad",        200, 1, 20, Null)
+        .Parameters.Append .CreateParameter("@Fah",        200, 1, 20, Null)
+    End With
+
+    On Error Resume Next
+    cmd.Execute
+    If Err.Number <> 0 Then
+        Response.Write "ERROR " & Err.Number & ": " & Err.Description
+        Response.End
+    End If
+    On Error Goto 0
+
+    Set cmd = Nothing
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function SYSLOGON(cnn,acc)
+
+Usuario = UserLogon()
+'response.write "SYSLOGON"+Usuario
+XXX = UsrAcc(Usuario,"U",Cnn,acc)
+
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Responsables"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 25, "seguridad")
+		.Parameters.Append .CreateParameter("@Id", 3, 1, , Null)          ' adInteger = 3
+		.Parameters.Append .CreateParameter("@Funcion", 200, 1, 50, Null)
+		.Parameters.Append .CreateParameter("@IdSeg", 200, 1, 100, CStr(Usuario))
+		Set rs = .Execute
+	End With
+
+if not rs.eof then
+
+	session("func") = rs(0)
+	session("usuario") = rs(1)        ' ID_SEG (login de Windows/AD, ej. FDELLARUPE)
+	session("usuario_id") = 0         ' ID numerico legado (PK de CG_COR_RESPONSABLES), si el SP lo devuelve
+	If rs.Fields.Count > 2 Then session("usuario_id") = rs(2)
+
+else
+
+	session("func") = "FUNC"
+	session("usuario") = "0"
+	session("usuario_id") = 0
+
+end if
+
+rs.close
+Set cmd = Nothing
+
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function dameId(param, Cnn)
+
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+
+	With cmd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Responsables"
+		.CommandType = 4
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 25, "id_seg")
+		.Parameters.Append .CreateParameter("@Id", 3, 1, , Null)          ' adInteger = 3
+		.Parameters.Append .CreateParameter("@Funcion", 200, 1, 50, Null)
+		.Parameters.Append .CreateParameter("@IdSeg", 200, 1, 100, CStr(param))
+		'Set rq = .Execute
+	End With
+
+
+	On Error Resume Next
+Set rq = cmd.Execute
+If Err.Number <> 0 Then
+    Response.Write "ERROR " & Err.Number & ": " & Err.Description
+    Response.End
+End If
+On Error Goto 0
+
+
+if not rq.eof then
+	dameId = rq(0)
+else
+	dameId = 0
+end if
+
+rq.close
+Set cmd = Nothing
+
+End Function
+
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function Esta(id,tipo,cn)
+
+	'response.write "Esta:" & id & "-"& tipo & "-" 
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = Cn
+		.CommandText = "sp_cg_Estadisticas"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "existe")
+		.Parameters.Append .CreateParameter("@Tipo", 200, 1, 10, CStr(tipo))
+		.Parameters.Append .CreateParameter("@Id", 3, 1, 4, CLng(id))
+        .Parameters.Append .CreateParameter("@CantAcc",      3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@UltAcc",     200, 1, 1000, Null)
+        .Parameters.Append .CreateParameter("@UltAccUsr",  200, 1, 100, Null)
+        .Parameters.Append .CreateParameter("@UltTipoAcc", 200, 1, 1000, Null)
+        .Parameters.Append .CreateParameter("@Acc",        200, 1, 1000, Null)
+        .Parameters.Append .CreateParameter("@Cli",          3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@Uau",        200, 1, 100, Null)
+        .Parameters.Append .CreateParameter("@Uta",        200, 1, 1000, Null)
+        .Parameters.Append .CreateParameter("@Fcd",         3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@Fch",         3, 1,  4, Null)
+        .Parameters.Append .CreateParameter("@Fad",        200, 1, 20, Null)
+        .Parameters.Append .CreateParameter("@Fah",        200, 1, 20, Null)		
+		
+	End With
+
+    On Error Resume Next
+    Set rf = cmd.Execute
+    If Err.Number <> 0 Then
+        Response.Write "ERROR " & Err.Number & ": " & Err.Description
+        Response.End
+    End If
+    On Error Goto 0
+
+    Set cmd = Nothing
+
+
+xesta = ""
+
+if not rf.eof then
+	xesta = 1
+else
+	xesta = 0
+end if
+
+rf.close
+Set cmd = Nothing
+
+Esta = xesta
+
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function dameUltId(tipo,cn)
+
+ultId = ""
+
+tabla = ""
+select case tipo
+	case "I"
+		tabla = "incidentes"
+	case "P"
+		tabla = "proyectos"
+	case "A"
+		tabla = "apl"
+end select
+
+If tabla <> "" Then
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = cn
+		.CommandText = "sp_cg_Utilidades"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "max_id")
+		.Parameters.Append .CreateParameter("@Campo", 200, 1, 30, Null)
+		.Parameters.Append .CreateParameter("@Tabla", 200, 1, 30, tabla)
+		.Parameters.Append .CreateParameter("@Id",          3, 1,  4, Null)
+		Set rt = .Execute
+	End With
+
+
+	if not rt.eof then ultId = rt(0)
+	rt.close
+	Set cmd = Nothing
+End If
+
+dameUltId = ultId
+
+End function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function ObjAcc(id,tipo,cn,acc)
+
+'response.write "ObjAcc:" & id & "-"& tipo & "-" 
+
+sEsta = Esta(id,tipo,cn)
+
+xacc = ""
+ultacc = ""
+cantacc = ""
+
+select case acc
+
+	case "C"
+		xacc = "CREACION"
+		ultacc = 0
+		cantacc = 0
+	case "D"
+		xacc = "CONSULTA"
+		ultacc = NOW()
+		cantacc = 1
+	case "A"
+		xacc = "ACTUALIZA"
+		ultacc = NOW()
+		cantacc = 1
+end select
+
+
+Dim cmd
+Set cmd = Server.CreateObject("ADODB.Command")
+With cmd
+    .ActiveConnection = cn
+    .CommandText = "sp_cg_Estadisticas"
+    .CommandType = 4
+
+    .Parameters.Append .CreateParameter("@Modo",       200, 1, 20, "existe")
+    .Parameters.Append .CreateParameter("@Tipo",       200, 1, 10, CStr(tipo))
+    .Parameters.Append .CreateParameter("@Id",           3, 1,  4, CLng(id))
+    .Parameters.Append .CreateParameter("@CantAcc",      3, 1,  4, Null)
+    .Parameters.Append .CreateParameter("@UltAcc",     200, 1, 1000, Null)
+    .Parameters.Append .CreateParameter("@UltAccUsr",  200, 1, 100, Null)
+    .Parameters.Append .CreateParameter("@UltTipoAcc", 200, 1, 1000, Null)
+    .Parameters.Append .CreateParameter("@Acc",        200, 1, 1000, Null)
+    .Parameters.Append .CreateParameter("@Cli",          3, 1,  4, Null)
+    .Parameters.Append .CreateParameter("@Uau",        200, 1, 100, Null)
+    .Parameters.Append .CreateParameter("@Uta",        200, 1, 1000, Null)
+    .Parameters.Append .CreateParameter("@Fcd",         3, 1,  4, Null)
+    .Parameters.Append .CreateParameter("@Fch",         3, 1,  4, Null)
+    .Parameters.Append .CreateParameter("@Fad",        200, 1, 20, Null)
+    .Parameters.Append .CreateParameter("@Fah",        200, 1, 20, Null)
+End With
+
+Select Case tipo
+
+    Case "I", "P", "A"    ' mismo bloque para INCIDENTES / PROYECTOS / APL
+
+        If sEsta = 0 Then
+            With cmd
+                .Parameters("@Modo")    = "insertar"
+                .Parameters("@CantAcc") = cantacc
+                .Parameters("@UltAcc")  = CStr(ultacc)
+                .Parameters("@Acc")     = CStr(xacc)
+ 
+            End With
+        Else
+            With cmd
+                .Parameters("@Modo")       = "actualizar_usr"
+                .Parameters("@UltAcc")     = CStr(Now())
+                .Parameters("@UltAccUsr")  = CStr(session("USUARIO"))
+                .Parameters("@Acc")        = CStr(xacc)
+ 
+            End With
+        End If
+
+End Select
+
+    On Error Resume Next
+    Set rf = cmd.Execute
+    If Err.Number <> 0 Then
+        Response.Write "ERROR " & Err.Number & ": " & Err.Description
+        Response.End
+    End If
+    On Error Goto 0
+	
+Set cmd = Nothing
+
+
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+function botonera()
+
+shtml = shtml & "<table style='height:100%;width:100%;' >"
+
+shtml = shtml & "<tr>"
+
+shtml = shtml & "<td><font style='margin-left:5%;font-size:20pt;font-family:Serif;color:#000000;letter-spacing:0.2em;'><b>INCIDENTES</b></font></td>"
+
+if session("FUNC") = "FUNC" then
+
+	formx4 = "<form id='formx4' style='height:70%;' method='post' action='agregar2.asp?tipo=INC'></form>"
+	botonx4 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='CARGAR NUEVO INCIDENTE' onclick=""document.getElementById('formx4').submit();"">"
+	shtml = shtml & "<td align=right>" & botonx4 & "</td>"
+
+end if
+
+formx5 = "<form id='formx5' style='height:70%;' method='post' action='index.asp'></form>"
+botonx5 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='VOLVER' onclick=""document.getElementById('formx5').submit();"">"
+
+
+
+
+if cantregmover <> 0 then
+	formx22 = "<form id='formx22' style='height:1px;' method='post' action='incidentes.asp?opc=listar&cantregmover=" & (cantregmover - cantregmostrar) & "'></form>"
+	botonx22 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='ATRAS' onclick=""document.getElementById('formx22').submit();"">"
+else
+	botonx22 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='ATRAS'>"
+end if
+
+if not rs.eof then
+	formx23 = "<form id='formx23' style='height:1px;' method='post' action='incidentes.asp?opc=listar&cantregmover=" & (cantregmover + cantregmostrar) & "'></form>"
+	botonx23 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='SIGUIENTE' onclick=""document.getElementById('formx23').submit();"">"
+else
+	botonx23 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='SIGUIENTE'>"
+end if
+
+	shtml = shtml & "<td align=right>" & botonx22 & "</td>"
+	shtml = shtml & "<td>" & botonx23 & "</td>"
+	shtml = shtml & "<td style='width:10%;' align=center>" & botonx5 & "</td>"
+	'html = html & "<td>" & Server.MapPath(Request.ServerVariables("PATH_INFO")) & "</td>"
+
+shtml = shtml & "</tr>"
+
+shtml = shtml & "</table>"
+
+botonera = shtml
+
+end function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+' Texto SQL seguro (comillas escapadas) para concatenar un ID_SEG (login) en una sentencia
+Function SqlStr(v)
+	SqlStr = "N'" & Replace(v & "", "'", "''") & "'"
+End Function
+
+' Id HTML seguro a partir de un ID_SEG (solo letras, numeros y _)
+Function DomId(v)
+	Dim s, i, c, r
+	s = v & "" : r = ""
+	For i = 1 To Len(s)
+		c = Mid(s, i, 1)
+		If (c >= "0" And c <= "9") Or (c >= "A" And c <= "Z") Or (c >= "a" And c <= "z") Then r = r & c Else r = r & "_"
+	Next
+	DomId = r
+End Function
+
+Function getName(cn,campo,tabla,id)
+
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = cn
+		.CommandText = "sp_cg_Utilidades"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "consultar_campo")
+		.Parameters.Append .CreateParameter("@Campo", 200, 1, 100, CStr(campo))
+		.Parameters.Append .CreateParameter("@Tabla", 200, 1, 30, CStr(tabla))
+		If IsNumeric(id) Then
+			.Parameters.Append .CreateParameter("@Id", 3, 1, 4, CLng(id))
+			.Parameters.Append .CreateParameter("@IdSeg", 200, 1, 100, Null)
+		Else
+			.Parameters.Append .CreateParameter("@Id", 3, 1, 4, Null)
+			.Parameters.Append .CreateParameter("@IdSeg", 200, 1, 100, CStr(id))
+		End If
+		Set ns = .Execute
+	End With
+
+	xName = ""
+	if not ns.eof then xName = ns(0)
+
+	getName = xName
+
+	ns.close()
+	Set cmd = Nothing
+
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function armaCombo(sql,cn,clave,valor,texto,comboid)
+
+	Set nrs = cn.Execute(sql)
+
+	html = html & "<select class='ui-select' id='" & comboid & "' name='" & comboid & "'>"
+
+
+
+	Do While Not nrs.eof
+
+		If clave = nrs(valor) Then
+
+			html = html & "<option value='" & nrs(valor) & "' selected>" & nrs(texto) & "</option>"
+
+		Else
+
+			html = html & "<option value='" & nrs(valor) & "'>" & nrs(texto) & "</option>"
+
+		End If
+
+		nrs.movenext
+	Loop
+
+	armaCombo = html & "</select>"
+
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function SendMail(ByVal strEmailBodyMessage, ByVal strRecipientEmailAddress , ByVal strFromEmailAddress, ByVal strSubject, strMailComponent, blnHTML,Byval Importance, byval notification)
+
+	'Dimension variables
+       Dim objCDOSYSMail		'Holds the CDOSYS mail object
+       Dim objCDOMail			'Holds the CDONTS mail object
+       Dim objJMail			'Holds the Jmail object
+       Dim objAspEmail			'Holds the Persits AspEmail email object
+       Dim objAspMail			'Holds the Server Objects AspMail email object
+       Dim strEmailBodyAppendMessage	'Holds the appended email message
+       Dim SmtpServer
+       Dim SmtpPort
+
+       SmtpServer = Session("SMTPServer")
+       SmtpPort   = Session("SMTPPort")
+
+      ' RESPONSE.WRITE strRecipientEmailAddress & "<BR>" & strFromEmailAddress
+       SHTMLMail = "<!DOCTYPE HTML PUBLIC""-//IETF//DTD HTML//EN"">"
+       SHTMLMail = SHTMLMail & "<html>"
+       SHTMLMail = SHTMLMail & "<head>"
+       SHTMLMail = SHTMLMail & "<title>" & subject & "</title>"
+       SHTMLMail = SHTMLMail & "</head>"
+       SHTMLMail = SHTMLMail & "<body bgcolor=""FFFFFF"">"
+       SHTMLMail = SHTMLMail & strEmailBodyMessage
+
+       SHTMLMail = SHTMLMail & "</body>"
+       SHTMLMail = SHTMLMail & "</html>"
+
+
+	'******************************************
+	'***	        Mail components        ****
+	'******************************************
+
+	'Select which email component to use
+	Select Case ucase(strMailComponent)
+
+
+		'******************************************
+		'***	  MS no envia     ****
+		'******************************************
+
+		'CDOSYS mail component
+		Case "NOSEND"
+
+
+
+		'******************************************
+		'***	  MS CDOSYS mail component     ****
+		'******************************************
+
+		'CDOSYS mail component
+		Case "CDOSYS"
+
+			'Dimension variables
+			Dim objCDOSYSCon
+
+			'Create the e-mail server object
+			    Set objCDOSYSMail = Server.CreateObject("CDO.Message")
+		    	Set objCDOSYSCon = Server.CreateObject ("CDO.Configuration")
+
+		    	'Set and update fields properties
+
+		        	'Out going SMTP server
+		        	 objCDOSYSCon.Fields("http://schemas.microsoft.com/cdo/configuration/smtpserver") = SmtpServer
+		        	'SMTP port
+		        	 objCDOSYSCon.Fields("http://schemas.microsoft.com/cdo/configuration/smtpserverport")  =SmtpPort
+		        	'CDO Port
+		        	 objCDOSYSCon.Fields("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+
+
+
+		        	'Timeout
+		        	objCDOSYSCon.Fields("http://schemas.microsoft.com/cdo/configuration/smtpconnectiontimeout") = 60
+	        		objCDOSYSCon.Fields.Update
+
+
+				'Update the CDOSYS Configuration
+				Set objCDOSYSMail.Configuration = objCDOSYSCon
+
+
+				'Who the e-mail is from
+				'objCDOSYSMail.From = strFromEmailName & " <" & strFromEmailAddress & ">"
+				objCDOSYSMail.From = strFromEmailAddress
+
+				'Who the e-mail is sent to
+				'objCDOSYSMail.To = strRecipientName & " <" & strRecipientEmailAddress & ">"
+				'response.write strRecipientEmailAddress & "22"
+				 objCDOSYSMail.To =  strRecipientEmailAddress &""
+			     'IF OPWK = "REASIGNAR" then
+			      '	 objCDOSYSMail.CC = usrcc
+			    'end if
+				'The subject of the e-mail
+				objCDOSYSMail.Subject = strSubject
+
+				'Set the e-mail body format (HTMLBody=HTML TextBody=Plain)
+				If UCASE(blnHTML)="SI" Then
+				 	objCDOSYSMail.HTMLBody = SHTMLMail
+				Else
+					objCDOSYSMail.TextBody = SHTMLMail
+				End If
+                if UCASE(notification)="SI" then
+                   objCDOSYSMail.fields("urn:schemas:mailheader:disposition-notification-to") =chr34 & strFromEmailAddress & chr(34) ' "<valid e-mail address>"     'ToDo: Type a valid e-mail address.
+		           objCDOSYSMail.fields("urn:schemas:mailheader:return-receipt-to") = chr34 & strFromEmailAddress & chr(34) 			' "<valid e-mail address>"  'ToDo: Type a valid e-mail address.
+                end if
+                select case importance
+                case 0 'BAJA
+                 objCDOSYSMail.Fields("urn:schemas:mailheader:X-Priority").value= 5
+                case 1 'NORMAL
+                  objCDOSYSMail.Fields("urn:schemas:mailheader:X-Priority").value= 3
+                case 2  'ALTA
+                   objCDOSYSMail.Fields("urn:schemas:mailheader:X-Priority").value= 1
+
+                end select
+
+				objCDOSYSMail.Fields.Update
+
+				'Send the e-mail
+				on error resume next
+				objCDOSYSMail.Send
+
+
+			'Close the server mail object
+			Set objCDOSYSMail = Nothing
+
+
+
+
+		'******************************************
+		'***  	  MS CDONTS mail component     ****
+		'******************************************
+
+		'CDONTS mail component
+		Case "CDONTS"
+
+
+
+
+
+
+			'Create the e-mail server object
+			Set objCDOMail = Server.CreateObject("CDONTS.NewMail")
+
+				'Who the e-mail is from
+				objCDOMail.From =  strFromEmailAddress
+
+				'Who the e-mail is sent to
+				objCDOMail.To = strRecipientEmailAddress
+
+				'The subject of the e-mail
+				objCDOMail.Subject = strSubject
+
+				'The main body of the e-amil
+				objCDOMail.Body = SHTMLMail
+
+				'Set the e-mail body format (0=HTML 1=Text)
+				If blnHTML ="SI" Then
+					objCDOMail.BodyFormat = 0
+				Else
+					objCDOMail.BodyFormat = 1
+				End If
+
+				'Set the mail format (0=MIME 1=Text)
+				objCDOMail.MailFormat = 0
+
+				'Importance of the e-mail (0=Low, 1=Normal, 2=High)
+				objCDOMail.Importance = importance
+
+			     if UCASE(notification) = "SI" then
+				  strReply_To = "<" & From & ">"
+				  objCDOMail.Value("Disposition-Notification-To") = strReply_To
+			     end if
+
+				'Send the e-mail
+				objCDOMail.Send
+
+
+			'Close the server mail object
+			  Set objCDOMail = Nothing
+
+
+
+
+		'******************************************
+		'***  	  w3 JMail mail component      ****
+		'******************************************
+
+		'JMail component
+		Case "Jmail"
+
+			'Create the e-mail server object
+			Set objJMail = Server.CreateObject("JMail.SMTPMail")
+
+			With objJMail
+				'Out going SMTP mail server address
+			.ServerAddress = strIncomingMailServer
+
+			'Who the e-mail is from
+			.Sender = strFromEmailAddress
+			.SenderName = strFromEmailName
+
+			'Who the e-mail is sent to
+			.AddRecipient strRecipientEmailAddress
+
+			'The subject of the e-mail
+			.Subject = strSubject
+
+				'Set the e-mail body format (BodyHTML=HTML Body=Text)
+				If blnHTML = True Then
+					.HTMLBody = strEmailBodyMessage & strEmailBodyAppendMessage
+				Else
+					.Body = strEmailBodyMessage & strEmailBodyAppendMessage
+				End If
+
+				'Importance of the e-mail
+				.Priority = 3
+
+				'Send the e-mail
+				If NOT strIncomingMailServer = "" Then .Execute
+			End With
+
+			'Close the server mail object
+			Set objJMail = Nothing
+
+
+
+
+		'******************************************
+		'*** Persits AspEmail mail component   ****
+		'******************************************
+
+		'AspEmail component
+		Case ucase("AspEmail")
+			'Create the e-mail server object
+			Set objAspEmail = Server.CreateObject("Persits.MailSender")
+
+
+				'Out going SMTP mail server address
+				objAspEmail.Host = SmtpServer
+
+				'Who the e-mail is from
+				objAspEmail.From = strFromEmailAddress
+				'.FromName = strFromEmailName
+
+				'Who the e-mail is sent to
+				objAspEmail.AddAddress strRecipientEmailAddress
+              '  response.write strRecipientEmailAddress
+				'The subject of the e-mail
+				objAspEmail.Subject = strSubject
+
+				'Set the e-mail body format (BodyHTML=HTML Body=Text)
+				If ucase(blnHTML) = "SI" Then
+					objAspEmail.IsHTML = True
+				End If
+
+				'The main body of the e-mail
+				objAspEmail.Body = SHTMLMail
+
+				 select case importance
+				   case 0 'BAJA
+				    objAspEmail.Priority=5
+				   case 1 'NORMAL
+				    objAspEmail.Priority=3
+				   case 2  'ALTA
+				    objAspEmail.Priority=1
+                 end select
+
+
+                 if UCASE(notification)="SI" then
+                  objAspEmail.AddCustomHeader "Return-Receipt-To: " & chr(34) & strFromEmailAddress & chr(34)
+ 				 end if
+
+
+				'Send the e-mail
+				objAspEmail.Send
+
+
+			'Close the server mail object
+			Set objAspEmail = Nothing
+
+
+
+
+		'********************************************
+		'*** ServerObjects AspMail mail component ***
+		'********************************************
+
+		'AspMail component
+		Case "AspMail"
+
+		   	'Create the e-mail server object
+		   	Set objAspMail = Server.CreateObject("SMTPsvg.Mailer")
+
+		   	With objAspMail
+			   	'Out going SMTP mail server address
+			   	.RemoteHost = strIncomingMailServer
+
+			   	'Who the e-mail is from
+			   	.FromAddress = strFromEmailAddress
+			   	.FromName = strFromEmailName
+
+			   	'Who the e-mail is sent to
+			   	.AddRecipient " ", strRecipientEmailAddress
+
+			   	'The subject of the e-mail
+			   	.Subject = strSubject
+
+			   	'Set the e-mail body format (BodyHTML=HTML Body=Text)
+			   	If blnHTML = True Then
+			    		.ContentType = "text/HTML"
+			   	End If
+
+			   	'The main body of the e-mail
+			   	.BodyText = strEmailBodyMessage & strEmailBodyAppendMessage
+
+			   	'Send the e-mail
+			   	If NOT strIncomingMailServer = "" Then .SendMail
+			   End With
+
+		   	'Close the server mail object
+		   	Set objAspMail = Nothing
+	End Select
+
+	'Set the returned value of the function to true
+	SendMail = True
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Function getMail(id,cn)
+
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = cn
+		.CommandText = "sp_cg_Utilidades"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "consultar_mail")
+		If IsNumeric(id) Then
+			.Parameters.Append .CreateParameter("@Id", 3, 1, 4, CLng(id))
+			.Parameters.Append .CreateParameter("@IdSeg", 200, 1, 100, Null)
+		Else
+			.Parameters.Append .CreateParameter("@Id", 3, 1, 4, Null)
+			.Parameters.Append .CreateParameter("@IdSeg", 200, 1, 100, CStr(id))
+		End If
+		Set ns = .Execute
+	End With
+
+	getMail = ""
+	if not ns.eof then getMail = ns(0)
+
+	ns.close
+	Set cmd = Nothing
+
+end function
+
+FUNCTION MAILREC()
+
+fecha = clng(date) - CLng(CDate("01-01-1900"))
+
+Dim cmd
+Set cmd = Server.CreateObject("ADODB.Command")
+With cmd
+	.ActiveConnection = Cnn
+	.CommandText = "sp_cg_Agenda"
+	.CommandType = 4
+	.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "recordatorios")
+	.Parameters.Append .CreateParameter("@DiaAviso", 3, 1, 4, CLng(fecha))
+	Set rs = .Execute
+End With
+
+do while not rs.eof
+
+	smail = getMail(rs(3),cnn)
+	xxx = SendMail(rs(1),smail,"soptec@corconsulting.com.ar","RECORDATORIO","CDOSYS","SI","1","NO")
+
+	if rs(6) & "" <> "" then
+
+		ccs = split(rs(6),",")
+
+		for i=0 to ubound(ccs)
+			mail = getMail(ccs(i),cnn)
+			xxx = SendMail(rs(1),mail,"soptec@corconsulting.com.ar","RECORDATORIO (copia)","CDOSYS","SI","1","NO")
+		next
+
+	end if
+
+	Dim cmdMarca
+	Set cmdMarca = Server.CreateObject("ADODB.Command")
+	With cmdMarca
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Agenda"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "marcar_enviado")
+		.Parameters.Append .CreateParameter("@Id", 3, 1, 4, CLng(rs(0)))
+		.Execute
+	End With
+	Set cmdMarca = Nothing
+
+rs.movenext
+loop
+
+rs.close
+Set cmd = Nothing
+
+END FUNCTION
+
+FUNCTION getCli(id)
+
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Utilidades"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "consultar_cli")
+		.Parameters.Append .CreateParameter("@Id", 3, 1, 4, CLng(id))
+		Set xc = .Execute
+	End With
+
+nClientes = ""
+sep = ""
+do while not xc.eof
+
+	nClientes = nClientes & seP & xc(0)
+	sep = ",&nbsp;"
+
+xc.movenext
+loop
+
+getCli = nClientes
+
+xc.close
+Set cmd = Nothing
+
+END FUNCTION
+
+FUNCTION getMenuParam()
+
+'mhtml = mhtml & "<nav id='menu' style='background:#ABDDFF;color:#000000;font-size:13pt;'>"
+mhtml = mhtml & "<nav id='menu'>"
+
+'Agregamos un contenedor header para que el título y la "X" de cerrar queden prolijos
+mhtml = mhtml & "<div class='menu-header'>"
+'mhtml = mhtml & "<h2>Menu</h2>"
+mhtml = mhtml & "<h2 class='menu-titulo'>Men&uacute;</h2>"
+
+'Botón para cerrar el menú (la X que vi en tu captura de DevTools)
+mhtml = mhtml & "<a class='close menu-cerrar' href='#menu' aria-label='Cerrar men&uacute;'>"
+mhtml = mhtml & "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>"
+mhtml = mhtml & "<path stroke-linecap='round' stroke-linejoin='round' d='M6 18L18 6M6 6l12 12' />"
+mhtml = mhtml & "</svg>"
+mhtml = mhtml & "</a>"
+mhtml = mhtml & "</div>"
+
+'mhtml = mhtml & "<ul>"
+mhtml = mhtml & "<ul class='menu-lista'>"
+'response.write "SESION"&session("USUARIO")
+Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Menu"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 15, "param")
+		.Parameters.Append .CreateParameter("@IdUsr", 200, 1, 100, CStr(session("USUARIO")))
+		.Parameters.Append .CreateParameter("@FuncUsr", 200, 1, 50, CStr(session("FUNC")))
+		If CLng(session("USUARIO_ID")) = 2 OR CLng(session("USUARIO_ID")) = 50 OR CLng(session("USUARIO_ID")) = 4 OR CLng(session("USUARIO_ID")) = 53 Then
+			.Parameters.Append .CreateParameter("@EsAdmin", 3, 1, 4, 1)
+		Else
+			.Parameters.Append .CreateParameter("@EsAdmin", 3, 1, 4, 0)
+		End If
+		Set rk = .Execute
+	End With
+
+do while not rk.eof
+
+'mhtml = mhtml & "<li><a href='" & rk(2) & "?xmenu=" & rk(0) & "&xtmenu=" & rk(3) & "'>" & rk(1) & "</a></li>"
+mhtml = mhtml & "<li><a class='menu-link' href='" & rk(2) & "?xmenu=" & rk(0) & "&xtmenu=" & rk(3) & "'>" & rk(1) & "</a></li>"
+
+rk.movenext
+loop
+
+mhtml = mhtml & "</ul>"
+mhtml = mhtml & "</nav>"
+
+getMenuParam = mhtml
+
+END FUNCTION
+
+'Dim gMenuCtxListo, gMenuCtxId, gMenuCtxTipo
+
+' xmenu / xtmenu son OPCIONALES. Orden de resolucion del menu actual:
+'  1) los que lleguen por QueryString (links viejos o historial del navegador)
+'  2) el menu que corresponde a la pagina actual (CG_MENUES.MODULO, via sp_cg_MenuContexto)
+'  3) el ultimo contexto guardado en la sesion (paginas internas: detalle, altas, etc.)
+' Se calcula una sola vez por pedido.
+Sub MenuContexto(ByRef idMenu, ByRef tipoMenu)
+	Dim qm, qt, cmdC, rsC, pagina
+	If Not gMenuCtxListo Then
+		gMenuCtxId = 0
+		gMenuCtxTipo = ""
+		qm = Trim(Request.QueryString("xmenu") & "")
+		qt = Trim(Request.QueryString("xtmenu") & "")
+		If qm <> "" And qt <> "" And IsNumeric(qm) Then
+			gMenuCtxId = CLng(qm)
+			gMenuCtxTipo = qt
+		Else
+			pagina = Request.ServerVariables("SCRIPT_NAME") & ""
+			pagina = Mid(pagina, InStrRev(pagina, "/") + 1)
+			On Error Resume Next
+			Set cmdC = Server.CreateObject("ADODB.Command")
+			cmdC.ActiveConnection = Cnn
+			cmdC.CommandText = "sp_cg_MenuContexto"
+			cmdC.CommandType = 4
+			cmdC.Parameters.Append cmdC.CreateParameter("@Pagina", 200, 1, 255, pagina)
+			cmdC.Parameters.Append cmdC.CreateParameter("@IdUsr", 200, 1, 100, CStr(session("USUARIO")))
+			cmdC.Parameters.Append cmdC.CreateParameter("@FuncUsr", 200, 1, 50, CStr(session("FUNC")))
+			Set rsC = cmdC.Execute
+			If Err.Number = 0 Then
+				If Not rsC.EOF Then
+					gMenuCtxId = CLng(rsC(0))
+					gMenuCtxTipo = CStr(rsC(1))
+				End If
+			End If
+			Err.Clear
+			On Error Goto 0
+			Set cmdC = Nothing
+		End If
+		If gMenuCtxId > 0 Then
+			Session("CTX_XMENU") = gMenuCtxId
+			Session("CTX_XTMENU") = gMenuCtxTipo
+		ElseIf Trim(Session("CTX_XMENU") & "") <> "" Then
+			gMenuCtxId = CLng(Session("CTX_XMENU"))
+			gMenuCtxTipo = CStr(Session("CTX_XTMENU"))
+		End If
+		gMenuCtxListo = True
+	End If
+	idMenu = gMenuCtxId
+	tipoMenu = gMenuCtxTipo
+End Sub
+
+FUNCTION getPermisos(smenu,tipoMenu,tipoPerm)
+
+Dim xAtrib,cmd, sp, xPermiso
+'response.write "getPermisos"
+xAtrib = ""
+
+' xmenu/xtmenu opcionales: si no llegan, se resuelve el menu de la pagina actual
+Dim mPerm, tPerm
+mPerm = Trim(smenu & "")
+tPerm = Trim(tipoMenu & "")
+If mPerm = "" Or tPerm = "" Or Not IsNumeric(mPerm) Then MenuContexto mPerm, tPerm
+select case tipoPerm
+
+	case "ALTA"
+		xAtrib = "agregar"
+	case "MODIF"
+		xAtrib = "modificar"
+	case "ELIM"
+		xAtrib = "eliminar"
+	case "CONS"
+		xAtrib = "consultar"
+	case "EST"
+		xAtrib = "estado"
+
+end select
+
+
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_MenuUsuario"
+		.CommandType = 4
+		 .Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "permiso")
+		 .Parameters.Append .CreateParameter("@FuncUsr", 200, 1, 50, CStr(session("FUNC")))
+		 .Parameters.Append .CreateParameter("@Flag",        200, 1, 1000, Null)
+		 .Parameters.Append .CreateParameter("@Valor",          3, 1,  4, Null)
+		 .Parameters.Append .CreateParameter("@Id",          3, 1,  4, Null)
+		.Parameters.Append .CreateParameter("@IdMenu", 3, 1, 4, CLng(mPerm))
+		.Parameters.Append .CreateParameter("@TipoMenu", 200, 1, 100, CStr(tPerm))
+		.Parameters.Append .CreateParameter("@IdUsr", 200, 1, 100, CStr(session("USUARIO")))
+		.Parameters.Append .CreateParameter("@Atributo", 200, 1, 20, xAtrib)
+		.Parameters.Append .CreateParameter("@Dato1",        200, 1, 1000, Null)
+		.Parameters.Append .CreateParameter("@Dato2",          3, 1,  4, Null)
+		.Parameters.Append .CreateParameter("@Dato3",          3, 1,  4, Null)
+ 		.Parameters.Append .CreateParameter("@Dato4",          3, 1,  4, Null)
+		.Parameters.Append .CreateParameter("@Dato5",          3, 1,  4, Null)
+		.Parameters.Append .CreateParameter("@Dato6",          3, 1,  4, Null)
+
+
+	End With
+
+
+    On Error Resume Next
+    Set sp = cmd.Execute
+    If Err.Number <> 0 Then
+        Response.Write "ERROR " & Err.Number & ": " & Err.Description
+        Response.End
+    End If
+    On Error Goto 0
+
+    Set cmd = Nothing
+
+
+ xPermiso = "0"
+
+if not sp.eof then
+	xPermiso = sp(0)
+end if
+
+getPermisos = xPermiso
+
+END FUNCTION
+
+FUNCTION getMenuPrinc()
+
+html = html & "<div class='inner'  style='border-bottom:solid 1px #132574;padding:2rem;'>"
+html = html & "<section class='tiles'>"
+
+Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Menu"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 15, "principal")
+		.Parameters.Append .CreateParameter("@IdUsr", 200, 1, 100, CStr(session("USUARIO")))
+		.Parameters.Append .CreateParameter("@FuncUsr", 200, 1, 50, CStr(session("FUNC")))		
+		On Error Resume Next
+		Set mp = .Execute
+		If Err.Number <> 0 Then
+			Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+			Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+			Response.Write "Contexto: getMenuPrinc<br>"
+			Response.Write "Codigo: " & Err.Number & "<br>"
+			Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+			Response.End
+		End If
+		On Error Goto 0
+	End With
+	Set cmd = Nothing
+
+
+do while not mp.eof
+
+html = html & "<a href='" & mp(2) & "?xmenu=" & mp(0) & "&xtmenu=" & mp(3) & "'>"
+html = html & "<article class='cardindex'>"
+'html = html & "<span class='image' style='border-radius: 20px;'>"
+html = html & "<img style='height:6rem;max-width:100%;' src='images/" & mp("icono") & "' alt='' />"
+'html = html & "</span>"
+'html = html & "<a href='" & mp(2) & "?xmenu=" & mp(0) & "&xtmenu=" & mp(3) & "'>"
+html = html & "<font class='font-titular'>" & ucase(mp(1)) & "</font>"
+'html = html & "</a>"
+html = html & "</article>"
+html = html & "</a>"
+
+mp.movenext
+loop
+
+html = html & "</section>"
+
+html = html & "</div>"
+
+END FUNCTION
+
+Function getMaxID(cn,tabla)
+
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	With cmd
+		.ActiveConnection = Cnn
+		.CommandText = "sp_cg_Utilidades"
+		.CommandType = 4
+		.Parameters.Append .CreateParameter("@Modo", 200, 1, 20, "max_id")
+		.Parameters.Append .CreateParameter("@Tabla", 200, 1, 30, CStr(tabla))
+		On Error Resume Next
+		Set mo = .Execute
+		If Err.Number <> 0 Then
+			Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+			Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+			Response.Write "Contexto: getMaxID (tabla=" & Server.HTMLEncode(tabla) & ")<br>"
+			Response.Write "Codigo: " & Err.Number & "<br>"
+			Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+			Response.End
+		End If
+		On Error Goto 0
+	End With
+
+maxID = 0
+if not mo.eof then maxID = mo(0)
+mo.close
+Set cmd = Nothing
+
+getMaxID = maxID
+
+End Function
+
+
+' =========================================================================
+' Función: puedeAct
+' Verifica si un incidente puede ser actualizado según sus estados.
+' =========================================================================
+Function puedeAct(cnnObj, idIncidente)
+    Dim cmd, rs, resultado
+    resultado = "NO"
+
+    If idIncidente & "" <> "" And IsNumeric(idIncidente) Then
+        Set cmd = Server.CreateObject("ADODB.Command")
+        With cmd
+            .ActiveConnection = cnnObj
+            .CommandText = "sp_cg_PuedeAct"
+            .CommandType = 4 ' adCmdStoredProc
+            .Parameters.Append .CreateParameter("@id", 3, 1, , CLng(idIncidente))
+            On Error Resume Next
+        Set rs = .Execute
+        If Err.Number <> 0 Then
+            Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+            Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+            Response.Write "Contexto: puedeAct (id=" & Server.HTMLEncode(idIncidente) & ")<br>"
+            Response.Write "Codigo: " & Err.Number & "<br>"
+            Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+            Response.End
+        End If
+        On Error Goto 0
+        End With
+
+        If Not rs.EOF Then
+            Dim estDesa, estFunc
+            estDesa = UCase(rs("estado_desa") & "")
+            estFunc = UCase(rs("estado_func") & "")
+
+            If estDesa <> "OK" Or estFunc <> "OK" Then
+                resultado = "SI"
+            End If
+        End If
+
+        rs.Close
+        Set rs = Nothing
+        Set cmd = Nothing
+    End If
+
+    puedeAct = resultado
+End Function
+
+
+' =========================================================================
+' Función: armaComboSP
+' Genera un elemento HTML <select> ejecutando un Stored Procedure parametrizado.
+' =========================================================================
+Function armaComboSP(cnnObj, spName, selectedValue, inputName, p1Name, p1Val)
+    Dim cmd, rs, htmlCombo, valId, valDesc, isSelected
+
+    Set cmd = Server.CreateObject("ADODB.Command")
+    With cmd
+        .ActiveConnection = cnnObj
+        .CommandText = spName
+        .CommandType = 4 ' adCmdStoredProc
+		.Parameters.Append .CreateParameter("@Origen", 200, 1, 50, CStr(p1Name))
+
+        ' Asignar parámetro si existe
+        If p1Name <> "" And Not IsNull(p1Val) And p1Val <> "" Then
+                  .Parameters.Append .CreateParameter("@Codigo", 200, 1, 100, CStr(p1Val))
+		Else
+				  .Parameters.Append .CreateParameter("@Codigo", 200, 1, 100, Null )
+        End If
+	'	 response.write "armaComboSP SP-"&CStr(spName)
+	'	 response.write "  Origen -"&CStr(p1Name)
+	'	 response.write "  VALOR -"&CStr(p1Val)
+
+        ' Set rs = .Execute
+     End With
+
+	On Error Resume Next
+    Set rs = cmd.Execute
+    If Err.Number <> 0 Then
+        Response.Write "ERROR " & Err.Number & ": " & Err.Description
+        Response.End
+    End If
+    On Error Goto 0
+
+    htmlCombo = "<select class='input-moderno ui-select' id='" & inputName & "' name='" & inputName & "'>"
+    If Trim(p1Val & "") = "" Then
+        htmlCombo = htmlCombo & "<option value='0'>-- Seleccione --</option>"
+    End If
+	
+	'response.write "<br>selectedValue:"  & selectedValue
+	
+	'response.write "valId"  & valId
+    If Not rs Is Nothing Then
+        Do While Not rs.EOF
+            valId = rs(0)
+            valDesc = rs(1)
+
+            ' Coincide con el valor guardado (sin distinguir mayusculas ni espacios; tolera Null).
+            ' Si la lista viene restringida a un solo codigo (p1Val, campo de solo lectura), esa unica opcion queda seleccionada.
+            If LCase(Trim(valId & "")) = LCase(Trim(selectedValue & "")) Or Trim(p1Val & "") <> "" Then
+                isSelected = " selected"
+            Else
+                isSelected = ""
+            End If
+
+            htmlCombo = htmlCombo & "<option value='" & valId & "'" & isSelected & ">" & Server.HTMLEncode(valDesc & "") & "</option>"
+            rs.MoveNext
+        Loop
+        rs.Close
+        Set rs = Nothing
+    End If
+
+    htmlCombo = htmlCombo & "</select>"
+    Set cmd = Nothing
+
+    armaComboSP = htmlCombo
+End Function
+
+Function IIf(cond, tVal, fVal)
+    If cond Then
+        IIf = tVal
+    Else
+        IIf = fVal
+    End If
+End Function
+
+Function RolResponsableActual()
+    If UCase(session("FUNC") & "") = "TEC" Then
+        RolResponsableActual = "TECNICO"
+    Else
+        RolResponsableActual = "FUNCIONAL"
+    End If
+End Function
+
+Function ComboP1Val(editable, selectedValue)
+    If editable Then
+        ComboP1Val = ""
+    Else
+        ComboP1Val = selectedValue & ""
+    End If
+End Function
+
+Function ComboCampo(cnnObj, selectedValue, inputName, origen, editable)
+    ComboCampo = armaComboSP(cnnObj, "sp_cg_ListarDatosCombos", selectedValue, inputName, origen, ComboP1Val(editable, selectedValue))
+End Function
+
+Function ComboUsuariosADPrueba(cn, inputName)
+	Dim rsDom, rsAd, cnAd, cmdAd, htmlAd, base, userName, password, displayName, cantidad, estado, consulta
+	htmlAd = "<select form='sForm' class='input-moderno' id='" & inputName & "' name='" & inputName & "' style='width:90%;'><option value=''>Seleccione un usuario de AD</option>"
+	cantidad = 0
+	estado = ""
+	On Error Resume Next
+	Set rsDom = cn.Execute("SELECT * FROM DOMINIOS WHERE RAIZLDAP IS NOT NULL AND DESCRIPCION <> 'DEFAULT'")
+	If Err.Number <> 0 Then
+		estado = "No se pudo leer DOMINIOS: " & Err.Description
+		Err.Clear
+		On Error GoTo 0
+		ComboUsuariosADPrueba = htmlAd & "<option value='' disabled>" & Server.HTMLEncode(estado) & "</option></select>"
+		Exit Function
+	End If
+	On Error GoTo 0
+	If rsDom.EOF Then estado = "No hay dominios LDAP configurados"
+	Do While Not rsDom.EOF
+		base = Replace(Replace(rsDom("RAIZLDAP") & "", "<", ""), ">", "")
+		userName = rsDom("USRLDAP") & ""
+		password = rsDom("PWDLDAP") & ""
+		On Error Resume Next
+		If IsObject(ofv) Then password = CStr(ofv.getCript("D", password))
+		Err.Clear
+		On Error GoTo 0
+		If Trim(base) <> "" Then
+			On Error Resume Next
+			Set cnAd = Server.CreateObject("ADODB.Connection")
+			cnAd.Provider = "ADsDSOObject"
+			If Trim(userName) <> "" Then
+				cnAd.Properties("User ID") = userName
+				cnAd.Properties("Password") = password
+				cnAd.Properties("Encrypt Password") = True
+			End If
+			Err.Clear
+			cnAd.Open "Active Directory Provider"
+			If Err.Number = 0 Then
+				Set cmdAd = Server.CreateObject("ADODB.Command")
+				Set cmdAd.ActiveConnection = cnAd
+				cmdAd.Properties("Page Size") = 1000
+				cmdAd.Properties("Searchscope") = 2
+				consulta = "SELECT sAMAccountName,name,displayName FROM '" & Replace(base, "'", "''") & "' WHERE objectCategory='person' AND objectClass='user'"
+				cmdAd.CommandText = consulta
+				Err.Clear
+				Set rsAd = cmdAd.Execute
+				If Err.Number = 0 Then
+					Do While Not rsAd.EOF
+						If IsNull(rsAd("displayName")) Then displayName = "" Else displayName = rsAd("displayName") & ""
+						If Trim(displayName) = "" Then
+							If IsNull(rsAd("name")) Then displayName = "" Else displayName = rsAd("name") & ""
+						End If
+						htmlAd = htmlAd & "<option value='" & Server.HTMLEncode(rsAd("sAMAccountName") & "") & "'>" & Server.HTMLEncode(displayName) & " (" & Server.HTMLEncode(rsAd("sAMAccountName") & "") & ")</option>"
+						cantidad = cantidad + 1
+						rsAd.MoveNext
+					Loop
+					rsAd.Close
+				Else
+					estado = "Error consultando AD: " & Err.Description
+					Err.Clear
+				End If
+				Set rsAd = Nothing
+				Set cmdAd = Nothing
+				cnAd.Close
+			Else
+				estado = "Error conectando AD: " & Err.Description
+				Err.Clear
+			End If
+			Set cnAd = Nothing
+			On Error GoTo 0
+		End If
+		rsDom.MoveNext
+	Loop
+	rsDom.Close
+	Set rsDom = Nothing
+	If cantidad = 0 And estado = "" Then estado = "AD conectado, sin usuarios activos"
+	If estado <> "" Then htmlAd = htmlAd & "<option value='' disabled>" & Server.HTMLEncode(estado) & "</option>"
+	ComboUsuariosADPrueba = htmlAd & "</select>"
+End Function
+
+Function ComboProyectoCampo(cnnObj, selectedProy, idCliente, editable)
+    If editable Then
+        ComboProyectoCampo = armaComboSP(cnnObj, "sp_cg_ListarDatosCombos", selectedProy, "id_proyecto", "id_proyecto", idCliente)
+    Else
+        ComboProyectoCampo = armaComboSP(cnnObj, "sp_cg_ListarDatosCombos", selectedProy, "id_proyecto", "id_proyecto", selectedProy)
+    End If
+End Function
+
+Function HtmlInputCampo(inputName, valor, editable)
+    Dim ro
+    If editable Then
+        ro = ""
+    Else
+        ro = " readonly"
+    End If
+    HtmlInputCampo = "<input class='input-moderno ui-input' id='" & inputName & "' name='" & inputName & "' type='text' style='width:90%;' value='" & Server.HTMLEncode(valor & "") & "'" & ro & ">"
+End Function
+
+Function HtmlTextAreaCampo(inputName, valor, alto, editable)
+    Dim ro
+    If editable Then
+        ro = ""
+    Else
+        ro = " readonly"
+    End If
+    HtmlTextAreaCampo = "<textarea class='txtar input-moderno ui-textarea' id='" & inputName & "' name='" & inputName & "' style='height:" & alto & ";width:100%; resize: vertical;'" & ro & ">" & Server.HTMLEncode(valor & "") & "</textarea>"
+End Function
+
+Function HtmlSelectSiNo(inputName, valor, editable)
+    Dim htmlSel, v
+    v = UCase(Trim(valor & ""))
+    htmlSel = "<select class='input-moderno ui-select' id='" & inputName & "' name='" & inputName & "' style='width:90%;'>"
+    If editable Then
+        htmlSel = htmlSel & "<option value='SI'" & IIf(v = "SI", " selected", "") & ">SI</option>"
+        htmlSel = htmlSel & "<option value='NO'" & IIf(v <> "SI", " selected", "") & ">NO</option>"
+    Else
+        htmlSel = htmlSel & "<option value='" & IIf(v = "SI", "SI", "NO") & "' selected>" & IIf(v = "SI", "SI", "NO") & "</option>"
+    End If
+    htmlSel = htmlSel & "</select>"
+    HtmlSelectSiNo = htmlSel
+End Function
+
+Function HistCol(rs, nombre)
+    ' lectura tolerante de una columna del historial (vacio si el SP todavia no la devuelve)
+    On Error Resume Next
+    HistCol = rs(nombre) & ""
+    If Err.Number <> 0 Then
+        HistCol = ""
+        Err.Clear
+    End If
+    On Error Goto 0
+End Function
+
+' Hora de un avance: se guarda en segundos del dia (0 = sin hora) -> "HH:MM"
+Function HistHora(seg)
+    Dim s
+    HistHora = ""
+    If Trim(seg & "") = "" Or Not IsNumeric(seg & "") Then Exit Function
+    s = CLng(seg)
+    If s <= 0 Then Exit Function
+    HistHora = Right("0" & (s \ 3600), 2) & ":" & Right("0" & ((s Mod 3600) \ 60), 2)
+End Function
+
+' Historial de avances (sp_cg_ObtenerComentarios): fecha y hora concatenadas, usuario, responsable,
+' tipo de avance, estado, via y detalle.
+' [UI] Marca: el pop-up de lectura ya se incluyo en la pagina
+Dim uiDialogoLecturaListo
+
+Function HtmlHistorialRelainc(cnnObj, idObj, tipoObj)
+    Dim rsH, htmlH, hay, fh, hh
+    hay = False
+    Set rsH = ObtenerComentarios(cnnObj, idObj, tipoObj)
+    htmlH = "<div class='ui-table-wrap' tabindex='0' role='region' aria-label='Historial de avances'><table class='tabla-moderna ui-table ui-hist'>"
+    '[UI-ANT] htmlH = htmlH & "<thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Responsable</th><th>Tipo de avance</th><th>Estado</th><th>V&iacute;a</th><th>Detalle</th></tr></thead><tbody>"
+    ' [UI] Orden pedido por Luis: fecha y hora, detalle (doble de ancho), estado, tipo, responsable, usuario y via
+    htmlH = htmlH & "<thead><tr><th>Fecha y hora</th><th class='ui-hist__detalle'>Detalle</th><th>Estado</th><th>Tipo de avance</th><th>Responsable</th><th>Usuario</th><th>V&iacute;a</th></tr></thead><tbody>"
+    Do While Not rsH.EOF
+        hay = True
+        fh = GTFechadorsh(rsH("fecha"))
+        hh = HistHora(rsH("hora"))
+        If hh <> "" Then fh = fh & " " & hh
+        htmlH = htmlH & "<tr>"
+        '[UI-ANT] htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "usuario")) & "</td>"
+        '[UI-ANT] htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "responsable")) & "</td>"
+        '[UI-ANT] htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "TAV_DESCRIPCION")) & "</td>"
+        '[UI-ANT] htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "AV_ESTADO")) & "</td>"
+        '[UI-ANT] htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "VIA_PEDIDO")) & "</td>"
+        '[UI-ANT] htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "descripcion")) & "</td>"
+        htmlH = htmlH & "<td>" & Server.HTMLEncode(fh) & "</td>"
+        '[UI-ANT] htmlH = htmlH & "<td class='ui-hist__detalle'>" & Server.HTMLEncode(HistCol(rsH, "descripcion")) & "</td>"
+        ' [UI] Detalle recortado a 3 renglones; al tocarlo abre el pop-up de lectura con el avance completo.
+        ' Atributos con comillas dobles: Server.HTMLEncode no escapa el apostrofo.
+        htmlH = htmlH & "<td class='ui-hist__detalle'><button type='button' class='ui-hist__ver' onclick='UiVerAvance(this)'" & _
+            " data-texto=""" & Server.HTMLEncode(HistCol(rsH, "descripcion")) & """ data-fecha=""" & Server.HTMLEncode(fh) & """" & _
+            " data-estado=""" & Server.HTMLEncode(HistCol(rsH, "AV_ESTADO")) & """ data-tipo=""" & Server.HTMLEncode(HistCol(rsH, "TAV_DESCRIPCION")) & """" & _
+            " data-responsable=""" & Server.HTMLEncode(HistCol(rsH, "responsable")) & """ data-usuario=""" & Server.HTMLEncode(HistCol(rsH, "usuario")) & """" & _
+            " data-via=""" & Server.HTMLEncode(HistCol(rsH, "VIA_PEDIDO")) & """>" & _
+            "<span class='ui-sr-only'>Ver avance completo: </span><span class='ui-hist__texto'>" & Server.HTMLEncode(HistCol(rsH, "descripcion")) & "</span></button></td>"
+        htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "AV_ESTADO")) & "</td>"
+        htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "TAV_DESCRIPCION")) & "</td>"
+        htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "responsable")) & "</td>"
+        htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "usuario")) & "</td>"
+        htmlH = htmlH & "<td>" & Server.HTMLEncode(HistCol(rsH, "VIA_PEDIDO")) & "</td>"
+        htmlH = htmlH & "</tr>"
+        rsH.MoveNext
+    Loop
+    rsH.Close
+    Set rsH = Nothing
+    htmlH = htmlH & "</tbody></table></div>"
+    If Not hay Then
+        htmlH = "<div class='ui-empty'>Sin avances registrados.</div>"
+    End If
+    ' [UI] Pop-up de lectura (una sola vez por pagina)
+    htmlH = htmlH & HtmlDialogoLectura()
+    HtmlHistorialRelainc = htmlH
+End Function
+
+Function HtmlDialogoLectura()
+    Dim h
+    If uiDialogoLecturaListo Then
+        HtmlDialogoLectura = ""
+        Exit Function
+    End If
+    uiDialogoLecturaListo = True
+    h = "<dialog id='dlgLectura' class='ui-dialogo' aria-labelledby='dlgLecturaTitulo'>"
+    h = h & "<div class='ui-dialogo__head'><h2 class='ui-dialogo__titulo' id='dlgLecturaTitulo'>Avance</h2><button type='button' class='ui-dialogo__cerrar' aria-label='Cerrar' onclick='UiLecturaCerrar()'>&times;</button></div>"
+    h = h & "<div class='ui-dialogo__body' id='dlgLecturaCuerpo'></div>"
+    h = h & "<div class='ui-dialogo__acciones'><button type='button' class='ui-button ui-button--secondary' onclick='UiLecturaCerrar()'>Cerrar</button></div>"
+    h = h & "</dialog>"
+    h = h & "<script>(function(){if(window.UiVerAvance)return;"
+    h = h & "function campo(etq,val,texto){var d=document.createElement('div');d.className='ui-field';var l=document.createElement('div');l.className='ui-field__label';l.textContent=etq;var v=document.createElement('div');v.className='ui-dialogo__valor'+(texto?' ui-dialogo__valor--texto':'');v.textContent=(val&&val.trim())?val:'-';d.appendChild(l);d.appendChild(v);return d;}"
+    h = h & "function abrir(titulo,nodos,origen){var dlg=document.getElementById('dlgLectura');document.getElementById('dlgLecturaTitulo').textContent=titulo;var c=document.getElementById('dlgLecturaCuerpo');c.innerHTML='';nodos.forEach(function(n){c.appendChild(n);});dlg.__origen=origen;dlg.showModal();var cerrar=dlg.querySelector('.ui-dialogo__acciones button');if(cerrar)cerrar.focus();}"
+    h = h & "window.UiVerAvance=function(b){var g=document.createElement('div');g.className='ui-dialogo__grid';"
+    h = h & "[['Fecha y hora','data-fecha'],['Responsable','data-responsable'],['Tipo de avance','data-tipo'],['Estado','data-estado'],['Usuario','data-usuario'],['V\u00eda','data-via']].forEach(function(x){g.appendChild(campo(x[0],b.getAttribute(x[1])));});"
+    h = h & "abrir('Avance',[campo('Detalle del avance',b.getAttribute('data-texto'),true),g],b);};"
+    h = h & "window.UiVerTexto=function(titulo,idTexto,origen){var s=document.getElementById(idTexto);abrir(titulo,[campo('Descripci\u00f3n',s.innerText,true)],origen);};"
+    h = h & "window.UiLecturaCerrar=function(){document.getElementById('dlgLectura').close();};"
+    h = h & "var dlg=document.getElementById('dlgLectura');dlg.addEventListener('close',function(){if(dlg.__origen)dlg.__origen.focus();});dlg.addEventListener('click',function(e){if(e.target===dlg)dlg.close();});"
+    h = h & "window.UiMarcarRecortes=function(){document.querySelectorAll('.ui-recorte').forEach(function(el){var b=document.querySelector('[data-recorte=\x22'+el.id+'\x22]');if(b)b.hidden=!(el.scrollHeight>el.clientHeight+1);});};"
+    h = h & "window.addEventListener('load',UiMarcarRecortes);window.addEventListener('resize',UiMarcarRecortes);})();</script>"
+    HtmlDialogoLectura = h
+End Function
+
+Function HtmlCamposAvance(responsableActual)
+    Dim htmlA, hoy, horaAct, selF, selT, selC, r, rsT, optT
+    r = UCase(Trim(responsableActual & ""))
+    If r = "" Then r = RolResponsableActual()
+    hoy = Year(Date()) & "-" & Right("0" & Month(Date()), 2) & "-" & Right("0" & Day(Date()), 2)
+    horaAct = Right("0" & Hour(Time()), 2) & ":" & Right("0" & Minute(Time()), 2)
+    selF = IIf(r = "FUNCIONAL", " selected", "")
+    selT = IIf(r = "TECNICO", " selected", "")
+    selC = IIf(r = "CLIENTE", " selected", "")
+    htmlA = "<textarea class='txtar input-moderno ui-textarea' id='avance' name='avance' style='height:120px;width:100%;' placeholder='Detalle del avance'></textarea>"
+    htmlA = htmlA & "<label>Fecha <input class='input-moderno ui-input ui-date' id='avance_fecha' name='avance_fecha' type='date' value='" & hoy & "'></label> "
+    htmlA = htmlA & "<label>Hora <input class='input-moderno ui-input' id='avance_hora' name='avance_hora' type='time' value='" & horaAct & "'></label> "
+    htmlA = htmlA & "<label>Responsable <select class='input-moderno ui-select' id='responsable_avance' name='responsable_avance'>"
+    htmlA = htmlA & "<option value='FUNCIONAL'" & selF & ">FUNCIONAL</option>"
+    htmlA = htmlA & "<option value='TECNICO'" & selT & ">TECNICO</option>"
+    htmlA = htmlA & "<option value='CLIENTE'" & selC & ">CLIENTE</option></select></label>"
+    ' tipo de avance (CG_TIPO_AVANCE)
+    optT = "<option value=''>-- Seleccione --</option>"
+    Set rsT = GetListaComboExtended(Cnn, "tipo_avance")
+    Do While Not rsT.EOF
+        optT = optT & "<option value='" & rsT(0) & "'>" & Server.HTMLEncode(rsT(1) & "") & "</option>"
+        rsT.MoveNext
+    Loop
+    rsT.Close
+    htmlA = htmlA & " <label>Tipo de avance <select class='input-moderno ui-select' id='tipo_avance' name='tipo_avance'>" & optT & "</select></label>"
+    HtmlCamposAvance = htmlA
+End Function
+
+Function HtmlBotonEditarFila(formId, puede)
+    If CStr(puede) = "1" Or puede = True Then
+        HtmlBotonEditarFila = "<input class='btn-accion ui-button ui-button--quiet' type='button' value='Editar' onclick=""toggleEditarFila('" & formId & "', this);"">"
+    Else
+        HtmlBotonEditarFila = ""
+    End If
+End Function
+
+Function HtmlCampoCatalogo(inputName, valor, formId, puede)
+    HtmlCampoCatalogo = "<div style='display:flex;align-items:center;gap:0.5rem;'>"
+    HtmlCampoCatalogo = HtmlCampoCatalogo & "<input class='input-moderno ui-input' name='" & inputName & "' type='text' value='" & Server.HTMLEncode(valor & "") & "' readonly>"
+    HtmlCampoCatalogo = HtmlCampoCatalogo & HtmlBotonEditarFila(formId, puede)
+    HtmlCampoCatalogo = HtmlCampoCatalogo & "</div>"
+End Function
+
+Function ScriptEdicionCatalogo()
+    Dim js
+    js = "<script type='text/javascript'>"
+    js = js & "function toggleEditarFila(formu, btn){"
+    js = js & " var f=document.getElementById(formu); if(!f){return;}"
+    js = js & " if(btn.getAttribute('data-mode')!=='edit'){"
+    js = js & "  var els=f.querySelectorAll('input,textarea,select');"
+    js = js & "  if(els.length===0){ var row=btn.closest?btn.closest('tr'):null; if(row) els=row.querySelectorAll('input,textarea,select'); }"
+    js = js & "  for(var i=0;i<els.length;i++){ if(els[i].type==='button'||els[i].type==='submit') continue;"
+    js = js & "   els[i].readOnly=false; els[i].disabled=false; if(els[i].className) els[i].className=els[i].className.replace('input-deshabilitado',''); }"
+    js = js & "  btn.value='Guardar'; btn.setAttribute('data-mode','edit'); btn.style.backgroundColor='#2563eb';"
+    js = js & " } else {"
+    js = js & "  try{f.submit();}catch(e){alert('Error al guardar: '+e.message);}"
+    js = js & " }"
+    js = js & "}"
+    js = js & "</script>"
+    ScriptEdicionCatalogo = js
+End Function
+
+' Función auxiliar para formatear fechas de entrega
+Function Fechador(fec)
+    If IsDate(fec) Then
+        Fechador = FormatDateTime(fec, 2)
+    Else
+        Fechador = fec
+    End If
+End Function
+
+
+' Función genérica para obtener datos de combos usando el Stored Procedure
+Function GetDatosCombo(Cnn, origen, codigo)
+    Dim cmd
+    Set cmd = Server.CreateObject("ADODB.Command")
+    cmd.ActiveConnection = Cnn
+    cmd.CommandText = "sp_cg_ListarDatosCombos"
+    cmd.CommandType = 4 ' 4 = adCmdStoredProc
+
+    ' Agregamos los parámetros esperados por el SP
+    ' adVarChar = 200, adParamInput = 1, longitud = 20
+    cmd.Parameters.Append cmd.CreateParameter("@Origen", 200, 1, 20, origen)
+
+    ' Manejo de nulos para el parámetro @Codigo
+    If Trim(codigo) = "" Then
+        cmd.Parameters.Append cmd.CreateParameter("@Codigo", 200, 1, 100, Null)
+    Else
+        cmd.Parameters.Append cmd.CreateParameter("@Codigo", 200, 1, 100, codigo)
+    End If
+
+    ' Retornamos el Recordset
+    On Error Resume Next
+    Set GetDatosCombo = cmd.Execute()
+    If Err.Number <> 0 Then
+        Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+        Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+        Response.Write "Contexto: GetDatosCombo (origen=" & Server.HTMLEncode(origen) & ")<br>"
+        Response.Write "Codigo: " & Err.Number & "<br>"
+        Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+        Response.End
+    End If
+    On Error Goto 0
+    Set cmd = Nothing
+End Function
+
+
+
+Function InsertarDatoAuxiliar(Cnn, sParam, sDato1, sDato2, sDato3)
+    Dim cmd
+    Set cmd = Server.CreateObject("ADODB.Command")
+
+    cmd.ActiveConnection = Cnn
+    cmd.CommandText = "sp_cg_InsertarTablaAuxiliar"
+    cmd.CommandType = 4 ' 4 = adCmdStoredProc
+
+    ' Parametrización segura de entradas
+    cmd.Parameters.Append cmd.CreateParameter("@Param", 200, 1, 30, sParam)
+    cmd.Parameters.Append cmd.CreateParameter("@Dato1", 200, 1, 255, sDato1)
+    cmd.Parameters.Append cmd.CreateParameter("@Dato2", 200, 1, 255, sDato2)
+    cmd.Parameters.Append cmd.CreateParameter("@Dato3", 200, 1, 255, sDato3)
+
+    On Error Resume Next
+    cmd.Execute
+    If Err.Number <> 0 Then
+        Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+        Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+        Response.Write "Contexto: InsertarDatoAuxiliar (param=" & Server.HTMLEncode(sParam) & ")<br>"
+        Response.Write "Codigo: " & Err.Number & "<br>"
+        Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+        Response.End
+    End If
+    On Error Goto 0
+    Set cmd = Nothing
+End Function
+
+Function ConsultarRelacionAPL(Cnn, idApl, idRelac, tipoRelac)
+    Dim cmd
+    Set cmd = Server.CreateObject("ADODB.Command")
+    cmd.ActiveConnection = Cnn
+    cmd.CommandText = "sp_cg_ConsultarRelacionAPL"
+    cmd.CommandType = 4 ' adCmdStoredProc
+
+    cmd.Parameters.Append cmd.CreateParameter("@IdApl", 3, 1, 4, CLng(idApl))
+    cmd.Parameters.Append cmd.CreateParameter("@IdRelac", 3, 1, 4, CLng(idRelac))
+    cmd.Parameters.Append cmd.CreateParameter("@TipoRelac", 200, 1, 10, tipoRelac)
+
+    On Error Resume Next
+    Set ConsultarRelacionAPL = cmd.Execute()
+    If Err.Number <> 0 Then
+        Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+        Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+        Response.Write "Contexto: ConsultarRelacionAPL (idApl=" & Server.HTMLEncode(idApl) & ")<br>"
+        Response.Write "Codigo: " & Err.Number & "<br>"
+        Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+        Response.End
+    End If
+    On Error Goto 0
+    Set cmd = Nothing
+End Function
+ 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' FUNCIONES CENTRALIZADAS DE MANEJO DE ERRORES DB
+' Se recomienda usar estas funciones en lugar de .Execute directo
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+' Ejecuta un ADODB.Command (Stored Proc) con manejo de errores.
+' Retorna el Recordset o Nothing si hubo error.
+Function EjecutarConErrores(cn, spName, paramDefs)
+	Dim cmd, i, rs
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4 ' adCmdStoredProc
+	cmd.CommandText = spName
+	If Not IsEmpty(paramDefs) Then
+		For i = 0 To UBound(paramDefs)
+			cmd.Parameters.Append cmd.CreateParameter(paramDefs(i)(0), paramDefs(i)(1), 1, paramDefs(i)(2), paramDefs(i)(3))
+		Next
+	End If
+	On Error Resume Next
+	Set rs = cmd.Execute()
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "SP: " & Server.HTMLEncode(spName) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+	Set cmd = Nothing
+	Set EjecutarConErrores = rs
+End Function
+
+' Ejecuta un ADODB.Command sin resultado (INSERT/UPDATE/DELETE) con manejo de errores.
+' Retorna True si OK, False si error.
+Function EjecutarNonQueryConErrores(cn, spName, paramDefs)
+	Dim cmd, i
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4 ' adCmdStoredProc
+	cmd.CommandText = spName
+	If Not IsEmpty(paramDefs) Then
+		For i = 0 To UBound(paramDefs)
+			cmd.Parameters.Append cmd.CreateParameter(paramDefs(i)(0), paramDefs(i)(1), 1, paramDefs(i)(2), paramDefs(i)(3))
+		Next
+	End If
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "SP: " & Server.HTMLEncode(spName) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+	Set cmd = Nothing
+	EjecutarNonQueryConErrores = True
+End Function
+
+' Ejecuta cn.Execute(sql) con manejo de errores.
+' Retorna el Recordset o Nothing si hubo error.
+Function EjecutarSQLConErrores(cn, sql, contexto)
+	Dim rs
+	On Error Resume Next
+	Set rs = cn.Execute(sql)
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		If contexto <> "" Then Response.Write "Contexto: " & Server.HTMLEncode(contexto) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+	Set EjecutarSQLConErrores = rs
+End Function
+
+' Ejecuta cn.Execute(sql) sin resultado con manejo de errores.
+Function EjecutarSQLNonQueryConErrores(cn, sql, contexto)
+	On Error Resume Next
+	cn.Execute(sql)
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		If contexto <> "" Then Response.Write "Contexto: " & Server.HTMLEncode(contexto) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+End Function
+
+' Ejecuta ADODB.Command con manejo de errores para operaciones no-query (INSERT/UPDATE/DELETE).
+' cmd ya debe estar configurado con ActiveConnection, CommandType, CommandText y parametros.
+Function EjecutarCmdNonQueryConErrores(cmd, contexto)
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		If contexto <> "" Then Response.Write "Contexto: " & Server.HTMLEncode(contexto) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+End Function
+
+' Ejecuta ADODB.Command con manejo de errores para operaciones query (SELECT).
+' cmd ya debe estar configurado. Retorna Recordset o Nothing.
+Function EjecutarCmdConErrores(cmd, contexto)
+	Dim rs
+	On Error Resume Next
+	Set rs = cmd.Execute()
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		If contexto <> "" Then Response.Write "Contexto: " & Server.HTMLEncode(contexto) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+	Set EjecutarCmdConErrores = rs
+End Function
+
+' Ejecuta ADODB.Command con manejo de errores para operaciones query.
+' Armado interno del Command. Retorna Recordset o Nothing.
+Function EjecutarCmdCompletoConErrores(cn, spName, paramDefs, contexto)
+	Dim cmd, i, rs
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4 ' adCmdStoredProc
+	cmd.CommandText = spName
+	If Not IsEmpty(paramDefs) Then
+		For i = 0 To UBound(paramDefs)
+			cmd.Parameters.Append cmd.CreateParameter(paramDefs(i)(0), paramDefs(i)(1), 1, paramDefs(i)(2), paramDefs(i)(3))
+		Next
+	End If
+	On Error Resume Next
+	Set rs = cmd.Execute()
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		If contexto <> "" Then Response.Write "Contexto: " & Server.HTMLEncode(contexto) & "<br>"
+		Response.Write "SP: " & Server.HTMLEncode(spName) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+	Set cmd = Nothing
+	Set EjecutarCmdCompletoConErrores = rs
+End Function
+
+' Wrapper directo para cn.Execute(sql) - retorna Recordset
+' Reemplaza: Set rs = Cnn.Execute(sql)
+' Por:       Set rs = Exec(Cnn, sql)
+Function Exec(cn, sql)
+	Dim rs
+	On Error Resume Next
+	Set rs = cn.Execute(sql)
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "SQL: " & Server.HTMLEncode(CStr(sql)) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+	Set Exec = rs
+End Function
+
+' Wrapper directo para cn.Execute(sql) sin resultado (INSERT/UPDATE/DELETE)
+' Reemplaza: Cnn.Execute(sql)
+' Por:       ExecNonQuery Cnn, sql
+Sub ExecNonQuery(cn, sql)
+	On Error Resume Next
+	cn.Execute(sql)
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "SQL: " & Server.HTMLEncode(CStr(sql)) & "<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+End Sub
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' PERMISOS ESTILO E-MANAGER (ETAPA 1) - version v1, solo para pruebas
+' Replica ObtenerAtributos de E-Manager (Atrm / AtrmUsuarios / AtrmGrupos) llamando a
+' sp_cg_Permisos (ver DB/Cambios_Permisos_Etapa1.sql). No usa el objeto ofv.
+'  formName : nombre de la pantalla (Atrm.depen), por ejemplo CG_INCIDENTES
+'  tipoPerm : ALTA | MODIF | ELIM | CONS | EST
+' Devuelve 1 (permitido) o 0 (denegado), igual que getPermisos.
+' Reglas: sin fila de permiso -> permite (como E-Manager). Sin usuario valido -> deniega.
+' Resultado cacheado por pantalla dentro del mismo request.
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'Dim CG_ATRM_APLI, gAtrmForm, gAtrmEstado, gAtrmAgregar, gAtrmModificar, gAtrmEliminar, gAtrmConsultar, gAtrmOrigen
+CG_ATRM_APLI = "COREM20"   ' debe coincidir con @Aplicacion de sp_cg_Permisos / Atrm.aplicacion
+gAtrmForm = ""
+
+Function getPermisosAtrm(formName, tipoPerm)
+	Dim usr, cmd, rsP
+	getPermisosAtrm = 0
+
+	usr = Trim(session("USUARIO") & "")
+	If usr = "" Or usr = "0" Then Exit Function
+
+	If UCase(gAtrmForm) <> UCase(formName & "") Or gAtrmForm = "" Then
+		Set cmd = Server.CreateObject("ADODB.Command")
+		With cmd
+			.ActiveConnection = Cnn
+			.CommandText = "sp_cg_Permisos"
+			.CommandType = 4
+			.Parameters.Append .CreateParameter("@Form", 202, 1, 200, CStr(formName))
+			.Parameters.Append .CreateParameter("@Usuario", 202, 1, 200, usr)
+			.Parameters.Append .CreateParameter("@Aplicacion", 202, 1, 200, CG_ATRM_APLI)
+		End With
+
+		On Error Resume Next
+		Set rsP = cmd.Execute
+		If Err.Number <> 0 Then
+			Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+			Response.Write "<b>ERROR DE BASE DE DATOS</b><br>Contexto: getPermisosAtrm (form=" & Server.HTMLEncode(formName & "") & ")<br>"
+			Response.Write "Codigo: " & Err.Number & "<br>Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+			Response.End
+		End If
+		On Error Goto 0
+
+		gAtrmEstado = 0 : gAtrmAgregar = 0 : gAtrmModificar = 0 : gAtrmEliminar = 0 : gAtrmConsultar = 0 : gAtrmOrigen = ""
+		If Not rsP.EOF Then
+			gAtrmEstado = CLng(rsP("Estado"))
+			gAtrmAgregar = CLng(rsP("Agregar"))
+			gAtrmModificar = CLng(rsP("Modificar"))
+			gAtrmEliminar = CLng(rsP("Eliminar"))
+			gAtrmConsultar = CLng(rsP("Consultar"))
+			gAtrmOrigen = rsP("Origen") & ""
+		End If
+		rsP.Close
+		Set rsP = Nothing
+		Set cmd = Nothing
+		gAtrmForm = formName & ""
+	End If
+
+	Select Case UCase(tipoPerm & "")
+		Case "ALTA":  getPermisosAtrm = gAtrmAgregar
+		Case "MODIF": getPermisosAtrm = gAtrmModificar
+		Case "ELIM":  getPermisosAtrm = gAtrmEliminar
+		Case "CONS":  getPermisosAtrm = gAtrmConsultar
+		Case "EST":   getPermisosAtrm = gAtrmEstado
+	End Select
+End Function
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' FILTRO POR RESPONSABLE EN LISTADOS (incidentes / proyectos)
+' Por defecto: registros del usuario de la sesion. Valor "*" = todos los registros.
+'  CgRespSeleccionado() : valor elegido (form o querystring); si no hay, el usuario de la sesion
+'  CgRespParam(r)       : valor para @Respon ("" = sin filtro)
+'  CgComboResponsable   : <select name=resp> con TODOS, MIS REGISTROS y la lista de responsables
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Function CgRespSeleccionado()
+	Dim r
+	r = Request.Form("resp")
+	If r & "" = "" Then r = Request.QueryString("resp")
+	If r & "" = "" Then r = Session("USUARIO") & ""
+	CgRespSeleccionado = r
+End Function
+
+Function CgRespParam(r)
+	If r & "" = "*" Then CgRespParam = "" Else CgRespParam = r & ""
+End Function
+
+Function CgComboResponsable(cn, seleccionado, formId)
+	Dim h, rsR, miUsr, v
+	miUsr = Trim(Session("USUARIO") & "")
+	h = "<select class='ui-select' onchange=""document.getElementById('" & formId & "').submit();"" id='resp' name='resp'>"
+	If seleccionado & "" = "*" Then
+		h = h & "<option value='*' selected>RESPONSABLE: TODOS</option>"
+	Else
+		h = h & "<option value='*'>RESPONSABLE: TODOS</option>"
+	End If
+	If miUsr <> "" And miUsr <> "0" Then
+		h = h & "<option value='" & Server.HTMLEncode(miUsr) & "'"
+		If LCase(seleccionado & "") = LCase(miUsr) Then h = h & " selected"
+		h = h & ">MIS REGISTROS (" & Server.HTMLEncode(miUsr) & ")</option>"
+	End If
+	Set rsR = cn.Execute("sp_cg_Responsables @Modo='combo_todos'")
+	Do While Not rsR.EOF
+		v = rsR(0) & ""
+		If LCase(v) <> LCase(miUsr) Then
+			h = h & "<option value='" & Server.HTMLEncode(v) & "'"
+			If LCase(seleccionado & "") = LCase(v) Then h = h & " selected"
+			h = h & ">" & Server.HTMLEncode(rsR(1) & "") & "</option>"
+		End If
+		rsR.MoveNext
+	Loop
+	rsR.Close
+	Set rsR = Nothing
+	CgComboResponsable = h & "</select>"
+End Function
+
+%>

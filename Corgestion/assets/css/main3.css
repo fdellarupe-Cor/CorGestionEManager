@@ -1,0 +1,140 @@
+.mostrar{
+ 	padding:20px;	
+}
+
+.inp{	
+	border-radius: 5px;	
+	width:95%;
+	height:95%;
+	font-size:12pt;
+	font-family:Helvetica;
+}
+
+.losli{
+	list-style:none;
+	font-family:Helvetica;
+	font-weight:bold;
+}
+
+.tb{
+	width:100%;
+	height:50%;
+	table-layout:auto;
+	border:0;
+	border-radius: 25px;
+	font-family:Comic Sans;
+	font-family:Helvetica;
+	background-image: linear-gradient(#FF0000, #FEF5E7);
+}
+
+.tb1{
+	width:100%;
+	height:50%;
+	table-layout:auto;
+	border:0;
+	border-radius: 25px;
+	font-family:Comic Sans;
+	font-family:Helvetica;
+	background-image: linear-gradient(#FEF5E7, #FFFFFF);
+}
+
+
+.lista{
+	display:none;
+	'border-radius: 100px 100px 100px 100px;
+	'-moz-border-radius: 100px 100px 100px 100px;
+	'-webkit-border-radius: 100px 100px ;
+	'border: 2px solid #ff0000;
+	margin-left:40px;
+	padding:20px;
+	margin:20px;
+	overflow:auto;
+
+}
+
+.prueba{
+	border-radius: 55px 5px 5px 55px;
+	-moz-border-radius: 55px 0px 0px 55px;
+	-webkit-border-radius: 55px 0px 0px 55px;
+	border: 2px solid #ffffff;
+	overflow:auto;
+	width:350px;
+	height:270px;
+}
+
+.entra{
+	border-radius: 55px 0px 0px 55px;
+	-moz-border-radius: 55px 0px 0px 55px;
+	-webkit-border-radius: 55px 0px 0px 55px;
+	border: 1px dashed #000000;
+}
+
+.remarca{
+	font-size:20pt;
+}
+
+.Menu {
+	position:relative;
+	top:7px;
+	left:-84px;
+	width:30px;
+	height:30px;
+	border-radius:75px;
+	margin:0px;
+	padding:0px;
+	display:inline-block;
+}
+			
+.Menu > li {
+	width:22px;
+	height:22px;
+	border:1px solid #000000;
+	border-radius:75px;
+	position:absolute;
+	top:50px;
+	left:-100px;
+	list-style:none;
+	margin:0px;
+	z-index:1;
+	cursor:pointer;	
+}
+			
+/* Las siguientes transiciónes cumplen 3 funciones a la vez : 
+- Animación de la bola hacia fuera/dentro al pasar por encima del logo
+- Animacion del color del fondo de la bola pequeña al pasar por encima con el mouse
+Son tres acciones distintas (Menu:hover, li:hover, y li:active) pero en una sola línea especificamos la transición para ellas.
+Para el hover del menu se utilizan el top y el left de la transición.
+Para el hover del li se utiliza el background-color.
+Y para el active del li tambien se utiliza el background-color con un color distinto.
+*/
+	
+/* Primera */
+.Menu > li:nth-child(1) {
+	top:0px;
+	left:90px;
+	transition:top 0.2s ease-in  0.5s, left 0.2s ease-in 0.5s, background-color 0.1s ease-in 0.5s; 
+
+	top:-20px;
+	left:120px;
+	transition:top 0.2s ease-in  0.1s, left 0.2s ease-in 0.1s, background-color 0.1s ease-in 0s; 
+}	
+.Menu > li:nth-child(1):hover {	background-color:#F90;	}
+.Menu > li:nth-child(1):active { background-color:#0C0;	}
+	
+/* Segunda */
+.Menu > li:nth-child(2) {
+	top:0px;
+	left:90px;
+	transition:top 0.2s ease-in 0.5s, left 0.2s ease-in 0.5s, background-color 0.1s ease-in 0.5s; 
+
+	top:20px;
+	left:120px;
+	transition:top 0.2s ease-in  0s, left 0.2s ease-in 0s, background-color 0.1s ease-in 0s;
+}
+.Menu > li:nth-child(2):hover {	background-color:#F90;	}
+.Menu > li:nth-child(2):active { background-color:#0C0;	}
+
+
+					
+
+			

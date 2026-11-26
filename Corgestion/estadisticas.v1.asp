@@ -1,0 +1,737 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+
+html = headhtml()
+html = html & "<body>"
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+XXX = SYSLOGON(cnn,"MENU_ESTADISTICAS")
+
+If request.form("sel") & "" = "" Then
+	sel = request.querystring("sel")
+Else
+	sel = request.form("sel")
+End If
+
+If sel & "" = "" Then sel = 0
+
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+
+html = html & "<div>"
+
+html = html & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+html = html & "<div >"
+
+html = html & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+html = html & "<img src='images/iso_cor.png' style='width:6rem;' >"
+html = html & "<font style='font-size:15pt;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+html = html & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+html = html & "<nav>"
+html = html & "<ul>"
+'html = html & "<li><a href='#menu'></a></li>"
+html = html & "</ul>"
+html = html & "</nav>"
+html = html & "</td>"
+
+html = html & "</tr></table>"
+
+html = html & "</div>"
+
+html = html & "</header>"
+
+'html = html & "<div style='height:9%;width:100%;border-top:solid 5px #FF3D3D;border-bottom:double 6px #001BFF;'>"
+
+html = html & "<table class='titulo-seccion' >"
+html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+html = html & "<td><h2>ESTADISTICAS</h2></td>"
+
+html = html & "<td>"
+
+html = html & "<div>"
+
+html = html & "<form id='sform' style='height:100%;width:100%;' method='post' action='estadisticas.asp?xmenu=" & xmenu & "&xtmenu=" & xtmenu & "' >"
+
+html = html & "<select id='sel' name='sel' onchange=""document.getElementById('sform').submit();"" >"
+
+If sel = 0 Then
+	html = html & "<option value='0' selected >INCIDENTES</option>"
+Else
+	html = html & "<option value='0' >INCIDENTES</option>"
+End If
+
+If sel = 1 Then
+	html = html & "<option value='1' selected >PROYECTOS</option>"
+Else
+	html = html & "<option value='1'>PROYECTOS</option>"
+End If
+
+If sel = 2 Then
+	html = html & "<option value='2' selected >APL</option>"
+Else
+	html = html & "<option value='2'>APL</option>"
+End If
+
+If sel = 3 Then
+	html = html & "<option value='3' selected >USUARIOS</option>"
+Else
+	html = html & "<option value='3'>USUARIOS</option>"
+End If
+
+html = html & "</select>"
+
+html = html & "</form>"
+
+html = html & "</div>"
+
+html = html & "</td>"
+
+formx04 = "<form id='formx04' method='post' action='index.asp'></form>"
+botonx04 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('formx04').submit();"">"
+html = html & "<td>" & botonx04 & "</td>"
+
+html = html & "</tr>"
+
+html = html & "</table>"
+
+html = html & "</div>"
+
+'DIV QUE SE RELLENA DEPENDE LO QUE QUIERA CONSULTAR ELEGIDO EN EL COMBO
+
+If sel = 0 Then 'INCIDENTES
+
+	' --- INICIO NORMALIZACION: FORMULARIO ESTADISTICAS (INCIDENTES) ---
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div style='max-width: 900px; margin: 2rem auto;'>"
+
+	html = html & "<form id='xForm' method='post' action='estadisticasDet.asp?tipo=I&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' align=center cellspacing=0 cellpadding=3>"
+	html = html & "<div class='bloque-datos'>"
+
+	'TITULO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' align=center valign=center colspan=4><b><u>INCIDENTES</u></b></td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header'>INCIDENTES</div>"
+
+	html = html & "<div class='bloque-body'>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>&nbsp;</td>"
+	'html = html & "</tr>"
+
+	' --- INICIO GRILLA ---
+	html = html & "<div class='grid-datos-doble'>"
+
+	'ID
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ID</td>"
+	'html = html & "<td class='fil' >"
+	'html = html & "<input class='inpu' id='id' name='id' type='text'>"
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ID</div>"
+	html = html & "<div><input type='text' id='id' name='id' class='input-moderno'></div>"
+
+	'CLIENTE
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >CLIENTE</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,descripcion from clientes",cnn,request.form("cli"),0,1,"cli")
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>CLIENTE</div>"
+	html = html & "<div class='dato-value'>"
+	html = html & armaCombo("sp_cg_Catalogo_Listar @Catalogo='clientes'",cnn,request.form("cli"),0,1,"cli")
+	html = html & "</select></div>" ' <--- PARCHE: Forzamos el cierre del combo
+
+	'ULT USUARIO QUE ACCEDIO
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ULTIMO ACC USUARIO</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,nombre + ' ' + apellido from CG_COR_RESPONSABLES",Cnn,request.form("uau"),0,1,"uau")
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ULTIMO ACC USUARIO</div>"
+	html = html & "<div class='dato-value'>"
+	html = html & armaCombo("sp_cg_Responsables @Modo='combo_todos'",Cnn,request.form("uau"),0,1,"uau")
+	html = html & "</select></div>" ' <--- PARCHE: Forzamos el cierre del combo
+
+	'ULT TIPO ACCESO
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ULTIMO TIPO ACC</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & "<select id='uta' name='uta' class='selec' >"
+	'html = html & "<option value=''>S/D</option>"
+	'html = html & "<option value='CONSULTA'>CONSULTA</option>"
+	'html = html & "<option value='ACTUALIZA'>ACTUALIZA</option>"
+	'html = html & "</select>"
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ULTIMO TIPO ACC</div>"
+	html = html & "<div class='dato-value'><select id='uta' name='uta'>"
+	html = html & "<option value=''>S/D</option>"
+	html = html & "<option value='CONSULTA'>CONSULTA</option>"
+	html = html & "<option value='ACTUALIZA'>ACTUALIZA</option>"
+	html = html & "</select></div>"
+
+	'FECHA CREACION
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' valign=center>FEC CREAC DESDE</td>"
+	'html = html & "<td class='fil' valign=center align=left>"
+	'html = html & "<input id='fcd' name='fcd' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "<td class='fil' >FEC CREAC HASTA</td>"
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input id='fch' name='fch' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>FEC CREAC DESDE</div>"
+	html = html & "<div><input type='text' id='fcd' name='fcd' class='input-moderno'></div>"
+	html = html & "<div class='dato-label'>FEC CREAC HASTA</div>"
+	html = html & "<div><input type='text' id='fch' name='fch' class='input-moderno'></div>"
+
+	'FECHA ULT ACC
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' valign=center>FEC ULT ACC DESDE</td>"
+	'html = html & "<td class='fil' valign=center align=left>"
+	'html = html & "<input id='fad' name='fad' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "<td class='fil' valign=center>FEC ULT ACC HASTA</td>"
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input id='fah' name='fah' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>FEC ULT ACC DESDE</div>"
+	html = html & "<div><input type='text' id='fad' name='fad' class='input-moderno'></div>"
+	html = html & "<div class='dato-label'>FEC ULT ACC HASTA</div>"
+	html = html & "<div><input type='text' id='fah' name='fah' class='input-moderno'></div>"
+
+	' --- FIN GRILLA ---
+	html = html & "</div>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>"
+	'html = html & "&nbsp;"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+
+	'BOTON CONSULTAR
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' colspan=4 align=center>"
+	html = html & "<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 1.5rem 0;'>"
+	html = html & "<div style='text-align: center; margin-bottom: 0.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input type='button' class='bot' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input type='button' class='btn-principal' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input type='button' class='botsp' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input type='button' class='btn-principal btn-accion-deshabilitado' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>"
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Fin .bloque-body
+	html = html & "</div>" ' Fin .bloque-datos
+
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Fin max-width
+
+ElseIf sel = 1 Then 'PROYECTOS
+
+	' --- INICIO NORMALIZACION: FORMULARIO ESTADISTICAS (PROYECTOS) ---
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div style='max-width: 900px; margin: 2rem auto;'>"
+
+	html = html & "<form id='xForm' method='post' action='estadisticasDet.asp?tipo=P&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' align=center cellspacing=0 cellpadding=3>"
+	html = html & "<div class='bloque-datos'>"
+
+	'TITULO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' align=center valign=center colspan=4><b><u>PROYECTOS</u></b></td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header'>PROYECTOS</div>"
+
+	html = html & "<div class='bloque-body'>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>&nbsp;</td>"
+	'html = html & "</tr>"
+
+	' --- INICIO GRILLA ---
+	html = html & "<div class='grid-datos-doble'>"
+
+	'ID
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ID</td>"
+	'html = html & "<td class='fil'>"
+	'html = html & "<input id='id' name='id' type='text' class='inpu'>"
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ID</div>"
+	html = html & "<div><input type='text' id='id' name='id' class='input-moderno'></div>"
+
+	'CLIENTE
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >CLIENTE</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,descripcion from clientes",cnn,request.form("cli"),0,1,"cli")
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>CLIENTE</div>"
+	html = html & "<div class='dato-value'>"
+	html = html & armaCombo("sp_cg_Catalogo_Listar @Catalogo='clientes'",cnn,request.form("cli"),0,1,"cli")
+	html = html & "</select></div>" ' <--- PARCHE: Forzamos el cierre del combo
+
+	'ULT USUARIO QUE ACCEDIO
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ULTIMO ACC USUARIO</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,nombre + ' ' + apellido from CG_COR_RESPONSABLES",Cnn,request.form("uau"),0,1,"uau")
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ULTIMO ACC USUARIO</div>"
+	html = html & "<div class='dato-value'>"
+	html = html & armaCombo("sp_cg_Responsables @Modo='combo_todos'",Cnn,request.form("uau"),0,1,"uau")
+	html = html & "</select></div>" ' <--- PARCHE: Forzamos el cierre del combo
+
+	'ULT TIPO ACCESO
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ULTIMO TIPO ACC</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & "<select id='uta' name='uta' class='selec'>"
+	'html = html & "<option value=''>S/D</option>"
+	'html = html & "<option value='CONSULTA'>CONSULTA</option>"
+	'html = html & "<option value='ACTUALIZA'>ACTUALIZA</option>"
+	'html = html & "</select>"
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ULTIMO TIPO ACC</div>"
+	html = html & "<div class='dato-value'><select id='uta' name='uta'>"
+	html = html & "<option value=''>S/D</option>"
+	html = html & "<option value='CONSULTA'>CONSULTA</option>"
+	html = html & "<option value='ACTUALIZA'>ACTUALIZA</option>"
+	html = html & "</select></div>"
+
+	'FECHA CREACION
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=right valign=center>FEC CREAC DESDE</td>"
+	'html = html & "<td class='fil' valign=center align=left>"
+	'html = html & "<input id='fcd' name='fcd' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "<td class='fil' align=right valign=center>FEC CREAC HASTA</td>"
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input id='fch' name='fch' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>FEC CREAC DESDE</div>"
+	html = html & "<div><input type='text' id='fcd' name='fcd' class='input-moderno'></div>"
+	html = html & "<div class='dato-label'>FEC CREAC HASTA</div>"
+	html = html & "<div><input type='text' id='fch' name='fch' class='input-moderno'></div>"
+
+	'FECHA ULT ACC
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=right valign=center>FEC ULT ACC DESDE</td>"
+	'html = html & "<td class='fil' valign=center align=left>"
+	'html = html & "<input id='fad' name='fad' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "<td class='fil' align=right valign=center>FEC ULT ACC HASTA</td>"
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input id='fah' name='fah' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>FEC ULT ACC DESDE</div>"
+	html = html & "<div><input type='text' id='fad' name='fad' class='input-moderno'></div>"
+	html = html & "<div class='dato-label'>FEC ULT ACC HASTA</div>"
+	html = html & "<div><input type='text' id='fah' name='fah' class='input-moderno'></div>"
+
+	' --- FIN GRILLA ---
+	html = html & "</div>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>&nbsp;</td>"
+	'html = html & "</tr>"
+
+	'BOTON CONSULTAR
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' colspan=4 align=center>"
+	html = html & "<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 1.5rem 0;'>"
+	html = html & "<div style='text-align: center; margin-bottom: 0.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input type='button' class='bot' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input type='button' class='btn-principal' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input type='button' class='botsp' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input type='button' class='btn-principal btn-accion-deshabilitado' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>"
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Fin .bloque-body
+	html = html & "</div>" ' Fin .bloque-datos
+
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Fin max-width
+
+ElseIf sel = 2 Then 'APL
+
+	' --- INICIO NORMALIZACION: FORMULARIO ESTADISTICAS (APLs) ---
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div style='max-width: 900px; margin: 2rem auto;'>"
+
+	html = html & "<form id='xForm' method='post' action='estadisticasDet.asp?tipo=A&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' align=center cellspacing=0 cellpadding=3>"
+	html = html & "<div class='bloque-datos'>"
+
+	'TITULO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' align=center valign=center colspan=4><b><u>APLs</u></b></td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header'>APLs</div>"
+
+	html = html & "<div class='bloque-body'>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>&nbsp;</td>"
+	'html = html & "</tr>"
+
+	' --- INICIO GRILLA ---
+	html = html & "<div class='grid-datos-doble'>"
+
+	'ID
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ID</td>"
+	'html = html & "<td class='fil' >"
+	'html = html & "<input id='id' name='id' type='text' class='inpu'>"
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ID</div>"
+	html = html & "<div><input type='text' id='id' name='id' class='input-moderno'></div>"
+
+	'CLIENTE
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >CLIENTE</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,descripcion from clientes",cnn,request.form("cli"),0,1,"cli")
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>CLIENTE</div>"
+	html = html & "<div class='dato-value'>"
+	html = html & armaCombo("sp_cg_Catalogo_Listar @Catalogo='clientes'",cnn,request.form("cli"),0,1,"cli")
+	html = html & "</select></div>" ' <--- PARCHE: Forzamos el cierre del combo
+
+	'ULT USUARIO QUE ACCEDIO
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ULTIMO ACC USUARIO</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,nombre + ' ' + apellido from CG_COR_RESPONSABLES",Cnn,request.form("uau"),0,1,"uau")
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ULTIMO ACC USUARIO</div>"
+	html = html & "<div class='dato-value'>"
+	html = html & armaCombo("sp_cg_Responsables @Modo='combo_todos'",Cnn,request.form("uau"),0,1,"uau")
+	html = html & "</select></div>" ' <--- PARCHE: Forzamos el cierre del combo
+
+	'ULT TIPO ACCESO
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ULTIMO TIPO ACC</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & "<select id='uta' name='uta' class='selec'>"
+	'html = html & "<option value=''>S/D</option>"
+	'html = html & "<option value='CONSULTA'>CONSULTA</option>"
+	'html = html & "<option value='ACTUALIZA'>ACTUALIZA</option>"
+	'html = html & "</select>"
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ULTIMO TIPO ACC</div>"
+	html = html & "<div class='dato-value'><select id='uta' name='uta'>"
+	html = html & "<option value=''>S/D</option>"
+	html = html & "<option value='CONSULTA'>CONSULTA</option>"
+	html = html & "<option value='ACTUALIZA'>ACTUALIZA</option>"
+	html = html & "</select></div>"
+
+	'FECHA CREACION
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=right valign=center>FEC CREAC DESDE</td>"
+	'html = html & "<td class='fil' valign=center align=left>"
+	'html = html & "<input id='fcd' name='fcd' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "<td class='fil' align=right valign=center>FEC CREAC HASTA</td>"
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input id='fch' name='fch' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>FEC CREAC DESDE</div>"
+	html = html & "<div><input type='text' id='fcd' name='fcd' class='input-moderno'></div>"
+	html = html & "<div class='dato-label'>FEC CREAC HASTA</div>"
+	html = html & "<div><input type='text' id='fch' name='fch' class='input-moderno'></div>"
+
+	'FECHA ULT ACC
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' align=right valign=center>FEC ULT ACC DESDE</td>"
+	'html = html & "<td class='fil' valign=center align=left>"
+	'html = html & "<input id='fad' name='fad' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "<td class='fil' align=right valign=center>FEC ULT ACC HASTA</td>"
+	'html = html & "<td class='fil' valign=center>"
+	'html = html & "<input id='fah' name='fah' class='inpu' type='text' />"
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>FEC ULT ACC DESDE</div>"
+	html = html & "<div><input type='text' id='fad' name='fad' class='input-moderno'></div>"
+	html = html & "<div class='dato-label'>FEC ULT ACC HASTA</div>"
+	html = html & "<div><input type='text' id='fah' name='fah' class='input-moderno'></div>"
+
+	' --- FIN GRILLA ---
+	html = html & "</div>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>&nbsp;</td>"
+	'html = html & "</tr>"
+
+	'BOTON CONSULTAR
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4 align=center>"
+	html = html & "<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 1.5rem 0;'>"
+	html = html & "<div style='text-align: center; margin-bottom: 0.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input type='button' class='bot' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input type='button' class='btn-principal' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input type='button' class='botsp' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input type='button' class='btn-principal btn-accion-deshabilitado' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>"
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Fin .bloque-body
+	html = html & "</div>" ' Fin .bloque-datos
+
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Fin max-width
+
+ElseIf sel = 3 Then 'USUARIOS
+
+	' --- INICIO NORMALIZACION: FORMULARIO ESTADISTICAS (USUARIOS) ---
+	'html = html & "<div style='height:75%;width:100%;'><br>"
+	html = html & "<div style='max-width: 900px; margin: 2rem auto;'>"
+
+	html = html & "<form id='xForm' method='post' action='estadisticasDet.asp?tipo=U&sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+
+	'html = html & "<table class='tabl' style='width:40%;' align=center cellspacing=0 cellpadding=3>"
+	html = html & "<div class='bloque-datos'>"
+
+	'TITULO
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' style='font-size:12pt;' align=center valign=center colspan=4><b><u>USUARIOS</u></b></td>"
+	'html = html & "</tr>"
+	html = html & "<div class='bloque-header'>USUARIOS</div>"
+	
+	html = html & "<div class='bloque-body'>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>&nbsp;</td>"
+	'html = html & "</tr>"
+
+	' --- INICIO GRILLA ---
+	html = html & "<div class='grid-datos-doble'>"
+
+	'USUARIOS
+	'html = html & "<tr>"
+	'html = html & "<td >&nbsp;</td>"
+	'html = html & "<td class='fil' align=center valign=center >ULTIMO ACC USUARIO</td>"
+	'html = html & "<td class='fil' valign=center align=center>"
+	'html = html & armaCombo("select id,nombre + ' ' + apellido from CG_COR_RESPONSABLES",Cnn,request.form("uau"),0,1,"uau")
+	'html = html & "</td>"
+	'html = html & "<td>&nbsp;</td>"
+	'html = html & "</tr>"
+	html = html & "<div class='dato-label'>ULTIMO ACC USUARIO</div>"
+	html = html & "<div class='dato-value'>"
+	html = html & armaCombo("sp_cg_Responsables @Modo='combo_todos'",Cnn,request.form("uau"),0,1,"uau")
+	html = html & "</select></div>" ' <--- PARCHE: Forzamos el cierre del combo
+
+	' --- FIN GRILLA ---
+	html = html & "</div>"
+
+	'ESPACIO
+	'html = html & "<tr>"
+	'html = html & "<td colspan=4>&nbsp;</td>"
+	'html = html & "</tr>"
+
+	'BOTON CONSULTAR
+	'html = html & "<tr>"
+	'html = html & "<td class='fil' colspan=4 align=center>"
+	html = html & "<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 1.5rem 0;'>"
+	html = html & "<div style='text-align: center; margin-bottom: 0.5rem;'>"
+
+	if getPermisos(xmenu,xtmenu,"CONS") = 1 then
+		'html = html & "<input type='button' class='bot' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+		html = html & "<input type='button' class='btn-principal' value='Consultar' onclick=""document.getElementById('xForm').submit();"">"
+	else
+		'html = html & "<input type='button' class='botsp' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+		html = html & "<input type='button' class='btn-principal btn-accion-deshabilitado' value='Consultar' onclick=""alert('Sin permiso para consultar.');"">"
+	end if
+
+	'html = html & "</td>"
+	'html = html & "</tr>"
+	html = html & "</div>"
+
+	'html = html & "</table>"
+	html = html & "</div>" ' Fin .bloque-body
+	html = html & "</div>" ' Fin .bloque-datos
+
+	html = html & "</form>"
+
+	'html = html & "</div>"
+	html = html & "</div>" ' Fin max-width
+
+End If
+
+html = html & "<script type='text/javascript'>"
+html = html & " function modificar(formu){ "
+html = html & " document.getElementById(formu).submit();"
+html = html & " alert('Descripcion actualizada');} "
+html = html & "</script>"
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+html = html & "<script src='assets/js/jquery-ui.js'></script>"
+
+html = html & "<script>"
+html = html & "  $( function() {"
+
+html = html & "$.datepicker.regional['es'] = {"
+html = html & "closeText: 'Cerrar',"
+html = html & "prevText: '< Ant',"
+html = html & "nextText: 'Sig >',"
+html = html & "currentText: 'Hoy',"
+html = html & "monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],"
+html = html & "monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],"
+html = html & "dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],"
+html = html & "dayNamesShort: ['Dom','Lun','Mar','Mi�','Juv','Vie','S�b'],"
+html = html & "dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sa'],"
+html = html & "weekHeader: 'Sm',"
+html = html & "dateFormat: 'dd/mm/yy',"
+html = html & "firstDay: 1,"
+html = html & "isRTL: false,"
+html = html & "showMonthAfterYear: false,"
+html = html & "yearSuffix: ''"
+html = html & "};"
+html = html & "$.datepicker.setDefaults($.datepicker.regional['es']);"
+
+html = html & "    $( ""#fcd"" ).datepicker();"
+html = html & "    $( ""#fch"" ).datepicker();"
+html = html & "    $( ""#fad"" ).datepicker();"
+html = html & "    $( ""#fah"" ).datepicker();"
+
+html = html & "  } );"
+html = html & "  </script>"
+
+html = html & formx04 & "</body>"
+html = html & "</html>"
+
+response.write html
+
+Function armaCombo(sql,cn,clave,valor,texto,comboid)
+
+	Set nrs = Exec(cn, sql)
+
+	xhtml = xhtml & "<select class='selec' xstyle='font-size:12pt;height:25px;color:#000000;border:solid 1px #000000;' id='" & comboid & "' name='" & comboid & "'>"
+
+	if comboid = "uau" then
+		xhtml = xhtml & "<option value='0' selected>TODOS</option>"
+	else
+		xhtml = xhtml & "<option value='0' selected>SIN DATOS</option>"
+	end if
+
+
+	Do While Not nrs.eof
+
+		If clave = nrs(valor) Then
+
+			xhtml = xhtml & "<option value='" & nrs(valor) & "' selected>" & nrs(texto) & "</option>"
+
+		Else
+
+			xhtml = xhtml & "<option value='" & nrs(valor) & "'>" & nrs(texto) & "</option>"
+
+		End If
+
+		nrs.movenext
+	Loop
+
+	armaCombo = xhtml & "</select>"
+
+End Function
+
+%>

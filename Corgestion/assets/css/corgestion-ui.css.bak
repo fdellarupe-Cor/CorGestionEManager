@@ -1,0 +1,4429 @@
+/* =========================================================================
+   CorGestion UI - sistema visual unico (prefijo ui-*)
+   -------------------------------------------------------------------------
+   Un solo prefijo para todo: clases ui-* y variables --ui-*.
+   Convencion BEM: bloque__elemento--modificador (ui-card, ui-card__title,
+   ui-button--primary). Los estados tambien son modificadores.
+
+   Se carga despues de main.css. Especificidad baja, sin !important.
+   Un cambio de tema = modificar los tokens de :root.
+
+   Alcance: las pantallas nuevas van dentro de un contenedor .ui-app.
+   Tipografias (Adobe Fonts): se cargan con el @import de abajo (antes las cargaba main.css).
+   Titulos: roc-grotesk - Textos: helvetica-lt-pro
+
+   Nombres reservados por jQuery UI (no usar para componentes propios):
+   ui-tabs, ui-dialog, ui-widget*, ui-state-*, ui-corner-*, ui-icon*,
+   ui-helper-*, ui-datepicker*, ui-menu*, ui-front. Desde el 15/10/2026 jquery-ui.css
+   NO se carga: su .ui-button chocaba con el del sistema. El calendario y el dialogo
+   de jQuery UI tienen su estilo en este archivo (bloque "jQuery UI").
+
+   Archivo en ASCII: se ve igual guardado como ANSI o UTF-8.
+   ========================================================================= */
+
+/* Fuentes del sistema (Adobe Fonts): roc-grotesk y helvetica-lt-pro */
+@import url("https://use.typekit.net/bhc1uss.css");
+
+
+:root {
+  /* Marca */
+  --ui-brand: #0e1949;
+  --ui-brand-strong: #132574;
+  --ui-accent: #7995ff;
+  --ui-accent-light: #e8edff;
+
+  /* Superficies */
+  --ui-page-bg: #e8edff;
+  --ui-bg: #f8fafc;
+  --ui-surface: #ffffff;
+  --ui-border: #e2e8f0;
+  --ui-border-input: #cbd5e1;
+  --ui-shadow-card: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.08);
+
+  /* Texto */
+  --ui-text: #1e293b;
+  /* Contraste WCAG AA (4.5:1) sobre blanco y sobre el fondo lila de las paginas:
+     muted 7.6:1 / 6.5:1, subtle 5.6:1 / 4.8:1. No usar grises mas claros para texto. */
+  --ui-text-muted: #4b5563;
+  --ui-text-subtle: #5f6878;
+
+  /* Estados semanticos */
+  --ui-success: #166534;
+  --ui-success-bg: #dcfce3;
+  --ui-warning: #92400e;
+  --ui-warning-bg: #fef3c7;
+  --ui-danger: #dc2626;
+  --ui-danger-bg: #fee2e2;
+  --ui-pending-bg: #f1f5f9;
+  --ui-pending-text: #475569;
+
+  /* Estados por color (pills y badges) */
+  --ui-status-gray-bg: #f1f2f4;
+  --ui-status-gray-text: #4b5563;
+  --ui-status-amber-bg: #fef3c7;
+  --ui-status-amber-text: #92400e;
+  --ui-status-blue-bg: #dbeafe;
+  --ui-status-blue-text: #1d4ed8;
+  --ui-status-green-bg: #dcfce7;
+  --ui-status-green-text: #15803d;
+  --ui-status-purple-bg: #ede9fe;
+  --ui-status-purple-text: #6d28d9;
+  --ui-status-red-bg: #fee2e2;
+  --ui-status-red-text: #b91c1c;
+
+  /* Botones */
+  --ui-btn-primary-bg: #7995ff;
+  /* Texto blanco sobre el celeste #7995FF (decision de marca). Contraste 2.8:1: no llega al minimo
+     WCAG AA (4.5:1). Para cumplirlo sin cambiar el texto, oscurecer --ui-btn-primary-bg (ej. #4361EE, 5.0:1). */
+  --ui-btn-primary-text: #ffffff;
+  --ui-btn-alt-bg: #e8edff;
+  --ui-btn-alt-text: #132574;
+
+  /* Formas */
+  --ui-radius: 8px;
+  --ui-radius-sm: 7px;
+  --ui-radius-md: 10px;
+  --ui-radius-lg: 14px;
+
+  /* Layout */
+  --ui-control-height: 40px;
+  --ui-content-width: 1440px;
+
+  /* Espaciado */
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 24px;
+  --ui-space-6: 32px;
+}
+
+/* Fondo base del sistema en toda la pagina (pedido de Luis). main.css pinta el body de blanco:
+   lo que quedaba fuera del contenedor (formularios ocultos, el espacio bajo una pagina corta)
+   se veia blanco. Este CSS se carga despues de main.css, asi que esta regla gana. */
+html,
+body {
+  background: var(--ui-page-bg);
+}
+
+/* =========================================================================
+   COMPONENTES DEL SISTEMA
+   Incidentes, proyectos y todo componente compartido.
+   ========================================================================= */
+
+/* ---------- Base y alcance ---------- */
+.ui-app, .ui-app * {
+  box-sizing: border-box;
+}
+.ui-app {
+  margin: 0;
+  font-family: "helvetica-lt-pro", Helvetica, Arial, sans-serif;
+  background: var(--ui-page-bg);
+  color: var(--ui-text);
+  -webkit-font-smoothing: antialiased;
+}
+.ui-app h1,
+.ui-app h2,
+.ui-app h3,
+.ui-topbar__title,
+.ui-card__title,
+.ui-modal__head h3,
+.ui-semaforo__num,
+.ui-donut__total,
+.ui-topbar__id {
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+}
+ 
+/* ---------- Estructura de pagina ---------- */
+.ui-page {
+  padding: 24px;
+}
+.ui-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.ui-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+.ui-grid-2 > .ui-card {
+  display: flex;
+  flex-direction: column;
+}
+ 
+/* ---------- Topbar ---------- */
+.ui-topbar {
+  background: var(--ui-brand);
+  color: #FFFFFF;
+}
+.ui-topbar__inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 25px 0px;
+}
+.ui-topbar__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.ui-topbar__id {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #132574;
+  background: #E8EDFF;
+  padding: 3px 9px;
+  border-radius: 6px;
+  letter-spacing: .02em;
+}
+.ui-topbar__title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  margin: 0;
+  line-height: 1.25;
+  color: #FFFFFF;
+}
+/* El margen superior separa el titulo de la etiqueta de ID (INC-811, PRY-153).
+   Sin etiqueta, como en la agenda, el titulo queda alineado con los botones. */
+.ui-topbar__id + .ui-topbar__title {
+  margin-top: 9px;
+}
+.ui-topbar__view {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #AEC0FF;
+  border: 1px solid rgba(174,192,255,.35);
+  border-radius: 20px;
+  padding: 5px 13px;
+  white-space: nowrap;
+}
+.ui-topbar__bottom {
+  display: flex; /* Cambio de Luis: flex con space-between (con 1fr 1fr el semaforo se veia mal en pantallas grandes) */
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+.ui-topbar__meta {
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.ui-topbar__label {
+  font-size: 11.5px;
+  color: #8FA3D9;
+  display: block;
+  margin-bottom: 5px;
+}
+.ui-topbar__value {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.ui-topbar__bottom > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 0;
+}
+.ui-topbar__ident {
+  flex: 1;
+  min-width: 0;
+}
+.ui-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ui-topbar__title-field {
+  margin-top: 10px;
+  min-width: min(420px, 70vw);
+}
+ 
+/* ---------- Semaforo de compromiso ---------- */
+.ui-semaforo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 14px 22px;
+  border-radius: var(--ui-radius-md);
+  max-width: 100%;
+}
+.ui-semaforo__cifra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.05;
+  flex: 0 0 auto;
+}
+.ui-semaforo__num {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+.ui-semaforo__label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  opacity: .8;
+}
+.ui-semaforo__graf {
+  flex: 0 0 auto;
+  width: 150px;
+  max-width: 100%;
+}
+.ui-semaforo__bar {
+  width: 100%;
+  height: 7px;
+  border-radius: 20px;
+  background: rgba(0,0,0,.10);
+  overflow: hidden;
+}
+.ui-semaforo__bar span {
+  display: block;
+  height: 100%;
+  background: currentColor;
+  opacity: .55;
+}
+.ui-semaforo__scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  opacity: .7;
+  margin-top: 5px;
+}
+.ui-semaforo--green {
+  background: linear-gradient(180deg,#F0FDF4,#DCFCE7);
+  color: #14532D;
+  box-shadow: inset 0 0 0 1px #BBF7D0;
+}
+.ui-semaforo--amber {
+  background: linear-gradient(180deg,#FFFBEB,#FEF3C7);
+  color: #78350F;
+  box-shadow: inset 0 0 0 1px #FDE68A;
+}
+.ui-semaforo--red {
+  background: linear-gradient(180deg,#FEF2F2,#FEE2E2);
+  color: #7F1D1D;
+  box-shadow: inset 0 0 0 1px #FECACA;
+}
+ 
+/* ---------- Tarjetas ---------- */
+.ui-card {
+  background: var(--ui-surface);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+  padding: 20px 22px;
+}
+.ui-card__title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+.ui-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.ui-card__header .ui-card__title {
+  margin: 0;
+}
+.ui-card > .ui-card__title:first-child,
+.ui-card > .ui-card__header:first-child {
+  background: var(--ui-brand-strong);
+  color: #FFFFFF;
+  margin: -20px -22px 18px;
+  padding: 14px 22px;
+  border-radius: var(--ui-radius-lg) var(--ui-radius-lg) 0 0;
+}
+.ui-card > .ui-card__header:first-child .ui-card__title {
+  color: #FFFFFF;
+}
+ 
+/* ---------- Botones ---------- */
+/* Un solo componente para todo el sistema. Sin modificador se ve como secundario.
+   Tambien lo usa jQuery UI en sus dialogos, que quedan con la misma estetica. */
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: var(--ui-btn-alt-bg);
+  color: var(--ui-btn-alt-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ui-button:hover {
+  background: #DAE1FF;
+}
+.ui-button--sm {
+  padding: 6px 12px;
+  font-size: 12.5px;
+}
+.ui-button--lg {
+  padding: 11px 24px;
+  font-size: 14px;
+}
+.ui-button--primary {
+  background: var(--ui-btn-primary-bg);
+  color: var(--ui-btn-primary-text);
+}
+.ui-button--primary:hover {
+  background: #6884F0;
+}
+.ui-button--secondary {
+  background: var(--ui-btn-alt-bg);
+  color: var(--ui-btn-alt-text);
+}
+.ui-button--secondary:hover {
+  background: #DAE1FF;
+}
+.ui-button--light {
+  background: #FFFFFF;
+  color: var(--ui-brand-strong);
+}
+.ui-button--light:hover {
+  background: var(--ui-accent-light);
+}
+.ui-button--quiet {
+  background: transparent;
+  color: var(--ui-brand-strong);
+}
+.ui-button--quiet:hover {
+  background: var(--ui-accent-light);
+}
+.ui-button--danger {
+  background: var(--ui-status-red-bg);
+  color: var(--ui-status-red-text);
+}
+.ui-button--danger:hover {
+  background: #FECACA;
+}
+.ui-button--icon {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 13px;
+}
+.ui-button--light[hidden] {
+  display: none;
+}
+.ui-path__copy {
+  flex: 0 0 auto;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+  background: #FFFFFF;
+  border: 1px solid #DDE1EC;
+  border-radius: 999px;
+  padding: 6px 13px;
+  cursor: pointer;
+}
+.ui-path__copy:hover {
+  background: var(--ui-accent-light);
+}
+
+/* ---------- Campos y formularios ---------- */
+.ui-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px,1fr));
+  gap: 16px 20px;
+}
+.ui-field__label {
+  font-size: 11px;
+  color: var(--ui-text-subtle);
+  margin-bottom: 4px;
+  display: block;
+}
+.ui-field__value {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.ui-field__value--muted {
+  color: var(--ui-text-subtle);
+  font-weight: 400;
+  font-style: italic;
+}
+.ui-input,
+.ui-select,
+.ui-textarea,
+.ui-date {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13.5px;
+  padding: 9px 11px;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ui-text);
+}
+.ui-input:focus,
+.ui-select:focus,
+.ui-textarea:focus,
+.ui-date:focus {
+  outline: none;
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 3px rgba(121,149,255,.18);
+}
+.ui-input[readonly],
+.ui-date[readonly] {
+  background: #F7F8FA;
+  color: var(--ui-text-muted);
+}
+textarea.ui-input,
+.ui-textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+.ui-field__hint,
+.ui-field__help {
+  font-size: 11px;
+  color: var(--ui-text-subtle);
+  margin-top: 5px;
+}
+.ui-empty {
+  font-size: 12.5px;
+  color: var(--ui-text-subtle);
+  padding: 16px 0;
+  text-align: center;
+}
+.ui-field {
+  display: grid;
+  min-width: 0;
+  margin-bottom: 15px;
+}
+.ui-grid > .ui-field,
+.ui-fields > .ui-field {
+  margin-bottom: 0;
+}
+.ui-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.ui-field__required {
+  color: var(--ui-status-red-text);
+  margin-left: 2px;
+}
+.ui-note {
+  font-size: 11.5px;
+  color: var(--ui-text-muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.ui-alert {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ui-text);
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  padding: 9px 12px;
+  border-radius: 8px;
+}
+.ui-alert--warning {
+  border-color: transparent;
+  color: #92400E;
+  background: #FEF3C7;
+  padding: 9px 12px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.ui-input--dark {
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.22);
+  color: #FFFFFF;
+}
+.ui-input--dark:focus {
+  background: rgba(255,255,255,.16);
+  border-color: #7995FF;
+  box-shadow: 0 0 0 3px rgba(121,149,255,.25);
+}
+.ui-input--dark option {
+  color: #1A1D23;
+}
+.ui-input--title {
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  padding: 7px 12px;
+}
+.ui-input[type="date"]::-webkit-calendar-picker-indicator,
+.ui-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(62%) sepia(58%) saturate(1200%) hue-rotate(197deg) brightness(103%) contrast(101%);
+  cursor: pointer;
+  opacity: 1;
+}
+.ui-input--dark[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(70%) sepia(45%) saturate(900%) hue-rotate(197deg) brightness(112%) contrast(101%);
+}
+.ui-prose {
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.ui-prose p {
+  margin: 0 0 10px;
+}
+.ui-prose p:last-child {
+  margin-bottom: 0;
+}
+.ui-field__error {
+  font-size: 11.5px;
+  color: #B91C1C;
+  margin-top: 5px;
+}
+.ui-field__error[hidden] {
+  display: none;
+}
+.ui-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.ui-toggle__opt {
+  flex: 1;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border);
+  background: #fff;
+  color: var(--ui-text-muted);
+  cursor: pointer;
+}
+.ui-toggle__opt--active {
+  background: #132574;
+  color: #fff;
+  border-color: #132574;
+}
+.ui-checkrow {
+  margin-bottom: 15px;
+  padding: 11px 13px;
+  background: #F7F9FF;
+  border: 1px solid #DDE4FF;
+  border-radius: 9px;
+}
+.ui-checkrow__label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ui-checkrow__label input {
+  width: 16px;
+  height: 16px;
+  accent-color: #7995FF;
+  cursor: pointer;
+}
+.ui-checkrow .ui-field__hint {
+  margin-top: 6px;
+  margin-left: 25px;
+}
+ 
+/* ---------- Badges y etiquetas de tipo ---------- */
+.ui-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  display: inline-block;
+}
+.ui-badge--gray,
+.ui-badge--pending {
+  background: var(--ui-status-gray-bg);
+  color: var(--ui-status-gray-text);
+}
+.ui-badge--amber,
+.ui-badge--warning {
+  background: var(--ui-status-amber-bg);
+  color: var(--ui-status-amber-text);
+}
+.ui-badge--blue {
+  background: var(--ui-status-blue-bg);
+  color: var(--ui-status-blue-text);
+}
+.ui-badge--green,
+.ui-badge--ok {
+  background: var(--ui-status-green-bg);
+  color: var(--ui-status-green-text);
+}
+.ui-badge--purple {
+  background: var(--ui-status-purple-bg);
+  color: var(--ui-status-purple-text);
+}
+.ui-badge--red,
+.ui-badge--danger {
+  background: var(--ui-status-red-bg);
+  color: var(--ui-status-red-text);
+}
+.ui-status-empty {
+  color: var(--ui-text-subtle);
+  font-size: 12.5px;
+}
+.ui-tag {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.ui-tag--anotacion {
+  background: #132574;
+  color: #FFFFFF;
+}
+.ui-tag--solicitud {
+  background: #7995FF;
+  color: var(--ui-btn-primary-text);
+}
+.ui-tag--insistencia {
+  background: #E8EDFF;
+  color: #132574;
+  box-shadow: inset 0 0 0 1px #B9C6FF;
+}
+ 
+/* ---------- Tablas ---------- */
+.ui-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ui-table th {
+  text-align: left;
+  font-size: 10.5px;
+  color: var(--ui-text-subtle);
+  font-weight: 700;
+  padding: 0 10px 8px 0;
+  border-bottom: 1px solid var(--ui-border);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.ui-table td {
+  font-size: 12.5px;
+  padding: 11px 10px 11px 0;
+  border-bottom: 1px solid var(--ui-border);
+  vertical-align: top;
+}
+.ui-table tbody tr:hover {
+  background: var(--ui-bg);
+}
+.ui-table tr:last-child td {
+  border-bottom: none;
+}
+.ui-table-wrap {
+  overflow-x: auto;
+}
+.ui-table__actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+ 
+/* ---------- Ciclo de vida ---------- */
+.ui-lifecycle {
+  padding-left: 4px;
+}
+.ui-lifecycle__item {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding: 0 0 20px 0;
+}
+.ui-lifecycle__item:last-child {
+  padding-bottom: 0;
+}
+.ui-lifecycle__item::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--ui-border);
+}
+.ui-lifecycle__item:last-child::before {
+  display: none;
+}
+.ui-lifecycle__dot {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+.ui-lifecycle__item--done .ui-lifecycle__dot {
+  background: var(--ui-accent);
+  box-shadow: 0 0 0 3px var(--ui-accent-light);
+}
+.ui-lifecycle__item--pend .ui-lifecycle__dot {
+  background: #fff;
+  border: 2px dashed var(--ui-text-subtle);
+}
+.ui-lifecycle__label {
+  font-size: 11px;
+  color: var(--ui-text-subtle);
+}
+.ui-lifecycle__value {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.ui-lifecycle__item--pend .ui-lifecycle__value {
+  color: var(--ui-text-subtle);
+  font-weight: 400;
+  font-style: italic;
+}
+ 
+/* ---------- Grafico de torta ---------- */
+.ui-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.ui-donut {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.ui-donut__chart {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: #F1F2F4;
+}
+.ui-donut__chart::after {
+  content: '';
+  position: absolute;
+  inset: 26px;
+  background: #fff;
+  border-radius: 50%;
+}
+.ui-donut__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.ui-donut__total {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.ui-donut__label {
+  font-size: 10px;
+  color: var(--ui-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-top: 2px;
+}
+.ui-donut__legend {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.ui-donut__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+}
+.ui-donut__name {
+  flex: 1;
+  color: var(--ui-text-muted);
+}
+.ui-donut__value {
+  font-weight: 700;
+}
+.ui-donut__pct {
+  font-size: 11px;
+  color: var(--ui-text-subtle);
+  min-width: 34px;
+  text-align: right;
+}
+ 
+/* ---------- Timeline de avances ---------- */
+.ui-hitl {
+  overflow-x: auto;
+  margin: 0 -4px 18px;
+  padding: 4px 4px 6px;
+}
+.ui-hitl__track {
+  display: flex;
+  min-width: max-content;
+}
+.ui-hitl__item {
+  position: relative;
+  flex: 0 0 168px;
+  padding-right: 16px;
+}
+.ui-hitl__item::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #DDE4FF;
+}
+.ui-hitl__item:first-child::before {
+  left: 8px;
+}
+.ui-hitl__item:last-child::before {
+  right: calc(100% - 8px);
+}
+.ui-hitl__dot {
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 0 0 1px #DDE4FF;
+  margin-bottom: 10px;
+}
+.ui-hitl__dot--anotacion {
+  background: #132574;
+}
+.ui-hitl__dot--solicitud {
+  background: #7995FF;
+}
+.ui-hitl__dot--insistencia {
+  background: #FFFFFF;
+  box-shadow: 0 0 0 2px #7995FF;
+}
+.ui-hitl__date {
+  font-size: 11px;
+  color: var(--ui-text-subtle);
+  margin-bottom: 4px;
+}
+.ui-hitl__text {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ui-hitl__status .ui-badge {
+  font-size: 10.5px;
+  padding: 2px 8px;
+}
+.ui-hitl__legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: var(--ui-text-muted);
+  margin-bottom: 16px;
+}
+.ui-hitl__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ui-hitl__legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+ 
+/* ---------- Carga de horas ---------- */
+.ui-hours__total {
+  font-weight: 700;
+  font-size: 15px;
+}
+.ui-hours__bar {
+  display: flex;
+  height: 9px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--ui-status-gray-bg);
+  margin-top: 16px;
+}
+.ui-hours__bar span {
+  display: block;
+  height: 100%;
+}
+.ui-hours__legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--ui-text-muted);
+}
+.ui-hours__legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+ 
+/* ---------- Path y archivos ---------- */
+.ui-path {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #EDEFF5;
+  border: 1px solid #DDE1EC;
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+.ui-path__text {
+  flex: 1;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12.5px;
+  color: #3A4256;
+  word-break: break-all;
+}
+.ui-files {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.ui-files__item {
+  font-size: 12.5px;
+  color: #132574;
+}
+.ui-files__item::before {
+  content: '\1F4CE\0020';
+}
+.ui-files__item--empty {
+  color: var(--ui-text-subtle);
+}
+.ui-files__item--empty::before {
+  content: '';
+}
+ 
+/* ---------- Barra de guardado ---------- */
+.ui-savebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0 14px;
+}
+.ui-savebar[hidden] {
+  display: none;
+}
+.ui-savebar__status {
+  font-size: 12.5px;
+  color: var(--ui-text-subtle);
+}
+.ui-savebar__status--pending {
+  color: #92400E;
+  font-weight: 700;
+}
+.ui-savebar__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+ 
+/* ---------- Modal ---------- */
+.ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(14,25,73,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+.ui-modal-overlay[hidden] {
+  display: none;
+}
+.ui-modal {
+  background: #fff;
+  border-radius: var(--ui-radius-lg);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  width: 100%;
+  max-width: 460px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.ui-modal__head {
+  background: var(--ui-brand-strong);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: var(--ui-radius-lg) var(--ui-radius-lg) 0 0;
+}
+.ui-modal__head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.ui-modal__head .ui-modal__sub {
+  font-size: 12px;
+  color: #AEC0FF;
+  margin-top: 3px;
+}
+.ui-modal__body {
+  padding: 20px 22px;
+}
+.ui-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+ 
+/* ---------- Toast ---------- */
+.ui-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #0E1949;
+  color: #fff;
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 60;
+}
+.ui-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+ 
+/* ---------- Integracion con pantallas del sistema ---------- */
+/* Componentes que usan las pantallas ASP (detalles.asp) y no estaban en los bocetos */
+.ui-link {
+  color: #132574;
+  font-weight: 700;
+  text-decoration: none;
+}
+.ui-link:hover {
+  text-decoration: underline;
+}
+.ui-button--disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.ui-field__value--break {
+  word-break: break-all;
+}
+.ui-field__value--inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ui-field__value--inline .ui-input,
+.ui-field__value--inline > input[type="text"],
+.ui-field__value--inline > input:not([type]) {
+  flex: 1;
+  min-width: 0;
+}
+.ui-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+}
+.ui-list__item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ui-border);
+  font-size: 13.5px;
+}
+.ui-list__item:last-child {
+  border-bottom: none;
+}
+.ui-actions-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+/* Pantallas de edicion: dos columnas, fondo a todo el ancho y contenido centrado a 1040px */
+.ui-edit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+  padding: 24px max(24px, calc((100% - 1040px) / 2));
+}
+.ui-edit__col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+/* Un <form> puede ser la tarjeta (edicion de proyecto) */
+form.ui-card {
+  margin: 0;
+}
+/* Barra superior sin fila inferior (titulo + acciones solamente) */
+.ui-topbar__top:last-child {
+  margin-bottom: 0;
+}
+ 
+.ui-field--top {
+  margin-top: 18px;
+}
+ 
+/* ---------- Compatibilidad con controles de los includes ---------- */
+/* ComboCampo, HtmlInputCampo, HtmlSelectSiNo, HtmlTextAreaCampo, HtmlCamposAvance y
+   HtmlHistorialRelainc arman su propio HTML. Mientras no emitan las clases ui-input y
+   ui-table, estas reglas les dan el mismo aspecto. Cuando los includes usen las clases,
+   este bloque se puede borrar completo. */
+.ui-edit input[type="text"],
+.ui-edit input:not([type]),
+.ui-edit select,
+.ui-edit textarea,
+.ui-page--edit input[type="text"],
+.ui-page--edit input:not([type]),
+.ui-page--edit select,
+.ui-page--edit textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13.5px;
+  padding: 9px 11px;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ui-text);
+}
+.ui-edit input[type="text"]:focus,
+.ui-edit input:not([type]):focus,
+.ui-edit select:focus,
+.ui-edit textarea:focus,
+.ui-page--edit input[type="text"]:focus,
+.ui-page--edit input:not([type]):focus,
+.ui-page--edit select:focus,
+.ui-page--edit textarea:focus {
+  outline: none;
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 3px rgba(121,149,255,.18);
+}
+.ui-edit textarea,
+.ui-page--edit textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+.ui-card table:not(.ui-table) {
+  width: 100%;
+  border-collapse: collapse;
+  border: none;
+}
+.ui-card table:not(.ui-table) th {
+  text-align: left;
+  font-size: 10.5px;
+  color: var(--ui-text-subtle);
+  font-weight: 700;
+  padding: 0 10px 8px 0;
+  border: none;
+  border-bottom: 1px solid var(--ui-border);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.ui-card table:not(.ui-table) td {
+  font-size: 12.5px;
+  padding: 11px 10px 11px 0;
+  border: none;
+  border-bottom: 1px solid var(--ui-border);
+  vertical-align: top;
+}
+.ui-card table:not(.ui-table) tr:last-child td {
+  border-bottom: none;
+}
+ 
+/* ---------- Datos pendientes de conectar ---------- */
+/* Marcan en pantalla lo que la propuesta necesita y todavia no viene de la base.
+   Cuando se conecte cada dato, se reemplaza el CgFalta() correspondiente en detalles.asp. */
+.ui-falta {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #92400E;
+  background: #FFFBEB;
+  border: 1px dashed #F59E0B;
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: normal;
+}
+.ui-falta-bloque {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #92400E;
+  background: #FFFBEB;
+  border: 1px dashed #F59E0B;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+ 
+/* ---------- Semaforo: estados sin plazo y resuelto ---------- */
+.ui-semaforo--gray {
+  background: #F3F4F6;
+  color: #4B5563;
+  box-shadow: inset 0 0 0 1px #E5E7EB;
+}
+.ui-semaforo--done {
+  background: linear-gradient(180deg,#F5F7FF,#E8EDFF);
+  color: #132574;
+  box-shadow: inset 0 0 0 1px #C7D2FE;
+}
+.ui-semaforo--gray .ui-semaforo__graf,
+.ui-semaforo--done .ui-semaforo__graf {
+  width: auto;
+  max-width: 220px;
+}
+ 
+/* ---------- Barra superior en edicion ---------- */
+/* Los controles los generan los includes (ComboCampo, HtmlInputCampo): se adaptan al fondo oscuro.
+   :not(.ui-input):not(.ui-select) deja afuera los controles que ya usan las clases del sistema. */
+.ui-topbar input[type="text"]:not(.ui-input):not(.ui-select),
+.ui-topbar input:not([type]):not(.ui-input):not(.ui-select),
+.ui-topbar select:not(.ui-input):not(.ui-select) {
+  font-family: inherit;
+  font-size: 14px;
+  min-width: 150px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 8px;
+  background: rgba(255,255,255,.10);
+  color: #FFFFFF;
+}
+.ui-topbar input[type="text"]:not(.ui-input):not(.ui-select):focus,
+.ui-topbar input:not([type]):not(.ui-input):not(.ui-select):focus,
+.ui-topbar select:not(.ui-input):not(.ui-select):focus {
+  outline: none;
+  border-color: #7995FF;
+  box-shadow: 0 0 0 3px rgba(121,149,255,.25);
+}
+.ui-topbar select:not(.ui-input):not(.ui-select) option {
+  color: #1A1D23;
+}
+.ui-topbar__title-field input[type="text"]:not(.ui-input):not(.ui-select),
+.ui-topbar__title-field input:not([type]):not(.ui-input):not(.ui-select) {
+  width: 100%;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  padding: 7px 12px;
+}
+.ui-topbar__value .ui-badge {
+  font-size: 13px;
+  padding: 4px 12px;
+}
+ 
+.ui-topbar--edit .ui-topbar__meta select {
+  min-width: 0;
+  width: 120px;
+}
+.ui-topbar--edit .ui-topbar__meta input[type="text"],
+.ui-topbar--edit .ui-topbar__meta input:not([type]) {
+  min-width: 0;
+  width: 105px;
+}
+.ui-topbar--edit .ui-topbar__meta {
+  column-gap: 20px;
+}
+/* La barra de guardado va sobre el fondo lila: el boton secundario pasa a blanco para distinguirse */
+.ui-savebar .ui-button--secondary {
+  background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #DAE1FF;
+}
+.ui-savebar .ui-button--secondary:hover {
+  background: #F5F7FF;
+}
+ 
+/* ---------- Responsive ---------- */
+@media (max-width:820px) {
+  .ui-topbar__bottom {
+    flex-direction: column; align-items: flex-start; /* angostas: datos arriba, semaforo abajo */
+    gap: 16px;
+  }
+  .ui-topbar__bottom > div:last-child {
+    justify-content: flex-start;
+  }
+}
+@media (max-width:900px) {
+  .ui-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .ui-edit {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================================
+   COMPONENTES DE PANTALLAS
+   Estructura de la capa ui- original. Colores, radios y tipografia vienen de
+   los tokens del sistema. Boton, badge, tabla, campo, input, alerta y estado
+   vacio se definen una sola vez en el bloque de arriba.
+   ========================================================================= */
+
+/* ---------- Base ---------- */
+.ui-shell, .ui-shell *, .ui-main *, .ui-panel *, .ui-toolbar *, .ui-grid * {
+  box-sizing: border-box;
+}
+.ui-shell :focus-visible,
+.ui-button:focus-visible,
+.ui-tabbar__link:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Capas de layout ---------- */
+.ui-shell {
+  width: 100%;
+}
+.ui-main {
+  max-width: var(--ui-content-width);
+  margin: 0 auto;
+  padding: var(--ui-space-5) var(--ui-space-6);
+}
+.ui-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+  flex-wrap: wrap;
+  padding: var(--ui-space-4) var(--ui-space-5);
+  background: var(--ui-surface);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+  margin-bottom: var(--ui-space-5);
+}
+.ui-page-header h1,
+.ui-page-header h2 {
+  margin: 0;
+  color: var(--ui-brand-strong);
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+}
+.ui-eyebrow {
+  margin: 0 0 var(--ui-space-1);
+  color: var(--ui-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ui-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+  flex-wrap: nowrap;
+}
+.ui-toolbar__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  flex-wrap: wrap;
+}
+.ui-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.ui-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-4);
+}
+.ui-cluster {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  flex-wrap: wrap;
+}
+.ui-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ui-space-3) var(--ui-space-4);
+  align-items: start;
+}
+.ui-grid__col--wide {
+  grid-column: 1 / -1;
+}
+
+/* ---------- Paneles: misma estetica que ui-card, con header y body propios ---------- */
+.ui-panel {
+  background: var(--ui-surface);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+}
+.ui-panel__header {
+  padding: 14px 22px;
+  background: var(--ui-brand-strong);
+  color: #FFFFFF;
+  border-radius: var(--ui-radius-lg) var(--ui-radius-lg) 0 0;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+.ui-panel__body {
+  padding: 20px 22px;
+}
+
+/* ---------- Campos: complementos de la capa ui- ---------- */
+.ui-field__control {
+  min-width: 0;
+}
+.ui-field-grid {
+  display: grid;
+  grid-template-columns: minmax(9rem, .6fr) minmax(10rem, 1.4fr);
+  gap: var(--ui-space-3) var(--ui-space-4);
+}
+.ui-field-grid--dual {
+  display: grid;
+  grid-template-columns: minmax(9rem, .6fr) minmax(10rem, 1.4fr) minmax(9rem, .6fr) minmax(10rem, 1.4fr);
+  gap: var(--ui-space-3) var(--ui-space-4);
+}
+.ui-field-grid dt,
+.ui-field-grid--dual dt {
+  color: var(--ui-text-subtle);
+  font-size: 11px;
+  margin: 0;
+}
+.ui-field-grid dd,
+.ui-field-grid--dual dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Controles: complementos de la capa ui- ---------- */
+.ui-textarea {
+  min-height: 8rem;
+}
+.ui-input:disabled,
+.ui-select:disabled,
+.ui-textarea:disabled,
+.ui-date:disabled {
+  background: var(--ui-bg);
+  color: var(--ui-text-muted);
+}
+.ui-check {
+  width: 1.1rem;
+  height: 1.1rem;
+  vertical-align: middle;
+  accent-color: var(--ui-accent);
+}
+
+/* ---------- Pestanas ---------- */
+/* Se llama .ui-tabbar y no .ui-tabs: jQuery UI reserva ".ui-tabs" para su widget
+   $(...).tabs() y los dos estilos chocarian sobre el mismo elemento. */
+.ui-tabbar {
+  display: flex;
+  gap: var(--ui-space-2);
+  border-bottom: 1px solid var(--ui-border);
+  flex-wrap: wrap;
+}
+.ui-tabbar__link {
+  display: inline-block;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  color: var(--ui-text-muted);
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 2px solid transparent;
+}
+.ui-tabbar__link:hover {
+  color: var(--ui-brand-strong);
+}
+.ui-tabbar__link.is-active {
+  color: var(--ui-brand-strong);
+  border-bottom-color: var(--ui-accent);
+}
+
+/* ---------- Alertas, paginacion y leyendas ---------- */
+.ui-alert--danger {
+  background: var(--ui-status-red-bg);
+  border-color: transparent;
+  color: var(--ui-status-red-text);
+}
+.ui-pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+}
+.ui-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  color: var(--ui-text-muted);
+  font-size: 0.85rem;
+}
+
+/* ---------- Formulario de edicion (sin pestanas) ---------- */
+.ui-edit-section {
+  padding: 20px 22px;
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-card);
+  margin-bottom: var(--ui-space-4);
+}
+.ui-edit-section > h2,
+.ui-edit-section > h3 {
+  margin: 0 0 var(--ui-space-4);
+  padding-bottom: var(--ui-space-2);
+  border-bottom: 1px solid var(--ui-border);
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  color: var(--ui-brand-strong);
+}
+.ui-edit-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-4) 0;
+  background: linear-gradient(to top, var(--ui-page-bg) 60%, transparent);
+}
+
+/* ---------- Agenda (agenda.asp) ---------- */
+/* Contenedor angosto para formularios y detalles cortos */
+.ui-container--narrow {
+  max-width: 720px;
+}
+/* Columna angosta para la accion de la fila (eliminar) */
+.ui-table__col--action {
+  width: 48px;
+}
+/* Celdas que abren el detalle de la fila */
+.ui-table__cell--link {
+  cursor: pointer;
+}
+.ui-table__cell--center {
+  text-align: center;
+}
+/* Tablas con botones en las filas: contenido centrado verticalmente */
+.ui-table--middle td {
+  vertical-align: middle;
+}
+/* Pie de tarjeta: paginacion y acciones debajo de una tabla */
+.ui-card__footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ui-border);
+}
+/* Fila de lista con una accion a la izquierda (ej. quitar una copia) */
+.ui-list__item--action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- Accesibilidad ---------- */
+/* Texto solo para lectores de pantalla (captions de tablas, etiquetas de botones de icono) */
+.ui-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Foco visible en todo el sistema (en la barra oscura, blanco) */
+.ui-app :focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+.ui-topbar :focus-visible {
+  outline-color: #FFFFFF;
+}
+.ui-button[aria-disabled="true"] {
+  opacity: .55;
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-app *,
+  .ui-toast {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ---------- Listados (incidentes y pantallas similares; ver IncFile/ui_componentes.inc) ---------- */
+.ui-container--wide {
+  max-width: 1240px;
+}
+/* La barra superior acompana el ancho del contenido (lo aplica UiPantallaAbre) */
+.ui-topbar__inner--wide {
+  max-width: 1240px;
+}
+.ui-topbar__inner--narrow {
+  max-width: 720px;
+}
+.ui-card__header .ui-card__title {
+  margin: 0;
+}
+/* Fila de filtros dentro de la tarjeta, arriba de la tabla */
+.ui-card__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 18px;
+  margin-bottom: 16px;
+}
+.ui-filtro-campo {
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+}
+/* Filtros compactos en el encabezado oscuro de una tarjeta */
+.ui-card__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 0 auto;
+}
+.ui-card__header .ui-select {
+  width: auto;
+  min-width: 200px;
+  max-width: 280px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  background-color: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 999px;
+}
+.ui-card__header .ui-select:hover {
+  background-color: rgba(255,255,255,.18);
+}
+.ui-card__header .ui-select:focus {
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.25);
+}
+.ui-card__header .ui-select option {
+  color: var(--ui-text);
+  background: #FFFFFF;
+  font-weight: 400;
+}
+.ui-card__header :focus-visible {
+  outline-color: #FFFFFF;
+}
+/* Aclaracion al pie de una tabla (ej. que significa una marca), centrada */
+.ui-table__nota {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
+
+/* Encabezado ordenable: la columna activa se marca con una flecha */
+.ui-table__sort {
+  color: inherit;
+  text-decoration: none;
+}
+.ui-table__sort:hover {
+  color: var(--ui-brand-strong);
+  text-decoration: underline;
+}
+.ui-table th[aria-sort] .ui-table__sort {
+  color: var(--ui-brand-strong);
+}
+.ui-table th[aria-sort="ascending"] .ui-table__sort::after {
+  content: " \2191";
+}
+/* Dato principal de la fila: enlace real, hasta dos lineas */
+.ui-table__titulo {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 440px;
+  color: var(--ui-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+a.ui-table__titulo:hover {
+  color: var(--ui-brand-strong);
+  text-decoration: underline;
+}
+/* Texto secundario debajo del dato de una celda */
+.ui-table__sub {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--ui-text-muted);
+}
+.ui-table__col--actions {
+  width: 84px;
+}
+.ui-table__nowrap {
+  white-space: nowrap;
+}
+/* Pie en tres zonas: informacion a la izquierda, acciones (paginacion) centradas */
+.ui-card__footer--split {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.ui-card__footer--split > .ui-card__footer-info {
+  grid-column: 1;
+}
+.ui-card__footer--split > :not(.ui-card__footer-info) {
+  grid-column: 2;
+  justify-content: center;
+}
+.ui-card__footer-info {
+  font-size: 12.5px;
+  color: var(--ui-text-muted);
+}
+/* Etiqueta de ID: incidente en lila claro, proyecto en azul de marca */
+.ui-tag-id {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--ui-accent-light);
+  color: var(--ui-brand-strong);
+}
+.ui-tag-id--pry {
+  background: var(--ui-brand-strong);
+  color: #FFFFFF;
+}
+
+/* ---------- Formularios de alta (agregar1/2/3; ver IncFile/ui_componentes.inc) ---------- */
+/* Un formulario que envuelve varias tarjetas las separa igual que el contenedor de la pagina */
+.ui-container > form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.ui-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+.ui-form-grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.ui-form-grid__ancho {
+  grid-column: 1 / -1;
+}
+/* En formularios la etiqueta es la guia de lectura: un poco mas visible que en las fichas */
+.ui-form-grid .ui-field__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ui-text-muted);
+}
+.ui-fieldset {
+  min-width: 0;
+  margin: 4px 0 0;
+  padding: 16px 0 0;
+  border: 0;
+  border-top: 1px solid var(--ui-border);
+}
+.ui-fieldset__legend {
+  padding: 0 10px 0 0;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+}
+.ui-form-nota {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
+.ui-savebar .ui-button--lg {
+  min-width: 200px;
+}
+@media (max-width: 860px) {
+  .ui-form-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .ui-form-grid,
+  .ui-form-grid--4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Inicio (inicio.asp) ---------- */
+/* Pantalla de inicio: un poco mas ancha que el resto (1200px), barra superior incluida */
+.ui-container--inicio {
+  max-width: 1200px;
+}
+.ui-topbar__inner--inicio {
+  max-width: 1200px;
+}
+.ui-home {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.ui-home__col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.ui-home__dupla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.ui-caso {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.ui-caso__link {
+  color: var(--ui-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+.ui-caso__link:hover {
+  color: var(--ui-brand-strong);
+  text-decoration: underline;
+}
+.ui-caso__meta {
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
+.ui-semfiltro {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.ui-semfiltro__op {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+.ui-semfiltro__op:hover {
+  background: rgba(255,255,255,.18);
+}
+.ui-semfiltro__op[aria-pressed="true"] {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: var(--ui-brand-strong);
+}
+.ui-semfiltro__punto {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.ui-semfiltro__cant {
+  font-weight: 400;
+  opacity: .85;
+}
+.ui-filtro-activo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--ui-text-muted);
+  margin: -4px 0 12px;
+}
+.ui-home .ui-tabbar {
+  margin: -4px 0 14px;
+}
+.ui-home .ui-tabbar__link {
+  background: none;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+}
+.ui-home .ui-tabbar__cant {
+  font-weight: 400;
+  color: var(--ui-text-muted);
+}
+.ui-sem {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ui-sem__punto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+.ui-sem--red {
+  color: #B91C1C;
+}
+.ui-sem--red .ui-sem__punto {
+  background: #EF4444;
+}
+.ui-sem--amber {
+  color: #92400E;
+}
+.ui-sem--amber .ui-sem__punto {
+  background: #F59E0B;
+}
+.ui-sem--green {
+  color: #15803D;
+}
+.ui-sem--green .ui-sem__punto {
+  background: #22C55E;
+}
+.ui-sem__fecha {
+  display: block;
+  font-weight: 400;
+  color: var(--ui-text-muted);
+  font-size: 11.5px;
+  margin-top: 1px;
+}
+.ui-pendientes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ui-pendiente {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ui-pendiente__texto {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-text);
+  margin: 0;
+}
+.ui-pendiente__meta {
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
+.ui-pendiente__acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.ui-widget {
+  background: #fff;
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+  padding: 18px 20px;
+}
+.ui-widget__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ui-widget__title {
+  margin: 0;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+}
+.ui-widget__link {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+  text-decoration: none;
+}
+.ui-widget__link:hover {
+  text-decoration: underline;
+}
+.ui-agenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ui-agenda__item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ui-border);
+}
+.ui-agenda__item:last-child {
+  border-bottom: 0;
+}
+.ui-agenda__dia {
+  flex: 0 0 52px;
+  text-align: center;
+  border-radius: 10px;
+  padding: 6px 0;
+  background: var(--ui-accent-light);
+  color: var(--ui-brand-strong);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  align-self: flex-start;
+}
+.ui-agenda__dia--hoy {
+  background: var(--ui-brand-strong);
+  color: #fff;
+}
+.ui-agenda__texto {
+  font-size: 13px;
+  color: var(--ui-text);
+  margin: 0;
+}
+.ui-agenda__meta {
+  font-size: 12px;
+  color: var(--ui-text-muted);
+  margin-top: 2px;
+}
+.ui-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 4px;
+}
+.ui-feed__item {
+  position: relative;
+  padding: 0 0 14px 22px;
+  font-size: 13px;
+  color: var(--ui-text);
+}
+.ui-feed__item::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--ui-border);
+}
+.ui-feed__item:last-child::before {
+  display: none;
+}
+.ui-feed__punto {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ui-accent);
+  box-shadow: 0 0 0 3px #fff;
+}
+.ui-feed__cuando {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ui-text-muted);
+  margin-top: 2px;
+}
+.ui-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--ui-accent-light);
+  color: var(--ui-brand-strong);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  max-width: 100%;
+}
+.ui-chip:hover {
+  background: #DAE1FF;
+}
+.ui-chip__titulo {
+  font-weight: 400;
+  color: var(--ui-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+@media (max-width: 1100px) {
+  .ui-home {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 700px) {
+  .ui-home__dupla {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Consultas (consultas.asp y proyRelac.asp) ---------- */
+/* Pestanas como pildoras (la activa en azul de marca): tipo de consulta, tipo de estadistica */
+.ui-tabbar--consultas,
+.ui-tabbar--pildoras {
+  gap: 8px;
+  border-bottom: 0;
+}
+.ui-tabbar--consultas .ui-tabbar__link,
+.ui-tabbar--pildoras .ui-tabbar__link {
+  padding: 9px 18px;
+  font-size: 13px;
+  border: 0;
+  border-radius: 999px;
+  background: #FFFFFF;
+  box-shadow: var(--ui-shadow-card);
+}
+.ui-tabbar--consultas .ui-tabbar__link:hover,
+.ui-tabbar--pildoras .ui-tabbar__link:hover {
+  background: #F5F7FF;
+}
+.ui-tabbar--consultas .ui-tabbar__link.is-active,
+.ui-tabbar--pildoras .ui-tabbar__link.is-active {
+  background: var(--ui-brand-strong);
+  color: #FFFFFF;
+}
+/* Fila de totales al pie de una tabla */
+.ui-table__total th,
+.ui-table__total td {
+  font-weight: 700;
+  color: var(--ui-text);
+  background: #F8FAFC;
+  border-top: 2px solid var(--ui-border);
+}
+/* El th de la fila de totales se ve como una celda (no como encabezado de columna) */
+.ui-table .ui-table__total th {
+  padding: 11px 10px 11px 0;
+  font-size: 12.5px;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: middle;
+  border-bottom: 0;
+}
+.ui-table .ui-table__total td {
+  vertical-align: middle;
+  border-bottom: 0;
+}
+/* Encabezados centrados (la regla general de th los alineaba a la izquierda) */
+.ui-table th.ui-table__cell--center {
+  text-align: center;
+}
+/* Lista agrupada: cada proyecto con sus incidentes relacionados */
+.ui-relac {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 13px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-relac__proy {
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+}
+.ui-relac__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #F5F7FF;
+}
+.ui-relac__titulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ui-text);
+}
+.ui-relac__cant {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
+.ui-relac__lista {
+  margin: 0;
+  padding: 4px 16px 8px 40px;
+  list-style: none;
+}
+.ui-relac__inc {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ui-border);
+}
+.ui-relac__inc:last-child {
+  border-bottom: 0;
+}
+.ui-relac__link {
+  color: var(--ui-text);
+  text-decoration: none;
+}
+.ui-relac__link:hover {
+  color: var(--ui-brand-strong);
+  text-decoration: underline;
+}
+
+/* ---------- Parametros: edicion en linea (HtmlCampoCatalogo, HtmlBotonEditarFila) ---------- */
+/* Campo editable en una celda: el texto ocupa el ancho disponible y los botones nunca se aplastan */
+.ui-catalogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ui-catalogo > div,
+.ui-catalogo > span:not(.ui-badge):not(.ui-tag-id):not(.ui-sr-only) {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ui-catalogo input[type="text"],
+.ui-catalogo input:not([type]) {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+.ui-catalogo .ui-badge,
+.ui-catalogo .ui-tag-id {
+  flex: 0 0 auto;
+}
+/* Ningun boton de una tabla se achica por debajo de su texto */
+.ui-table td input[type="button"],
+.ui-table td input[type="submit"],
+.ui-table td button,
+.ui-table td .ui-button {
+  flex: 0 0 auto;
+  min-width: max-content;
+  white-space: nowrap;
+}
+/* Botones que arma funciones.inc sin clases del sistema: se ven como botones secundarios */
+.ui-table td input[type="button"]:not(.ui-button),
+.ui-table td input[type="submit"]:not(.ui-button),
+.ui-table td button:not(.ui-button):not(.ui-permiso) {
+  padding: 7px 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ui-btn-alt-text);
+  background: var(--ui-btn-alt-bg);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+/* Campos de texto de las filas: mismo aspecto que .ui-input, mas compactos */
+.ui-catalogo input[type="text"]:not(.ui-input),
+.ui-catalogo input:not([type]):not(.ui-input) {
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ui-text);
+  background: #FFFFFF;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+}
+.ui-table td .ui-input,
+.ui-table td .ui-select {
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+/* ---------- Para hacer (todo.asp) ---------- */
+/* Fila resaltada (ej. bancos del Grupo Petersen) y su referencia al pie */
+.ui-table tr.ui-table__fila--grupo td {
+  background: #FBF4E9;
+}
+.ui-ref-grupo {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  border-radius: 3px;
+  background: #FBF4E9;
+  border: 1px solid #EBD9BC;
+}
+
+/* ---------- Aviso de exito (confirmacion despues de guardar) ---------- */
+.ui-alert--success {
+  color: var(--ui-status-green-text);
+  background: var(--ui-status-green-bg);
+  border-color: transparent;
+}
+
+/* ---------- Fichas de parametros (clientesDet, detalleCliente, detalleAplic) ---------- */
+/* Botones al pie de una tarjeta (Cancelar / Guardar), alineados a la derecha */
+.ui-card__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ui-border);
+}
+/* Varios botones en el encabezado de una tarjeta: juntos, a la derecha */
+.ui-card__header-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+/* Campos que arma funciones.inc (HtmlInputCampo) sin la clase del sistema: mismo aspecto que .ui-input */
+.ui-field input[type="text"]:not(.ui-input) {
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ui-text);
+  background: #FFFFFF;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.ui-field input[type="text"]:not(.ui-input)[readonly] {
+  color: var(--ui-text-muted);
+  background: #F7F8FA;
+}
+.ui-field input[type="text"]:not(.ui-input):focus {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
+}
+/* Boton suelto entre tarjetas (ej. Agregar ambiente) */
+.ui-acciones-pie {
+  display: flex;
+  justify-content: flex-end;
+}
+/* Desplegable angosto dentro de una tabla */
+.ui-select--compacta {
+  width: auto;
+  min-width: 96px;
+}
+.ui-table__col--select {
+  width: 140px;
+}
+
+/* ---------- Seguridad: interruptores de permisos (permisosDet.asp) ---------- */
+/* Si / No con icono y texto: el estado no depende solo del color */
+.ui-permiso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 58px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.ui-permiso--si {
+  color: var(--ui-status-green-text);
+  background: var(--ui-status-green-bg);
+}
+.ui-permiso--si::before {
+  content: "\2713";
+}
+.ui-permiso--no {
+  color: var(--ui-text-muted);
+  background: #FFFFFF;
+  border-color: var(--ui-border);
+}
+.ui-permiso--no::before {
+  content: "\2715";
+}
+button.ui-permiso:hover {
+  box-shadow: 0 0 0 3px rgba(121, 149, 255, 0.25);
+}
+.ui-permiso--fijo {
+  cursor: default;
+}
+.ui-table tr:target td {
+  background: #F5F7FF;
+}
+
+/* ---------- Reporte (reportesDet.asp): un bloque por caso ---------- */
+.ui-reporte {
+  display: flex;
+  flex-direction: column;
+}
+.ui-reporte__item {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--ui-border);
+}
+.ui-reporte__item:first-child {
+  padding-top: 4px;
+}
+.ui-reporte__item:last-child {
+  border-bottom: 0;
+}
+.ui-reporte__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ui-reporte__cliente {
+  font-weight: 700;
+  color: var(--ui-text);
+}
+.ui-reporte__datos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin: 0 0 12px;
+}
+.ui-reporte__datos dt {
+  font-size: 11px;
+  color: var(--ui-text-muted);
+}
+.ui-reporte__datos dd {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ui-text);
+}
+.ui-reporte__texto h3 {
+  margin: 10px 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ui-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.ui-reporte__texto p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ui-text);
+}
+@media (max-width: 700px) {
+  .ui-reporte__datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Impresion (cualquier pantalla): sin cabecera, botones ni sombras ---------- */
+@media print {
+  #wrapper,
+  .ui-topbar__actions,
+  .ui-pagination,
+  .ui-savebar {
+    display: none !important;
+  }
+  body,
+  .ui-page {
+    background: #FFFFFF !important;
+  }
+  .ui-topbar {
+    color: #000000 !important;
+    background: #FFFFFF !important;
+  }
+  .ui-topbar__title {
+    color: #000000 !important;
+  }
+  .ui-card {
+    box-shadow: none !important;
+    border: 1px solid #D0D5DD;
+    break-inside: auto;
+  }
+  .ui-card__header,
+  .ui-card__title {
+    color: #000000 !important;
+    background: #FFFFFF !important;
+  }
+  .ui-reporte__item {
+    break-inside: avoid;
+  }
+}
+
+/* ---------- Portada (index.asp): saludo, secciones agrupadas y acceso por cliente ---------- */
+.ui-topbar__sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #B8C4F5;
+}
+.ui-portal {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 3fr);
+  gap: 20px;
+  align-items: start;
+}
+.ui-portal__grupo {
+  padding: 20px;
+  background: #FFFFFF;
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+}
+.ui-portal__titulo {
+  margin: 0 0 14px;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+}
+.ui-portal__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-acceso {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  height: 100%;
+  padding: 14px;
+  color: var(--ui-text);
+  text-decoration: none;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  box-sizing: border-box;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.ui-acceso:hover {
+  border-color: var(--ui-accent);
+  box-shadow: 0 4px 14px rgba(19, 37, 116, 0.10);
+  transform: translateY(-1px);
+}
+.ui-acceso:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+.ui-acceso__icono {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  color: var(--ui-brand-strong);
+  background: var(--ui-accent-light);
+  border-radius: 12px;
+}
+.ui-acceso__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.ui-acceso__nombre {
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+}
+.ui-acceso__desc {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ui-text-muted);
+}
+/* Clientes: grilla fija de logos con acceso a incidentes y proyectos */
+.ui-clientes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-cliente {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+}
+.ui-cliente__marca {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 78px;
+  padding: 10px;
+  background: #FFFFFF;
+  text-decoration: none;
+}
+.ui-cliente__marca:hover {
+  background: #F5F7FF;
+}
+.ui-cliente__logo {
+  max-width: 100%;
+  max-height: 56px;
+  object-fit: contain;
+}
+.ui-cliente__nombre {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--ui-brand-strong);
+}
+.ui-cliente__links {
+  display: flex;
+  border-top: 1px solid var(--ui-border);
+}
+.ui-cliente__links a {
+  flex: 1 1 0;
+  padding: 7px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ui-brand-strong);
+  text-decoration: none;
+  background: var(--ui-bg);
+}
+.ui-cliente__links a + a {
+  border-left: 1px solid var(--ui-border);
+}
+.ui-cliente__links a:hover {
+  background: var(--ui-accent-light);
+}
+.ui-legal {
+  margin: 8px 0 0;
+  font-size: 12px;
+  text-align: center;
+  color: var(--ui-text-muted);
+}
+@media (max-width: 960px) {
+  .ui-portal {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Portada: desplegable de Parametros y Seguridad ---------- */
+.ui-menu-param {
+  position: relative;
+}
+.ui-menu-param__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  min-width: 250px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 10px;
+  text-align: left;
+  background: #FFFFFF;
+  border-radius: var(--ui-radius-md);
+  box-shadow: 0 12px 32px rgba(14, 25, 73, 0.22);
+}
+.ui-menu-param__panel ul {
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+.ui-menu-param__grupo {
+  margin: 6px 8px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+}
+.ui-menu-param__link {
+  display: block;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  color: var(--ui-text);
+  text-decoration: none;
+  border-radius: 8px;
+}
+.ui-menu-param__link:hover,
+.ui-menu-param__link:focus-visible {
+  color: var(--ui-brand-strong);
+  background: var(--ui-accent-light);
+}
+
+/* ---------- Avance desde la vista del incidente (detalles.asp) ---------- */
+.ui-avance-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+}
+.ui-avance-form[hidden] {
+  display: none;
+}
+.ui-avance-form__rol {
+  max-width: 320px;
+}
+.ui-avance-form .ui-card__acciones {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* ---------- Reuniones (agenda_ext.inc) ---------- */
+.ui-agenda-alta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) auto minmax(0, 1fr) minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+.ui-agenda-alta__o {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
+.ui-agenda-alta__copia {
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+.ui-agenda-participantes {
+  margin-bottom: 6px;
+}
+.ui-participante {
+  font-weight: 700;
+}
+.ui-participante__mail {
+  font-weight: 400;
+  color: var(--ui-text-muted);
+}
+.ui-agenda-relacion {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ui-agenda-relacion[hidden] {
+  display: none;
+}
+.ui-agenda-relacion .ui-input {
+  width: 96px;
+}
+.ui-agenda-tema {
+  min-width: 220px;
+}
+.ui-agenda-conclusion {
+  min-width: 220px;
+  min-height: 44px;
+  height: auto;
+}
+.ui-agenda-minutos {
+  width: 72px;
+}
+.ui-agenda-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+.ui-agenda-acciones__der {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ui-agenda-acciones__nota {
+  text-align: right;
+}
+.ui-alert__lista {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+.ui-tag-id--link {
+  text-decoration: none;
+}
+.ui-tag-id--link:hover {
+  text-decoration: underline;
+}
+@media (max-width: 900px) {
+  .ui-agenda-alta {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ui-agenda-alta__o {
+    display: none;
+  }
+}
+
+/* ---------- Agenda: copias del recordatorio (agenda.asp) ---------- */
+.ui-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.ui-opcion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--ui-text);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.ui-opcion:hover {
+  background: var(--ui-bg);
+}
+.ui-opcion:has(input:checked) {
+  background: var(--ui-accent-light);
+  font-weight: 700;
+}
+.ui-copias,
+.ui-copias-agregar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-copia {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
+  font-size: 13px;
+  color: var(--ui-text);
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+}
+.ui-copia .ui-button--icon {
+  width: 26px;
+  height: 26px;
+}
+.ui-copias__titulo {
+  margin: 18px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ui-text-muted);
+}
+.ui-copia-agregar {
+  display: inline-block;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+  text-decoration: none;
+  border: 1px dashed var(--ui-accent);
+  border-radius: 999px;
+}
+.ui-copia-agregar:hover {
+  background: var(--ui-accent-light);
+}
+.ui-agenda-asunto {
+  margin-top: 14px;
+}
+
+/* ---------- Detalle de APL (detalles2.asp) ---------- */
+.ui-grid-2--plano {
+  gap: 24px;
+}
+.ui-apl-rel__titulo {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+}
+.ui-apl-rel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-apl-rel .ui-relac__link {
+  font-size: 13px;
+}
+/* Estado del APL en la barra de la vista de consulta (lugar del semaforo) */
+.ui-apl-estado {
+  justify-self: end;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  text-align: right;
+}
+.ui-apl-estado__detalle {
+  font-size: 12px;
+  color: #B8C4F5;
+}
+/* Pantallas angostas: como el semaforo, debajo de los datos y alineado a la izquierda */
+@media (max-width: 820px) {
+  .ui-apl-estado {
+    margin-left: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+.ui-apl-arreglos {
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* ---------- Atributo hidden ---------- */
+/* Un componente con display propio (badge, filtro, fila flex) igual se oculta con hidden.
+   Va con dos niveles de especificidad para ganarle a las reglas de una sola clase. */
+.ui-app [hidden],
+.ui-app[hidden] {
+  display: none;
+}
+
+/* ---------- Responsive de la capa de pantallas ---------- */
+@media (max-width: 1050px) {
+  .ui-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 768px) {
+  .ui-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ui-toolbar__actions {
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 700px) {
+  .ui-main {
+    padding: var(--ui-space-4);
+  }
+  .ui-grid {
+    grid-template-columns: 1fr;
+  }
+  .ui-field-grid,
+  .ui-field-grid--dual {
+    grid-template-columns: 1fr;
+  }
+  .ui-edit-actions {
+    position: static;
+    background: none;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Agenda - Vista semanal (agenda_semana.asp)
+   Reutiliza los tokens --ui-* definidos mas arriba. Agrega solo lo que el
+   calendario necesita: estados de reunion, grilla horaria y panel lateral.
+   ------------------------------------------------------------------------- */
+
+:root {
+  --ui-week-info: #0f6cbd;
+  --ui-week-info-bg: #cfe4fa;
+  --ui-week-row-h: 58px;
+  --ui-week-gutter: 56px;
+  --ui-week-panel-w: 360px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estados de reunion: fondo + texto + borde izquierdo en una sola clase,
+   asignada desde VBScript segun ESTADO_AGENDA. */
+
+/* La vista semanal nueva va despues del bloque anterior: donde coinciden las reglas, gana la nueva */
+/* ---------- Agenda semanal (agenda_semana.asp) ---------- */
+.ui-week-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ui-week-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 0 14px;
+  padding: 0;
+  font-size: 12px;
+  color: var(--ui-text-muted);
+  list-style: none;
+}
+.ui-week-leyenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ui-week-muestra {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+.ui-week-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+}
+.ui-week-calendario {
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+}
+.ui-week-cabecera-dias {
+  display: grid;
+  grid-template-columns: 56px repeat(5, minmax(0, 1fr));
+  background: var(--ui-bg);
+  border-bottom: 1px solid var(--ui-border);
+}
+.ui-week-dia {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 4px;
+  border-left: 1px solid var(--ui-border);
+}
+.ui-week-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--ui-text-muted);
+}
+.ui-week-num {
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ui-text);
+}
+.ui-week-dia--hoy {
+  background: var(--ui-accent-light);
+}
+.ui-week-dia--hoy .ui-week-lbl,
+.ui-week-dia--hoy .ui-week-num {
+  color: var(--ui-brand-strong);
+}
+.ui-week-grilla-wrap {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  max-height: 64vh;
+  overflow-y: auto;
+}
+.ui-week-gutter-horas {
+  position: relative;
+  background: var(--ui-bg);
+}
+.ui-week-hora {
+  position: absolute;
+  right: 8px;
+  margin-top: -7px;
+  font-size: 11px;
+  color: var(--ui-text-muted);
+}
+/* La primera hora no se sube (quedaria cortada arriba) */
+.ui-week-hora:first-child {
+  margin-top: 2px;
+}
+.ui-week-columnas {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.ui-week-dia-col {
+  position: relative;
+  border-left: 1px solid var(--ui-border);
+}
+.ui-week-linea-hora {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-top: 1px solid #EEF1F6;
+}
+.ui-week-linea-ahora {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  border-top: 2px solid #D92D20;
+}
+.ui-week-punto {
+  position: absolute;
+  top: -6px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  background: #D92D20;
+  border-radius: 50%;
+}
+.ui-week-reunion {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  padding: 5px 7px;
+  font-family: inherit;
+  text-align: left;
+  border: 0;
+  border-left: 4px solid transparent;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.10);
+}
+.ui-week-reunion:hover {
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.16);
+}
+.ui-week-grilla-wrap:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: -3px;
+}
+.ui-week-reunion:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 1px;
+}
+.ui-week-reunion.is-sel {
+  box-shadow: 0 0 0 2px var(--ui-brand-strong);
+}
+.ui-week-reunion--pendiente {
+  color: #0F3E73;
+  background: #E8F1FB;
+  border-left-color: #0F5CA8;
+}
+.ui-week-reunion--postergada {
+  color: #6B4E00;
+  background: #FFF4D6;
+  border-left-color: #B7791F;
+}
+.ui-week-reunion--realizada {
+  color: #3F4652;
+  background: #F1F3F5;
+  border-left-color: #8A94A6;
+}
+.ui-week-muestra.ui-week-reunion--pendiente,
+.ui-week-muestra.ui-week-reunion--postergada,
+.ui-week-muestra.ui-week-reunion--realizada {
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+.ui-week-reunion--cruce {
+  box-shadow: inset 0 0 0 2px #D92D20;
+}
+.ui-week-flag {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: #D92D20;
+  border-radius: 50%;
+}
+.ui-week-flag--leyenda {
+  position: static;
+}
+/* En reuniones cortas el titulo tiene prioridad: no se achica; se recortan horario y avatares */
+.ui-week-hora-lbl,
+.ui-week-avatares {
+  flex-shrink: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.ui-week-titulo {
+  flex-shrink: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-right: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+}
+.ui-week-hora-lbl {
+  font-size: 11px;
+}
+.ui-week-avatares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 2px;
+}
+.ui-week-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #FFFFFF;
+  border-radius: 50%;
+}
+.ui-week-avatar--lg {
+  width: 30px;
+  height: 30px;
+  font-size: 11.5px;
+}
+/* Panel de detalle */
+.ui-week-panel {
+  position: sticky;
+  top: 12px;
+  padding: 16px;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+}
+/* El panel respeta el atributo hidden (sus clases definen display) */
+.ui-week-panel [hidden] {
+  display: none !important;
+}
+.ui-week-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 6px;
+  text-align: center;
+  color: var(--ui-text-muted);
+}
+.ui-week-vacio p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ui-week-panel__titulo {
+  margin: 10px 0 4px;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  color: var(--ui-brand-strong);
+}
+.ui-week-panel__cuando {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--ui-text-muted);
+}
+.ui-week-panel__seccion {
+  margin: 14px 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+}
+.ui-week-personas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-week-personas li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ui-week-persona {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  font-size: 13px;
+  color: var(--ui-text);
+}
+.ui-week-rol {
+  font-size: 11.5px;
+  color: var(--ui-text-muted);
+}
+.ui-week-cruce {
+  margin-bottom: 8px;
+  padding: 9px 11px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ui-status-red-text);
+  background: var(--ui-status-red-bg);
+  border-radius: 8px;
+}
+.ui-week-sin-cruce {
+  padding: 9px 11px;
+  font-size: 12.5px;
+  color: var(--ui-status-green-text);
+  background: var(--ui-status-green-bg);
+  border-radius: 8px;
+}
+.ui-week-abrir {
+  display: block;
+  margin-top: 16px;
+  text-align: center;
+}
+@media (max-width: 1100px) {
+  .ui-week-body {
+    grid-template-columns: 1fr;
+  }
+  .ui-week-panel {
+    position: static;
+  }
+}
+
+/* ---------- Dialogo (pop-up) del sistema: <dialog> nativo (avance desde la vista del incidente) ---------- */
+.ui-dialogo {
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  overflow: auto;
+  color: var(--ui-text);
+  background: #FFFFFF;
+  border: 0;
+  border-radius: var(--ui-radius-lg);
+  box-shadow: 0 24px 64px rgba(14, 25, 73, 0.35);
+}
+.ui-dialogo::backdrop {
+  background: rgba(14, 25, 73, 0.55);
+}
+.ui-dialogo__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px;
+  color: #FFFFFF;
+  background: var(--ui-brand-strong);
+}
+.ui-dialogo__titulo {
+  margin: 0;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.ui-dialogo__cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  border-radius: 50%;
+}
+.ui-dialogo__cerrar:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+.ui-dialogo__cerrar:focus-visible {
+  outline: 3px solid #FFFFFF;
+  outline-offset: 2px;
+}
+.ui-dialogo__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 22px;
+}
+.ui-dialogo__body .ui-field__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ui-text-subtle);
+}
+.ui-dialogo__body .ui-input,
+.ui-dialogo__body .ui-select {
+  width: 100%;
+  box-sizing: border-box;
+}
+.ui-dialogo__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+.ui-dialogo__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 20px;
+  border-top: 1px solid var(--ui-border);
+}
+@media (max-width: 560px) {
+  .ui-dialogo__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   jQuery UI: calendario (datepicker) y dialogo, con el estilo del sistema.
+   Reemplaza a jquery-ui.css, que chocaba con el sistema: los dos usan el prefijo ui- y
+   jquery-ui.css redefinia .ui-button (relleno, margen y hover de TODOS los botones).
+   Aca solo van las clases propias de esos dos componentes; no se redefine .ui-button.
+   ========================================================================== */
+.ui-helper-hidden {
+  display: none;
+}
+.ui-helper-hidden-accessible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+.ui-helper-clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.ui-front {
+  z-index: 100;
+}
+.ui-widget-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(14, 25, 73, 0.55);
+}
+/* Iconos de jQuery UI: sin imagenes; el texto queda oculto y se dibuja el simbolo */
+.ui-datepicker .ui-icon,
+.ui-dialog .ui-icon {
+  display: block;
+  overflow: hidden;
+  text-indent: -9999px;
+}
+/* --- Calendario --- */
+.ui-datepicker {
+  display: none;
+  width: 18em;
+  padding: 10px;
+  font-family: "helvetica-lt-pro", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: var(--ui-text);
+  background: #FFFFFF;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  box-shadow: 0 12px 32px rgba(14, 25, 73, 0.22);
+}
+.ui-datepicker .ui-datepicker-header {
+  position: relative;
+  padding: 6px 0 10px;
+}
+.ui-datepicker .ui-datepicker-title {
+  margin: 0 36px;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  line-height: 28px;
+  text-align: center;
+  color: var(--ui-brand-strong);
+}
+.ui-datepicker .ui-datepicker-title select {
+  margin: 0 2px;
+  padding: 2px 4px;
+  font-size: 12px;
+}
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+  position: absolute;
+  top: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.ui-datepicker .ui-datepicker-prev {
+  left: 2px;
+}
+.ui-datepicker .ui-datepicker-next {
+  right: 2px;
+}
+.ui-datepicker .ui-datepicker-prev::before,
+.ui-datepicker .ui-datepicker-next::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  font-size: 20px;
+  line-height: 26px;
+  text-align: center;
+  color: var(--ui-brand-strong);
+}
+.ui-datepicker .ui-datepicker-prev::before {
+  content: "\2039";
+}
+.ui-datepicker .ui-datepicker-next::before {
+  content: "\203A";
+}
+.ui-datepicker .ui-datepicker-prev:hover,
+.ui-datepicker .ui-datepicker-next:hover {
+  background: var(--ui-accent-light);
+}
+.ui-datepicker .ui-datepicker-prev .ui-icon,
+.ui-datepicker .ui-datepicker-next .ui-icon {
+  width: 100%;
+  height: 100%;
+}
+.ui-datepicker table {
+  width: 100%;
+  margin: 0;
+  font-size: 12.5px;
+  border-collapse: collapse;
+}
+.ui-datepicker th {
+  padding: 6px 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ui-text-muted);
+  border: 0;
+}
+.ui-datepicker td {
+  padding: 1px;
+  border: 0;
+}
+.ui-datepicker td a,
+.ui-datepicker td span {
+  display: block;
+  padding: 6px 0;
+  text-align: center;
+  text-decoration: none;
+  color: var(--ui-text);
+  border-radius: 8px;
+}
+.ui-datepicker td a:hover {
+  background: var(--ui-accent-light);
+}
+.ui-datepicker td .ui-state-highlight {
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+  box-shadow: inset 0 0 0 1px var(--ui-accent);
+}
+.ui-datepicker td .ui-state-active {
+  font-weight: 700;
+  color: #FFFFFF;
+  background: var(--ui-brand-strong);
+}
+.ui-datepicker .ui-datepicker-unselectable span,
+.ui-datepicker .ui-state-disabled {
+  color: var(--ui-text-subtle);
+  opacity: 0.5;
+  cursor: default;
+}
+.ui-datepicker .ui-datepicker-other-month a {
+  color: var(--ui-text-subtle);
+}
+.ui-datepicker .ui-datepicker-buttonpane {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ui-border);
+}
+/* --- Dialogo --- */
+.ui-dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* jQuery UI fija 300px en linea: el minimo gana y evita cortar titulo y campos */
+  min-width: min(420px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  overflow: hidden;
+  outline: 0;
+  font-family: "helvetica-lt-pro", Helvetica, Arial, sans-serif;
+  color: var(--ui-text);
+  background: #FFFFFF;
+  border: 0;
+  border-radius: var(--ui-radius-lg);
+  box-shadow: 0 24px 64px rgba(14, 25, 73, 0.35);
+}
+.ui-dialog .ui-dialog-titlebar {
+  position: relative;
+  padding: 14px 56px 14px 20px;
+  color: #FFFFFF;
+  background: var(--ui-brand-strong);
+  cursor: move;
+}
+.ui-dialog .ui-dialog-title {
+  display: block;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  min-width: 0;
+  margin: -15px 0 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 0;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  border-radius: 50%;
+}
+.ui-dialog .ui-dialog-titlebar-close::before {
+  content: "\00D7";
+  display: block;
+  font-size: 20px;
+  line-height: 30px;
+  text-align: center;
+}
+.ui-dialog .ui-dialog-titlebar-close:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+.ui-dialog .ui-dialog-titlebar-close .ui-icon,
+.ui-dialog .ui-dialog-titlebar-close .ui-button-icon-space {
+  display: none;
+}
+.ui-dialog .ui-dialog-content {
+  position: relative;
+  padding: 18px 20px;
+  overflow: auto;
+  font-size: 13.5px;
+  line-height: 1.5;
+  background: none;
+  border: 0;
+  box-sizing: border-box;
+}
+.ui-dialog .ui-dialog-content input,
+.ui-dialog .ui-dialog-content select,
+.ui-dialog .ui-dialog-content textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.ui-dialog .ui-dialog-buttonpane {
+  padding: 12px 20px 16px;
+  text-align: right;
+  border-top: 1px solid var(--ui-border);
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+/* Botones del dialogo: con el estilo del sistema (el primero es la accion principal) */
+.ui-dialog .ui-dialog-buttonset button {
+  padding: 9px 18px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+  background: var(--ui-accent-light);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.ui-dialog .ui-dialog-buttonset button:first-child {
+  color: #FFFFFF;
+  background: #7995FF;
+}
+.ui-dialog .ui-dialog-buttonset button:hover {
+  filter: brightness(0.95);
+}
+.ui-dialog .ui-dialog-buttonset button:active {
+  transform: translateY(1px);
+  filter: brightness(0.93);
+}
+.ui-dialog .ui-dialog-buttonset button:focus-visible,
+.ui-dialog .ui-dialog-titlebar-close:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+.ui-dialog .ui-resizable-handle {
+  position: absolute;
+  display: block;
+  font-size: 0.1px;
+}
+.ui-dialog .ui-resizable-se {
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  cursor: se-resize;
+}
+.ui-dialog .ui-resizable-e {
+  top: 0;
+  right: -4px;
+  width: 8px;
+  height: 100%;
+  cursor: e-resize;
+}
+.ui-dialog .ui-resizable-s {
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  cursor: s-resize;
+}
+.ui-dialog .ui-resizable-n,
+.ui-dialog .ui-resizable-w,
+.ui-dialog .ui-resizable-sw,
+.ui-dialog .ui-resizable-ne,
+.ui-dialog .ui-resizable-nw {
+  display: none;
+}
+
+/* ---------- Vista de incidente y proyecto (detalles.asp) ---------- */
+/* Arriba: Detalle (izquierda, angosto) y historial de avances (derecha, ancho), con la misma altura.
+   Debajo, a todo el ancho: Informacion y despues los APLs. */
+.ui-det-grid {
+  display: grid;
+  /* Detalle a la izquierda (angosta) y Avances a la derecha (ancha, 2 de 3 partes) */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 20px;
+  align-items: stretch;
+}
+.ui-det-grid__principal,
+.ui-det-grid__lateral {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* Cada tarjeta ocupa toda la altura de su columna: las dos terminan a la misma altura */
+.ui-det-grid__principal > .ui-card,
+.ui-det-grid__lateral > .ui-card {
+  flex: 1 1 auto;
+}
+/* Historial largo: la tabla se desplaza por dentro y la fila no crece sin limite */
+.ui-det-grid__lateral .ui-table-wrap {
+  max-height: 460px;
+  overflow-y: auto;
+}
+.ui-det-grid__lateral .ui-table-wrap:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.ui-det-grid__lateral .ui-table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #FFFFFF;
+}
+@media (max-width: 1100px) {
+  .ui-det-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* Tabla del historial de avances (funciones.inc, HtmlHistorialRelainc): siete columnas.
+   Las cortas toman el ancho de su contenido (sin cortar palabras) y el detalle se queda con
+   el resto, con un minimo de mas del doble que las demas. */
+.ui-hist {
+  width: 100%;
+}
+.ui-hist th {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+.ui-hist th,
+.ui-hist td {
+  padding-left: 6px;
+  padding-right: 6px;
+  vertical-align: top;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.ui-hist th:first-child,
+.ui-hist td:first-child {
+  padding-left: 0;
+}
+.ui-hist th:last-child,
+.ui-hist td:last-child {
+  padding-right: 0;
+}
+.ui-hist td {
+  font-size: 12.5px;
+}
+.ui-hist th.ui-hist__detalle,
+.ui-hist td.ui-hist__detalle {
+  width: 34%;
+  min-width: 170px;
+}
+.ui-hist td.ui-hist__detalle {
+  line-height: 1.5;
+  color: var(--ui-text);
+  overflow-wrap: anywhere;
+}
+/* ---------- Textos recortados con pop-up de lectura (historial y Detalle) ---------- */
+/* Detalle de cada avance: 3 renglones; toda la celda abre el pop-up con el avance completo */
+.ui-hist__ver {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+/* Gana sobre ".ui-table td button" (botones de accion de las tablas: sin cortes de linea y con forma de pildora) */
+.ui-table.ui-hist td button.ui-hist__ver {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 400;
+  text-align: left;
+  white-space: normal;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.ui-hist__texto {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+.ui-hist__ver:hover .ui-hist__texto {
+  color: var(--ui-brand-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ui-hist__ver:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+.ui-hist__ver:active {
+  opacity: 0.8;
+}
+/* Descripcion de la tarjeta Detalle: tiene mas alto, se recorta a 14 renglones */
+.ui-recorte {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 14;
+  line-clamp: 14;
+  overflow: hidden;
+}
+.ui-recorte__ver {
+  display: block;
+  margin-top: 8px;
+  text-align: left;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.ui-recorte__ver:hover {
+  color: var(--ui-accent);
+}
+.ui-recorte__ver:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Valores de solo lectura del pop-up (mismo aspecto de campo que "Anadir avance", sin edicion) */
+.ui-dialogo__valor {
+  min-height: 38px;
+  padding: 9px 11px;
+  box-sizing: border-box;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--ui-text);
+  background: var(--ui-page-bg, #F3F5FF);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  overflow-wrap: anywhere;
+}
+.ui-dialogo__valor--texto {
+  max-height: 50vh;
+  overflow-y: auto;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Pop-up angosto (Relacionar APL: un solo campo) */
+.ui-dialogo--chico {
+  width: min(420px, calc(100vw - 32px));
+}
+.ui-dialogo__ayuda {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
+
+/* ---------- Ventana emergente (buscar_entidades.asp) ---------- */
+.ui-ventana__pagina {
+  min-height: 100vh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+.ui-ventana__titulo {
+  margin: 0 0 16px;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+}
+.ui-ventana__busqueda {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+/* Gana sobre ".ui-container > form" (que apila en columna los formularios de alta) */
+.ui-container > form.ui-ventana__busqueda {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.ui-ventana__busqueda .ui-input {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+.ui-ventana__busqueda .ui-button {
+  flex: 0 0 auto;
+  width: auto;
+}
+.ui-ventana__pie {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* ---------- Pagina intermedia de guardado y borrado (actualizar.asp, eliminar.asp) ---------- */
+.ui-procesando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.ui-procesando__caja {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 28px;
+  background: #FFFFFF;
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-card);
+}
+.ui-procesando__icono {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--ui-accent-light);
+  border-top-color: var(--ui-accent);
+  border-radius: 50%;
+  animation: ui-girar 0.8s linear infinite;
+}
+.ui-procesando__texto {
+  margin: 0;
+  font-family: "roc-grotesk", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ui-brand-strong);
+}
+@keyframes ui-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-procesando__icono {
+    animation: none;
+  }
+}
+
+/* ---------- Campos dentro de los dialogos de jQuery UI (armaCargaParam.asp) ---------- */
+.ui-dialogo-campos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ui-dialogo-campos .ui-field__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ui-text-subtle);
+}
+.ui-dialogo-campos .ui-input,
+.ui-dialogo-campos .ui-select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---------- Reportes nuevos (reportesAgenda.asp, reportesPendientes.asp) ---------- */
+/* Recuadro "Dato: ..." de las maquetas: marca el valor que falta conectar (desaparece al conectar los datos).
+   El resto de esas pantallas usa los componentes del sistema, igual que el reporte por cliente. */
+.ui-dato {
+  display: inline-block;
+  padding: 1px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #7A5807;
+  background: #FFF8E1;
+  border: 1px dashed #C99A1E;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+/* Dentro de tablas el recuadro puede partirse (si no, ensancha la columna mas que el dato real) */
+.ui-table .ui-dato {
+  white-space: normal;
+}
+
+/* ---------- Agenda semanal: feriados (agenda_semana.asp, FeriadosAsegurar de feriados.inc) ---------- */
+/* Cabecera del dia: fondo ambar claro y el nombre del feriado en una segunda linea */
+.ui-week-dia--feriado {
+  flex-wrap: wrap;
+  row-gap: 2px;
+  background: #FFF8E1;
+}
+.ui-week-dia--feriado .ui-week-lbl,
+.ui-week-dia--feriado .ui-week-num {
+  color: #7A5807;
+}
+.ui-week-feriado {
+  flex-basis: 100%;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #7A5807;
+}
+/* Columna del dia: rayado ambar suave (las reuniones de ese dia se siguen viendo bien) */
+.ui-week-dia-col--feriado {
+  background: repeating-linear-gradient(135deg, rgba(201, 154, 30, 0.10) 0 8px, transparent 8px 16px);
+}
+
+/* ==========================================================================
+   Estados interactivos (todo el sistema): cursor de mano y respuesta al presionar.
+   Va al final para ganar sobre las reglas de cada componente.
+   ========================================================================== */
+/* Cursor de mano en todo lo que se puede tocar */
+a[href],
+button,
+select,
+summary,
+[role="button"],
+[role="tab"],
+input[type="button"],
+input[type="submit"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"],
+.ui-table__cell--link,
+.ui-table__sort,
+.ui-acceso,
+.ui-cliente__marca,
+.ui-week-reunion,
+.ui-opcion,
+.ui-copia-agregar,
+.ui-tag-id--link {
+  cursor: pointer;
+}
+/* Lo deshabilitado no es clicable (mismo peso que las reglas de arriba: gana por ir despues) */
+button:disabled,
+select:disabled,
+input:disabled,
+button[aria-disabled="true"],
+a[aria-disabled="true"],
+.ui-button.ui-button--disabled,
+.ui-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+.ui-permiso--fijo {
+  cursor: default;
+}
+
+/* Deshabilitados: no cambian al pasar el mouse (conservan el color base de su variante) */
+.ui-button--primary.ui-button--disabled:hover,
+.ui-button--primary[aria-disabled="true"]:hover {
+  background: var(--ui-btn-primary-bg);
+  color: var(--ui-btn-primary-text);
+}
+.ui-button--secondary.ui-button--disabled:hover,
+.ui-button--secondary[aria-disabled="true"]:hover {
+  background: var(--ui-btn-alt-bg);
+  color: var(--ui-btn-alt-text);
+}
+.ui-button--light.ui-button--disabled:hover,
+.ui-button--light[aria-disabled="true"]:hover {
+  background: #FFFFFF;
+  color: var(--ui-brand-strong);
+}
+.ui-button--quiet.ui-button--disabled:hover,
+.ui-button--quiet[aria-disabled="true"]:hover {
+  background: transparent;
+  color: var(--ui-brand-strong);
+}
+.ui-button--danger.ui-button--disabled:hover,
+.ui-button--danger[aria-disabled="true"]:hover {
+  background: var(--ui-status-red-bg);
+  color: var(--ui-status-red-text);
+}
+
+/* Respuesta al presionar: los botones se hunden 1px y se oscurecen apenas */
+.ui-button,
+.ui-permiso,
+.ui-tabbar__link,
+.ui-semfiltro__op,
+.ui-segmented button,
+.ui-stepper__btn,
+.ui-cliente__links a,
+.ui-menu-param__link,
+.ui-table td input[type="button"],
+.ui-table td input[type="submit"],
+.ui-table td button {
+  transition: transform .08s ease, filter .08s ease, background-color .12s ease;
+}
+.ui-button:not(.ui-button--disabled):not([aria-disabled="true"]):active,
+button.ui-permiso:active,
+.ui-tabbar__link:active,
+.ui-semfiltro__op:active,
+.ui-segmented button:active,
+.ui-stepper__btn:active,
+.ui-table td input[type="button"]:not(:disabled):active,
+.ui-table td input[type="submit"]:not(:disabled):active,
+.ui-table td button:not(:disabled):not([aria-disabled="true"]):active {
+  transform: translateY(1px);
+  filter: brightness(0.93);
+}
+/* Accesos de la portada: al presionar vuelven a su lugar (en hover se elevan) */
+.ui-week-reunion:active {
+  filter: brightness(0.95);
+}
+.ui-copia-agregar:active,
+.ui-opcion:active {
+  background-color: var(--ui-accent-light);
+}
+.ui-acceso:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 1px 4px rgba(19, 37, 116, 0.10);
+}
+/* Superficies clicables: se tinen de lila al presionar */
+.ui-dialogo__cerrar:active,
+.ui-cliente__marca:active,
+.ui-cliente__links a:active,
+.ui-menu-param__link:active,
+.ui-table__cell--link:active {
+  background-color: var(--ui-accent-light);
+}
+/* Enlaces de texto: se atenuan al presionar */
+.ui-link:active,
+.ui-table__sort:active,
+.ui-table__titulo:active,
+.ui-caso__link:active,
+.ui-relac__link:active,
+.ui-widget__link:active {
+  opacity: .7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-button,
+  .ui-permiso,
+  .ui-tabbar__link,
+  .ui-acceso {
+    transition: none;
+  }
+  .ui-button:active,
+  .ui-acceso:active {
+    transform: none;
+  }
+}
+

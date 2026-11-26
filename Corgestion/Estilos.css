@@ -1,0 +1,17 @@
+td{
+	border: solid;
+	border-radius: 10px;
+	padding: 10px;
+	background-color: aqua;
+	text-align: center;
+}
+
+table {
+	padding: 15px;
+	border-spacing: 10px;
+	font-family: TAhoma;
+	font-size: 12px;
+	text-align: center;
+}
+
+

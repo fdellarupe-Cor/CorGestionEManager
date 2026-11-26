@@ -1,0 +1,237 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<!-- #INCLUDE FILE="IncFile/datosDetalles.inc" -->
+<!-- #INCLUDE FILE="IncFile/datosApl.inc" -->
+<%
+'Option Explicit
+
+' Inicialización de variables y conexión
+Dim Cnn, cons, opc, xmenu, xtmenu, ord, par, cliente, idAplic, idtip, asp, fec, nFecini
+Dim rs, rsCombos, CantRegMostrar, CantRegMover, PosReg, env
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.Open scon1
+
+cons = Request.QueryString("cons")
+opc = Request.QueryString("opc")
+xmenu = Request.QueryString("xmenu")
+xtmenu = Request.QueryString("xtmenu")
+ord = Request.QueryString("ord")
+par = Request.QueryString("par") : If par = "" Then par = "asc"
+
+' Parametrización segura de enteros
+cliente = CLng("0" & Request.Form("cli"))
+If cliente = 0 Then cliente = CLng("0" & Request.QueryString("cli"))
+
+idAplic = CLng("0" & Request.Form("aplic"))
+If idAplic = 0 Then idAplic = CLng("0" & Request.QueryString("aplic"))
+
+idtip = CLng("0" & Request.Form("tip"))
+If idtip = 0 Then idtip = CLng("0" & Request.QueryString("tip"))
+
+asp = Request.Form("busc") : If asp = "" Then asp = Request.QueryString("busc")
+fec = Request.Form("fec") : If fec = "" Then fec = Request.QueryString("fec")
+
+CantRegMostrar = 10
+CantRegMover = CLng("0" & Request.QueryString("CantRegMover"))
+If CantRegMover < 0 Then CantRegMover = 0
+
+nFecini = 0
+If nFecini < CLng(CDate("01-01-1900")) Then nFecini = CLng(CDate("01-01-1900"))
+
+' Llamada a la capa de datos
+Set rs = GetAPLs(Cnn, cons, cliente, idAplic, idtip, asp, CLng("0" & fec), ord)
+If Not rs.EOF Then rs.Move (CantRegMover)
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <%= headhtml() %>
+</head>
+<body>
+    <header id='header' style='background:#0e1949;padding:1rem 0;'>
+        <div style='display:flex;padding: 0 1rem;align-items:center;'>
+            <div style='width:75%;'>
+                <a href='index.asp' class='logo' style='display:flex; align-items:center; text-decoration:none;'>
+                    <img src='images/iso_cor.png' style='width:6rem; margin-right:1rem;' >
+                    <span style='font-size:15pt;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <% If cons = "" Then %>
+    <!-- HEADER DE FILTROS Y CONTROLES -->
+    <div class='titulo-seccion' style='padding: 1rem 2rem;'>
+        <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;'>
+            <h2>APLs</h2>
+            <div style='display:flex; gap: 1rem;'>
+                <% If CStr(getPermisos(xmenu, xtmenu, "ALTA")) = "1" Then %>
+                    <form id='formNuevoApl' method='post' action='agregaragregar3.asp?tipo=APL&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>'>
+                        <input class='bot' type='button' value='NUEVO APL' onclick="document.getElementById('formNuevoApl').submit();">
+                    </form>
+                <% Else %>
+                    <input class='botsp' type='button' value='CARGAR NUEVO APL' disabled>
+                <% End If %>
+                
+                <form id='formVolver' method='post' action='index.asp'>
+                    <input class='bot' type='button' value='VOLVER' onclick="document.getElementById('formVolver').submit();">
+                </form>
+            </div>
+        </div>
+
+        <form id='xForm' method='post' action='apl.asp?ord=<%=ord%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>'>
+            <div style='display:flex; gap: 1rem; align-items:center;'>
+                <!-- COMBO CLIENTES USANDO LA FUNCIÓN CENTRALIZADA -->
+                <strong>CLIENTE:</strong>
+                <select onchange="document.getElementById('xForm').submit();" id='cli' name='cli'>
+                    <option value='0'>TODOS</option>
+                    <% 
+                    Set rsCombos = GetListaComboExtended(Cnn, "CLIENTES")
+                    Do While Not rsCombos.EOF 
+                        Dim selCli : selCli = "" : If CStr(rsCombos(0)) = CStr(cliente) Then selCli = "selected"
+                    %>
+                        <option value='<%=rsCombos(0)%>' <%=selCli%>><%=rsCombos(1)%></option>
+                    <% 
+                        rsCombos.MoveNext
+                    Loop 
+                    %>
+                </select>
+
+                <!-- COMBO APLICATIVOS USANDO LA FUNCIÓN CENTRALIZADA -->
+                <strong>APLICATIVO:</strong>
+                <select onchange="document.getElementById('xForm').submit();" id='aplic' name='aplic'>
+                    <option value='0'>TODOS</option>
+                    <% 
+                    Set rsCombos = GetListaComboExtended(Cnn, "APLICATIVOS")
+                    Do While Not rsCombos.EOF 
+                        Dim selApl : selApl = "" : If CStr(rsCombos(0)) = CStr(idAplic) Then selApl = "selected"
+                    %>
+                        <option value='<%=rsCombos(0)%>' <%=selApl%>><%=rsCombos(1)%></option>
+                    <% 
+                        rsCombos.MoveNext
+                    Loop 
+                    %>
+                </select>
+                
+                <!-- COMBO TIPO APL USANDO LA FUNCIÓN CENTRALIZADA -->
+                <strong>TIPO:</strong>
+                <select onchange="document.getElementById('xForm').submit();" id='tip' name='tip'>
+                    <option value='0'>TODOS</option>
+                    <% 
+                    Set rsCombos = GetListaComboExtended(Cnn, "TIPO_APL")
+                    Do While Not rsCombos.EOF 
+                        Dim selTip : selTip = "" : If CStr(rsCombos(0)) = CStr(idtip) Then selTip = "selected"
+                    %>
+                        <option value='<%=rsCombos(0)%>' <%=selTip%>><%=rsCombos(1)%></option>
+                    <% 
+                        rsCombos.MoveNext
+                    Loop 
+                    %>
+                </select>
+            </div>
+        </form>
+    </div>
+    <% End If %>
+
+    <!-- GRILLA DE RESULTADOS -->
+    <div class='inner' style='padding:2rem'>
+        <div class='bloque-datos table-responsive'>
+            <table class='tabla-moderna' style='width: 100%;'>
+                <thead>
+                    <tr>
+                        <th style='width: 40px;'></th>
+                        <th style='width: 40px;'></th>
+                        <th><a class='col-link' style='text-decoration: none;' href='apl.asp?ord=sec&cli=<%=cliente%>&par=asc&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&aplic=<%=idAplic%>'>SEC</a></th>
+                        <th><a class='col-link' style='text-decoration: none;' href='apl.asp?ord=nom&cli=<%=cliente%>&par=asc&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&aplic=<%=idAplic%>'>NOMBRE</a></th>
+                        <th>CLIENTE</th>
+                        <th>APLICATIVO</th>
+                        <th style='text-align: center;'>FECHA ENVIO</th>
+                        <% If cons = "" Then %><th>TIPO</th><% End If %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                    PosReg = 0
+                    Do While (Not rs.EOF) And (PosReg < CantRegMostrar)
+                        ' Lógica visual del badge de fecha
+                        If IsNull(rs(4)) Or rs(4) = 0 Then
+                            env = "<span class='badge badge-peligro'>NO ENVIADO</span>"
+                        Else
+                            env = "<span class='badge badge-ok'>" & Fechador(rs(4) + nFecini) & "</span>"
+                        End If
+                    %>
+                        <tr>
+                            <!-- CONTROLES DE ACCIÓN -->
+                            <td style='text-align:center;'>
+                                <form id='formDel<%=rs(0)%>' class='form-oculto' method='post' action='eliminar.asp?opc=apl&id=<%=rs(0)%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&vuelta=apl.asp'></form>
+                                <% If CStr(getPermisos(xmenu, xtmenu, "ELIM")) = "1" Then %>
+                                    <input class='btn-accion btn-accion-peligro' type='button' value='X' onclick="borrar('formDel<%=rs(0)%>');">
+                                <% Else %>
+                                    <input class='btn-accion btn-accion-deshabilitado' type='button' value='X' disabled>
+                                <% End If %>
+                            </td>
+                            <td style='text-align:center;'>
+                                <form id='formAct<%=rs(0)%>' class='form-oculto' method='post' action='detalles2.asp?id=<%=rs(0)%>&opc=act&cli=<%=cliente%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&idaplic=<%=idAplic%>&idtip=<%=idtip%>&cantregmover=<%=CantRegMover%>'></form>
+                                <% If CStr(getPermisos(xmenu, xtmenu, "MODIF")) = "1" Then %>
+                                    <input class='btn-accion btn-accion-primario' type='button' value='A' onclick="document.getElementById('formAct<%=rs(0)%>').submit();">
+                                <% Else %>
+                                    <input class='btn-accion btn-accion-deshabilitado' type='button' value='A' disabled>
+                                <% End If %>
+                            </td>
+                            
+                            <!-- DATOS DEL REGISTRO -->
+                            <td style='text-align: center; cursor:pointer;' onclick="document.location='detalles2.asp?id=<%=rs(0)%>&opc=ver&cli=<%=cliente%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&idAplic=<%=idAplic%>'"><%=rs("sec")%></td>
+                            <td style='cursor:pointer;' onclick="document.location='detalles2.asp?id=<%=rs(0)%>&opc=ver&cli=<%=cliente%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&idAplic=<%=idAplic%>'"><%=UCase(rs("nombre"))%></td>
+                            <td style='cursor:pointer;' onclick="document.location='detalles2.asp?id=<%=rs(0)%>&opc=ver&cli=<%=cliente%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&idAplic=<%=idAplic%>'"><%=rs("cliente")%></td>
+                            <td style='cursor:pointer;' onclick="document.location='detalles2.asp?id=<%=rs(0)%>&opc=ver&cli=<%=cliente%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&idAplic=<%=idAplic%>'"><%=rs("aplicativo")%></td>
+                            <td style='text-align: center; cursor:pointer;' onclick="document.location='detalles2.asp?id=<%=rs(0)%>&opc=ver&cli=<%=cliente%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&idAplic=<%=idAplic%>'"><%=env%></td>
+                            
+                            <% If cons = "" Then %>
+                            <td style='cursor:pointer;' onclick="document.location='detalles2.asp?id=<%=rs(0)%>&opc=ver&cli=<%=cliente%>&xmenu=<%=xmenu%>&xtmenu=<%=xtmenu%>&idAplic=<%=idAplic%>'"><%=rs("tipo_apl")%></td>
+                            <% End If %>
+                        </tr>
+                    <% 
+                        PosReg = PosReg + 1
+                        rs.MoveNext
+                    Loop 
+                    %>
+                </tbody>
+            </table>
+
+            <!-- PAGINACIÓN -->
+            <div style='display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end;'>
+                <% If CantRegMover <> 0 Then %>
+                    <form id='formAtras' class='form-oculto' method='post' action='apl.asp?cantregmover=<%=CantRegMover - CantRegMostrar%>&ord=<%=ord%>&cli=<%=cliente%>&par=<%=par%>&cons=<%=cons%>'></form>
+                    <input class='bot' type='button' value='ATRAS' onclick="document.getElementById('formAtras').submit();">
+                <% Else %>
+                    <input class='botsp' type='button' value='ATRAS' disabled>
+                <% End If %>
+                
+                <% If Not rs.EOF Then %>
+                    <form id='formSig' class='form-oculto' method='post' action='apl.asp?cantregmover=<%=CantRegMover + CantRegMostrar%>&ord=<%=ord%>&cli=<%=cliente%>&par=<%=par%>&cons=<%=cons%>'></form>
+                    <input class='bot' type='button' value='SIGUIENTE' onclick="document.getElementById('formSig').submit();">
+                <% Else %>
+                    <input class='botsp' type='button' value='SIGUIENTE' disabled>
+                <% End If %>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type='text/javascript'>
+        function borrar(formu) {
+            if (confirm('¿Desea eliminar este APL?')) {
+                document.getElementById(formu).submit();
+            }
+        }
+    </script>
+    <script src='assets/js/jquery.min.js'></script>
+    <script src='assets/js/skel.min.js'></script>
+    <script src='assets/js/util.js'></script>
+    <script src='assets/js/main.js'></script>
+</body>
+</html>
+<%
+Cnn.Close
+Set Cnn = Nothing
+%>

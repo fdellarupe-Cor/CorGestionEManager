@@ -1,0 +1,199 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+
+
+
+html = "<html>"
+html = html & "<head>"
+
+html = html & "<title>Cor Gestion</title>"
+html = html & "<meta charset='utf-8' />"
+html = html & "<meta name='viewport' content='width=device-width, initial-scale=1' />"
+html = html & "<link rel='stylesheet' href='assets/css/main.css' />"
+html = html & "<style style='text/css'>"
+html = html & ".tablX{"
+html = html & "width:100%; "
+html = html & "border-collapse:collapse; "
+html = html & "}"
+html = html & ".tablX td{ "
+html = html & "padding:7px; "
+html = html & "}"
+html = html & ".tablX tr{"
+html = html & "background: #FFFFFF;"
+html = html & "}"
+html = html & ".tablX tr:hover {"
+html = html & "background-color: #D4D4D4;"
+html = html & "}"
+html = html & "</style>"
+
+
+
+
+html = html & "</head>"
+html = html & "<body>"
+'response.write request.querystring & "<br>" & request.form
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.open "Provider=SQLOLEDB;Data Source=server-2025;Initial Catalog=dbcorgestionv5; user id=sa;password=bb4515$;"
+
+cons = request.querystring("cons")
+opc = request.querystring("opc")
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+CantRegMostrar = 10
+CantRegMover = CDbl(Request.querystring("CantRegMover"))
+if CantRegMover < 0 then CantRegMover = 0
+
+nFecini = 0
+
+If nFecini < CLng(CDate("01-01-1900")) Then
+	nFecini = CLng(CDate("01-01-1900"))
+Else
+	nFecini = 0
+End If
+
+cliente = request.form("cli")
+if cliente & "" = "" then cliente = request.querystring("cli")
+if cliente & "" = "" then cliente = 0
+
+ord = request.querystring("ord")
+
+par = request.querystring("par")
+if par & "" = "" then par = "asc"
+'if par = "asc" then
+'	par = "desc"
+'else
+'	par = "asc"
+'end if
+
+response.write Request.ServerVariables("REQUEST_METHOD")
+Response.Write "<br>Fecha y hora actual es: " & now
+
+On Error Resume Next
+
+
+
+'Response.Write "Error de comilla incompleta
+'If Err.Number <> 0 then
+'	response.write(err.description) & "Falta una comilla o algun caracter esta mal<br>"
+'	response.write "Descripcion: " '& Err.Description
+'	Response.End
+'End if
+
+
+
+RESPONSE.WRITE "<br>HOLA<br><br>"
+
+'HTML1 = html1 & "<script language='javascript'>"
+'HTML1 = html1 & "alert ('Testeando el java escri');"
+'HTML1 = html1 & "</script>"
+
+'Response.Write HTML1
+
+Session.LCID = 1034	'español
+'response.write Month(Actual)
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.open "Provider=SQLOLEDB;Data Source=server-2025;Initial Catalog=dbcorgestionv5; user id=sa;password=bb4515$;"
+
+
+	Set rs1 = Cnn.Execute("sp_Utilidades @Modo='consultar_campo', @Tabla='apl', @Campo='fecha_creacion', @Id=240")
+	RESPONSE.WRITE rs1(0) & "<br>"
+
+	Anio_Empieza = "1900"
+	Mes_Empieza = "01"
+	Dia_Empieza = "01"
+	Fecha_Empieza = Dia_Empieza & "-" & Mes_Empieza & "-" & Anio_Empieza
+	Response.Write Fecha_Empieza & "<br>"
+
+	Fecha_Dato = rs1(0) + 2 'En SQL Empieza 01-01-1900
+	'Anio_BD = Cint((rs1(0)/365)) & "<br>"
+	Anio_Dato = DatePart("yyyy",Fecha_Dato)
+	Response.Write Anio_Dato & "<br>"
+	Mes_Dato = DatePart("m",Fecha_Dato)
+	Response.Write Mes_Dato & "<br>"
+	Dia_Dato = DatePart("d",Fecha_Dato)
+	Response.Write Dia_Dato & "<br>"
+
+
+	'Response.Write FormatDateTime(Date,2)& "<br>"
+	'Response.Write DatePart("yyyy",Now)& "<br>"
+	'Response.Write Year(Actual)& "<br>"
+	'Response.Write Month(Actual)& "<br>"
+	'Response.Write Day(Actual)& "<br>"
+
+
+Response.Write "<br>Seleccione Cliente:<br><br>"
+
+response.WRITE "CLIENTE - DIRECCION <br>"
+
+Set rs = Cnn.Execute("sp_Utilidades @Modo='listar_clientes'")
+
+RESPONSE.WRITE RS(1)
+
+do while not rs.eof
+
+html = "<FORM METHOD='POST' ACTION='AplCliente.asp?Id=ElId&Banco=ElBanco'>"
+
+
+html = html & "<INPUT TYPE='TEXT' NAME='ElId' readonly='readonly' disabled='disabled' size='5' VALUE='" & rs(0) & "'>"
+html = html & "<INPUT TYPE='TEXT' NAME='ElBanco' readonly='readonly' disabled='disabled' size='50' VALUE='" & rs(1) & "'>"
+html = html & "<INPUT TYPE='SUBMIT' NAME='Enviar' VALUE='Ver'>"
+'html = html & "<LABEL SIZE= 50 FOR='ElBanco'>" & rs(1) & "> "
+
+
+html = html & " </form>"
+
+
+response.write html
+
+
+rs.movenext
+loop
+
+
+'response.write "<table style='margin:0 auto;font-family:tahoma; font-size:13px;' ><tr><td style='text-align:right;border:solid 1px;WIDTH:30px;border-color:green;'>" & rs(0) & "&nbsp;</td><td style='border:solid 1px;WIDTH:175px;border-color:green;'>" & rs(1) &"</td></tr></table>"
+'response.write "<div style='border-radius:10px; border: 1px; background-color: green;>" & rs(0) & "</div>"
+'rs.movenext
+'loop
+
+Response.Write "<br><br><tABLE><tr style='font-family:tahoma; font-size:11px'><td style='border:solid 1px;'>&nbsp;ID&nbsp;</td><td style='border:solid 1px;'>&nbsp;COLOR&nbsp;</TD><TD style='border:solid 1px;'>&nbsp;DIAS DE AVISO&nbsp;</TD></TR><tr style='font-family:tahoma; font-size:11px'><td ></td><td ></TD><TD></TD></TR><tr style='font-family:tahoma; font-size:11px'><td style='border:solid 1px;'>&nbsp;01&nbsp;</td><td style='border:solid 1px;background-color:red'></TD><TD style='border:solid 1px;'>&nbsp;VENCIDAS&nbsp;</TD></TR><tr style='font-family:tahoma; font-size:11px'><td style='border:solid 1px;'>&nbsp;02&nbsp;</td><td style='border:solid 1px;background-color:YELLOW'></TD><TD style='border:solid 1px;'>&nbsp;30 DIAS&nbsp;</TD></TR><tr style='font-family:tahoma; font-size:11px'><td style='border:solid 1px;'>&nbsp;03&nbsp;</td><td style='border:solid 1px;background-color:GREEN'></TD><TD style='border:solid 1px;'>&nbsp;60 DIAS&nbsp;</TD></TR></TABLE><br><br><br><br>"
+
+'Response.write "<FORM METHOD=GET ACTION='ValoresLista.asp'>	CuadroDeTexto1:<BR>	<INPUT TYPE='TEXT' NAME='1'>	<P>	CuadroDeTexto2:<BR>	<INPUT TYPE='TEXT' NAME='2'>		<P>	</form>
+'<INPUT TYPE='SUBMIT' VALUE='EnviarFormulario'>
+
+'html0 = "<FORM METHOD='GET' ACTION='ValoresLista.asp'>"
+'html0 = HTML0 & "Nombre: &nbsp; " & "<INPUT TYPE='TEXT' NAME='Nombre' VALUE=' '><br><br>"
+'html0 = HTML0 & "Apellido: &nbsp; " & "<INPUT TYPE='TEXT' NAME='Apellido' VALUE=' '><br><br>"
+'html0 = HTML0 & "<INPUT TYPE='SUBMIT' VALUE='EnviarFormulario'>"
+'html0 = HTML0 & "</FORM><br><br><br><br>"
+
+'response.write html0
+
+'html = "<FORM METHOD='POST' ACTION='ListaCanciones.asp'>"
+'html = HTML & "Lista de Canciones Favoritas:<br><br>"
+'html = HTML & "Nombre: &nbsp; " & "<INPUT TYPE='TEXT' NAME='Nombre' VALUE=' '><br><br>"
+'html = HTML & "Cancion1: &nbsp; " & "<INPUT TYPE='TEXT' NAME='Cancion1' VALUE=' '><br><br>"
+'html = HTML & "Cancion2: &nbsp; " & "<INPUT TYPE='TEXT' NAME='Cancion2' VALUE=' '><br><br>"
+'html = HTML & "Cancion3: &nbsp; " & "<INPUT TYPE='TEXT' NAME='Cancion3' VALUE=' '><br><br>"
+'html = HTML & "<INPUT TYPE='SUBMIT' NAME='Enviar' VALUE='Comparte'><br><br>"
+
+'response.write html
+
+
+'html3 = "----------------<br><br>"
+
+HTML2 = "<FORM METHOD='POST' ACTION='Procesar.asp' NAME='Formulario'>"
+HTML2 = HTML2 & "<TABLE><TR>"
+HTML2 = HTML2 & "<TD>Nombre: <INPUT TYPE='TEXT' NAME='Nombre'><br><br>"
+HTML2 = HTML2 & "Edad: <INPUT TYPE='TEXT' NAME='Edad'><br><br>"
+HTML2 = HTML2 & "<INPUT TYPE='SUBMIT' VALUE='Enviar'/>"
+
+'response.write html3
+response.write html2
+
+
+html = "</body>"
+html = html & "</html>"
+
+
+%>

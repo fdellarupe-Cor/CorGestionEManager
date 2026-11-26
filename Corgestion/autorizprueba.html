@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup Autorizaciones</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Configuración de la fuente Inter y estilos base */
+        :root {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Color principal similar al menú lateral de la imagen */
+        .bg-custom-blue {
+            background-color: #2b6cb0; /* Azul fuerte de la imagen */
+        }
+        .text-custom-blue {
+            color: #2b6cb0;
+        }
+        .header-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#2b6cb0',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden">
+
+    <!-- 1. BARRA DE NAVEGACIÓN LATERAL (SIMULACIÓN DE image_95b355.jpg) -->
+    <aside class="w-16 sm:w-64 bg-custom-blue text-white shadow-xl flex-shrink-0 transition-all duration-300 overflow-y-auto">
+        <div class="p-4 border-b border-primary-blue/50 h-16 flex items-center justify-center sm:justify-start">
+            <!-- Simulación de Logo (Bandera/Escudo) -->
+            <div class="w-8 h-8 rounded-full bg-red-500 border-2 border-white"></div>
+            <span class="hidden sm:inline ml-3 text-xl font-bold">APP NAME</span>
+        </div>
+        
+        <nav class="mt-4">
+            <!-- Item de menú simulado -->
+            <a href="#" class="flex items-center p-3 sm:p-4 hover:bg-white/10 transition duration-150">
+                <!-- Icono de persona (ejemplo, usando SVG inline) -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="hidden sm:inline ml-4 font-semibold text-sm">ADMIN</span>
+            </a>
+            
+            <a href="#" class="flex items-center p-3 sm:p-4 hover:bg-white/10 transition duration-150">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M21 8H3"/></svg>
+                <span class="hidden sm:inline ml-4 font-semibold text-sm">Novedades</span>
+                <span class="hidden sm:inline ml-auto text-xs opacity-75">&gt;</span>
+            </a>
+
+             <a href="#" class="flex items-center p-3 sm:p-4 bg-primary-blue/70 transition duration-150">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M3 3v18h18"/></svg>
+                <span class="hidden sm:inline ml-4 font-semibold text-sm">Formularios</span>
+                <span class="hidden sm:inline ml-auto text-xs opacity-75">&gt;</span>
+            </a>
+            <!-- Más ítems... -->
+        </nav>
+    </aside>
+
+    <!-- 2. CONTENIDO PRINCIPAL Y BARRA SUPERIOR (TOP BAR) -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+        
+        <!-- BARRA SUPERIOR (HEADER) -->
+        <header class="bg-white header-shadow sticky top-0 z-20 flex items-center h-16 p-4">
+            <div class="flex items-center space-x-4 flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-700"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-700 hover:text-primary-blue"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></a>
+                
+                <!-- 2.1. NUEVO BOTÓN DE AUTORIZACIONES (CHECKLIST) -->
+                <button id="openModalButton" class="relative text-primary-blue hover:text-blue-700 focus:outline-none p-1">
+                    <!-- SVG Icono de Checklist (Autorizaciones) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7 svg-icon">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <polyline points="9 12 11 14 15 10"></polyline>
+                    </svg>
+                    <!-- Contador de notificaciones (Simulado) -->
+                    <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                        3
+                    </span>
+                </button>
+            </div>
+
+            <!-- Buscador (Search) -->
+            <div class="relative flex items-center w-full max-w-sm ml-auto">
+                <input type="text" placeholder="Buscar documento..." class="py-2 pl-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue w-full text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute right-3 text-gray-400 w-5 h-5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+        </header>
+
+        <!-- AREA DE CONTENIDO PRINCIPAL (MAIN) -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">Capacitación en Seguridad Informática</h1>
+            
+            <!-- SIMULACIÓN DE CONTENIDO CENTRAL (image_95b355.jpg) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Columna Central (Noticias/Banner) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-gray-200 h-64 rounded-xl overflow-hidden shadow-lg border border-gray-300">
+                        <img src="https://placehold.co/1000x400/2b6cb0/ffffff?text=Banner+o+Video+Principal" alt="Banner Principal" class="w-full h-full object-cover opacity-70">
+                    </div>
+
+                    <!-- Mis autorizaciones y observaciones (Reubicado a modal) -->
+                    <div class="bg-white p-4 rounded-xl shadow-md border-t-4 border-primary-blue">
+                        <h2 class="text-lg font-bold text-gray-700 mb-4">Mis autorizaciones y observaciones 6</h2>
+                        <!-- Simulación de Listado de Autorizaciones (Contenido estático) -->
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <div class="p-2 bg-gray-50 rounded">SOLICITUD DE NORMATIVAS - PASO 999: FINAL...</div>
+                            <div class="p-2 bg-gray-50 rounded">SOLICITUD DE NORMATIVAS - PASO 999: FINAL...</div>
+                            <div class="p-2 bg-gray-50 rounded">SOLICITUD DE NORMATIVAS - PASO 999: FINAL...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha (Índice y Consultas) -->
+                <div class="lg:col-span-1 space-y-6">
+                    
+                    <!-- Índice 12 -->
+                    <div class="bg-white p-4 rounded-xl shadow-md border-t-4 border-gray-400">
+                        <h2 class="text-lg font-bold text-gray-700 mb-4">Índice 12</h2>
+                        <ul class="space-y-1 text-sm text-primary-blue/80">
+                            <li><a href="#" class="hover:text-primary-blue hover:underline">Agencia de Calificación y Rating</a></li>
+                            <li><a href="#" class="hover:text-primary-blue hover:underline">Atención al Cliente y Transparencia</a></li>
+                            <li><a href="#" class="hover:text-primary-blue hover:underline">Auditorías Internas de Cumplimiento</a></li>
+                            <!-- Más ítems -->
+                        </ul>
+                    </div>
+
+                    <!-- Mis Últimas Consultas de Formularios 11 -->
+                    <div class="bg-white p-4 rounded-xl shadow-md border-t-4 border-gray-400">
+                        <h2 class="text-lg font-bold text-gray-700 mb-4">Mis Últimas Consultas de Formularios 11</h2>
+                        <ul class="space-y-1 text-sm text-gray-600">
+                            <li>formu: SEGUROS CELULAR (O)</li>
+                            <li>formu: F104-3 CHEQUERAS DIGITALES (O)</li>
+                            <li>formu: F-310 PEDIDO DE FORMULARIO PARA...</li>
+                            <!-- Más ítems -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 3. ESTRUCTURA DEL MODAL (POP-UP) DE AUTORIZACIONES -->
+    <!-- Este elemento estará oculto por defecto y se activa con el botón de "Checklist" -->
+    <div id="authorizationsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 transition-opacity duration-300 ease-in-out" aria-modal="true" role="dialog">
+        
+        <!-- Contenedor Central del Modal -->
+        <div class="relative top-16 mx-auto p-0 border w-11/12 max-w-lg shadow-2xl rounded-lg bg-white transform transition-all duration-300 ease-in-out">
+            
+            <!-- Encabezado del Modal (Título y Cerrar) -->
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                <h3 class="text-lg font-semibold text-gray-800 uppercase tracking-wider">
+                    Autorizaciones Pendientes (3)
+                </h3>
+                <button id="closeModalButton" class="text-gray-500 hover:text-gray-700 focus:outline-none p-1 rounded-full hover:bg-gray-200" title="Cerrar">
+                    <!-- SVG Icono de CERRAR (Cruz) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <!-- CUERPO DEL MODAL (LISTA DE AUTORIZACIONES) -->
+            <div class="p-0 max-h-96 overflow-y-auto">
+
+                <!-- Tarjeta de Autorización 1 (Requiere Acción) -->
+                <div class="authorization-item p-4 border-b border-gray-100 hover:bg-primary-blue/5 transition duration-150 cursor-pointer flex items-start space-x-3">
+                    <div class="mt-1 text-primary-blue">
+                         <!-- SVG Icono de Alerta (Shield-Alert) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-sm font-medium text-gray-900">
+                            SOLICITUD N° 4820: <span class="text-primary-blue font-semibold">ALTA DE PERSONAL (V 1)</span>
+                        </p>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            <span class="font-bold">Acción Requerida:</span> Aprobar o Rechazar.
+                        </p>
+                    </div>
+                    <div class="text-xs text-gray-400 text-right">
+                        <span class="inline-block py-1 px-2 leading-none text-xs font-medium text-red-800 bg-red-100 rounded-full">
+                            URGENTE
+                        </span>
+                        <div class="mt-1 text-xs text-gray-500">Solicitó: Juan Pérez</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Autorización 2 (Requiere Revisión) -->
+                <div class="authorization-item p-4 border-b border-gray-100 hover:bg-primary-blue/5 transition duration-150 cursor-pointer flex items-start space-x-3">
+                    <div class="mt-1 text-primary-blue">
+                        <!-- SVG Icono de Documento (File-Text) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon w-5 h-5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-sm font-medium text-gray-900">
+                            NORMA: <span class="text-primary-blue font-semibold">PERSONAL UVA (V 3)</span>
+                        </p>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            <span class="font-bold">Acción Requerida:</span> Aceptar validación legal.
+                        </p>
+                    </div>
+                    <div class="text-xs text-gray-400 text-right">
+                        <div class="py-1 px-2 text-xs font-medium text-gray-800 bg-gray-100 rounded-full">Mediana</div>
+                        <div class="mt-1 text-xs text-gray-500">Asignada: Hoy</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Autorización 3 (Notificación de Proceso) -->
+                <div class="authorization-item p-4 border-b border-gray-100 hover:bg-primary-blue/5 transition duration-150 cursor-pointer flex items-start space-x-3">
+                    <div class="mt-1 text-primary-blue">
+                         <!-- SVG Icono de Link (Link) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon w-5 h-5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-sm font-medium text-gray-900">
+                            COMUNICADO: <span class="text-primary-blue font-semibold">04-01-12 - Tesorería Central (O)</span>
+                        </p>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            <span class="font-bold">Acción Requerida:</span> Confirmación de lectura.
+                        </p>
+                    </div>
+                    <div class="text-xs text-gray-400 text-right">
+                        <div class="py-1 px-2 text-xs font-medium text-green-800 bg-green-100 rounded-full">En Progreso</div>
+                         <div class="mt-1 text-xs text-gray-500">Última acción: 1h</div>
+                    </div>
+                </div>
+                
+                <!-- Separador de elementos vistos/históricos -->
+                <div class="p-2 text-center text-xs text-gray-500 border-t mt-2">-- Tareas Completadas Recientemente --</div>
+
+                <!-- Tarjeta de Autorización 4 (Completada) -->
+                <div class="authorization-item p-4 border-b border-gray-100 hover:bg-primary-blue/5 transition duration-150 cursor-pointer flex items-start space-x-3 opacity-60">
+                    <div class="mt-1 text-green-600">
+                        <!-- SVG Icono de Check (Check) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon w-5 h-5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-sm font-medium text-gray-600">
+                            PROCEDIMIENTO: <span class="font-normal">PUBLICIDAD EN HOMEBANKING 3 (O)</span>
+                        </p>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            Revisado y Aprobado.
+                        </p>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        Completado
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Pie de página del Modal -->
+            <div class="p-4 flex justify-end bg-gray-50 rounded-b-lg">
+                <button onclick="document.getElementById('authorizationsModal').classList.add('hidden')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-150 text-sm font-medium shadow-md">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // LÓGICA DE JAVASCRIPT PARA ABRIR/CERRAR EL MODAL
+        const modal = document.getElementById('authorizationsModal');
+        const openButton = document.getElementById('openModalButton');
+        const closeButton = document.getElementById('closeModalButton');
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            // Asegura que el modal aparezca cerca del botón
+            const modalContent = modal.querySelector('.relative');
+            
+            // Si quieres que el modal se posicione ligeramente a la derecha del botón
+            const buttonRect = openButton.getBoundingClientRect();
+            const modalWidth = modalContent.offsetWidth;
+            
+            // Intenta posicionar el modal a la derecha del botón, pero dentro de la pantalla
+            const leftPosition = Math.min(
+                buttonRect.right - (modalWidth / 2),
+                window.innerWidth - modalWidth - 16 // Mínimo margen de 16px a la derecha
+            );
+
+            modalContent.style.left = `${leftPosition}px`;
+            modalContent.style.top = '16px'; 
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+
+        // Abrir modal al hacer clic en el botón
+        openButton.addEventListener('click', openModal);
+
+        // Cerrar modal al hacer clic en el botón de cerrar
+        closeButton.addEventListener('click', closeModal);
+
+        // Cerrar modal al hacer clic fuera del contenido
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Cerrar modal al presionar la tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+        
+        // Ajustar el posicionamiento al cargar y al redimensionar
+        window.addEventListener('resize', () => {
+            if (!modal.classList.contains('hidden')) {
+                openModal(); // Re-ejecuta la lógica de posicionamiento
+            }
+        });
+        
+    </script>
+</body>
+</html>

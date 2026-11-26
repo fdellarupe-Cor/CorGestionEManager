@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<title>Prueba</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="assets/js/jquery-1.12.4.js"></script>
+<script src="assets/js/jquery-ui.js"></script>
+<script src="assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<link rel="stylesheet" href="assets/js/jquery-ui.css">
+
+<script>
+
+var anchoTotal = $(window).width();
+var altoTotal = $(window).height();
+
+$( function() {
+
+$("body").css({
+	"width": anchoTotal,
+	"height": altoTotal,
+	"overflow": "hidden",
+	"margin": "0",
+	"background": "lightblue",
+});
+
+$(".abc").css({
+	"width": $("body").width() / 2,
+	"height": $("body").height() / 2,
+	"border": "solid 1px red"
+});
+
+$("#divsin").css({
+	"width": $(".abc").width(),
+	"height": $(".abc").height()
+});
+
+var _SlideshowTransitions = [
+{$Duration: 700, $Opacity: 2, $Brother: { $Duration: 1000, $Opacity: 2} }
+];
+
+var options = {
+$FillMode: 3,
+$DragOrientation: 1,
+$AutoPlay: true,
+$AutoPlayInterval: 700,
+$SlideshowOptions: {
+$Class: $JssorSlideshowRunner$,
+$Transitions: _SlideshowTransitions,
+$TransitionsOrder: 1,
+$ShowLink: true
+}
+};
+
+var jssor_slider1 = new $JssorSlider$("slider1_container", options);
+
+});
+
+</script>
+
+</head>
+
+<body>
+
+<div class="abc">
+
+<div id="slider1_container">
+
+        <!-- Loading Screen -->
+<div u="loading">
+<div>
+</div>
+<div>
+</div>
+</div>
+
+        <!-- Slides Container -->
+<div id="divsin" u="slides" style="cursor:move;overflow:hidden;">
+
+<div>
+AAAAAAAAAAAAAAAAAAAAAAAA
+</div>
+
+<div>
+BBBBBBBBBBBBBBBBBBBBBBB
+</div>
+
+<div>
+CCCCCCCCCCCCCCCCCCCCCCC
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

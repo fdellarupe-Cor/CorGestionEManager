@@ -1,0 +1,277 @@
+<%
+'==============================================================================
+' IncFile/datosActualizar.inc
+' Capa de ACCESO A DATOS especifica de actualizar_v2.asp.
+'
+' El UPDATE dinamico (actinc/actproy) ya no arma SQL en el ASP: junta los
+' campos posteados en un JSON simple ({"col":"...","val":"..."}) y se lo pasa
+' a dbo.sp_cg_Registro_ActualizarCampos, que valida las columnas contra el
+' schema real antes de tocar la tabla (el original no validaba nada, usaba
+' el NAME del campo tal cual como columna SQL).
+'==============================================================================
+
+Function JSONEscape(s)
+	Dim r
+	r = s & ""
+	r = Replace(r, "\", "\\")
+	r = Replace(r, """", "\""")
+	r = Replace(r, vbCrLf, "\n")
+	r = Replace(r, vbCr, "\n")
+	r = Replace(r, vbLf, "\n")
+	JSONEscape = r
+End Function
+
+' Arma el JSON [{"col":"x","val":"y"}, ...] a partir de TODOS los campos de
+' request.form, igual que hacia el "For Each x In request.form" original.
+' overrideCampo/overrideValor sirve para el caso especial de "fecha_entrega"
+' en actproy (que en el original no usaba el valor crudo del form sino la
+' fecha ya convertida a dias-desde-1900).
+Function ArmarJsonDesdeForm(frm, overrideCampo, overrideValor, overrideCampo2, overrideValor2)
+	Dim x, json, primero
+	json = "["
+	primero = True
+
+	For Each x In frm
+		If LCase(x) <> "avances" And LCase(x) <> "avance" And LCase(x) <> "avance_fecha" And LCase(x) <> "avance_hora" And LCase(x) <> "responsable_avance" And LCase(x) <> "tipo_avance" Then
+			If Not primero Then json = json & ","
+			primero = False
+
+			If overrideCampo <> "" And LCase(x) = LCase(overrideCampo) Then
+				json = json & "{""col"":\""" & JSONEscape(x) & """,""val"":\""" & JSONEscape(overrideValor) & """}"
+			ElseIf overrideCampo2 <> "" And LCase(x) = LCase(overrideCampo2) Then
+				json = json & "{""col"":\""" & JSONEscape(x) & """,""val"":\""" & JSONEscape(overrideValor2) & """}"
+			Else
+				json = json & "{""col"":\""" & JSONEscape(x) & """,""val"":\""" & JSONEscape(frm(x)) & """}"
+			End If
+		End If
+	Next
+
+	json = json & "]"
+	ArmarJsonDesdeForm = json
+End Function
+
+' opt=actinc / opt=actproy: actualiza cualquier columna que haya venido en
+' el form (misma logica que el original, ver comentario arriba)
+Sub ActualizarCamposDinamico(cn, tabla, id, camposJson)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	
+	response.write camposJson
+	
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4 ' adCmdStoredProc
+	cmd.CommandText = "dbo.sp_cg_Registro_ActualizarCampos"
+	cmd.Parameters.Append cmd.CreateParameter("@tabla", 200, 1, 50, tabla)
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, CLng(id))
+	cmd.Parameters.Append cmd.CreateParameter("@camposJson", 203, 1, LEN(camposJson), camposJson) ' adLongVarWChar
+	'cmd.Execute
+	
+	On Error Resume Next
+     cmd.Execute
+    If Err.Number <> 0 Then
+        Response.Write "ERROR " & Err.Number & ": " & Err.Description
+        Response.End
+    End If
+    On Error Goto 0
+	
+End Sub
+
+' [ESTADO] Cambia el estado de UN avance (CG_AVANCES.IDESTADO) con sp_cg_Avance_CambiarEstado. tabla = incidentes | proyectos.
+' idEstado 0 = sin estado. Devuelve True si se guardo; False si el procedimiento rechazo el cambio (avance de otro caso, estado
+' inexistente, procedimiento todavia no creado, etc.).
+Function CambiarEstadoAvance(cn, tabla, idCaso, idAvance, idEstado)
+	Dim cmd
+	CambiarEstadoAvance = False
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_Avance_CambiarEstado"
+	cmd.Parameters.Append cmd.CreateParameter("@IdAvance", 3, 1, 4, CLng(idAvance))
+	cmd.Parameters.Append cmd.CreateParameter("@IdEstado", 3, 1, 4, CLng(idEstado))
+	cmd.Parameters.Append cmd.CreateParameter("@Tabla", 200, 1, 20, CStr(tabla))
+	cmd.Parameters.Append cmd.CreateParameter("@IdCaso", 3, 1, 4, CLng(idCaso))
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number = 0 Then CambiarEstadoAvance = True
+	Err.Clear
+	On Error Goto 0
+	Set cmd = Nothing
+End Function
+
+Sub RegistrarAvance(cn, tabla, id, descripcion, fecha, hora, responsable, tipoAvance)
+	If Trim(descripcion & "") = "" Then Exit Sub
+
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_Registro_Avance"
+	cmd.Parameters.Append cmd.CreateParameter("@tabla", 200, 1, 20, tabla)
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, CLng(id))
+	cmd.Parameters.Append cmd.CreateParameter("@descripcion", 203, 1, 4000, descripcion)
+	cmd.Parameters.Append cmd.CreateParameter("@fecha", 3, 1, 4, CLng(fecha))
+	cmd.Parameters.Append cmd.CreateParameter("@hora", 3, 1, 4, CLng(hora))
+	cmd.Parameters.Append cmd.CreateParameter("@responsable", 200, 1, 20, responsable)
+	cmd.Parameters.Append cmd.CreateParameter("@idusuario", 200, 1, 100, CStr(session("USUARIO")))
+	' tipo de avance (opcional, ultimo parametro del SP)
+	If IsNumeric(tipoAvance & "") And Trim(tipoAvance & "") <> "" And Trim(tipoAvance & "") <> "0" Then
+		cmd.Parameters.Append cmd.CreateParameter("@IdTipoAvance", 3, 1, 4, CLng(tipoAvance))
+	End If
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "Contexto: RegistrarAvance (tabla=" & Server.HTMLEncode(tabla) & ", id=" & Server.HTMLEncode(id) & ")<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+	Set cmd = Nothing
+End Sub
+
+Sub SincronizarEstadosIncidente(cn, id, estadoDesaNuevo, sFec, relainc)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_Incidentes_SincronizarEstados"
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, CLng(id))
+	cmd.Parameters.Append cmd.CreateParameter("@estadoDesaNuevo", 3, 1, 4, CLng(estadoDesaNuevo))
+	cmd.Parameters.Append cmd.CreateParameter("@sFec", 3, 1, 4, CLng(sFec))
+	cmd.Parameters.Append cmd.CreateParameter("@relainc", 200, 1, 100, relainc)
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "Contexto: SincronizarEstadosIncidente (id=" & Server.HTMLEncode(id) & ")<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+End Sub
+
+Sub SincronizarEstadosProyecto(cn, id, estadoDesaNuevo, sFec)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_Proyectos_SincronizarEstados"
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, CLng(id))
+	cmd.Parameters.Append cmd.CreateParameter("@estadoDesaNuevo", 3, 1, 4, CLng(estadoDesaNuevo))
+	cmd.Parameters.Append cmd.CreateParameter("@sFec", 3, 1, 4, CLng(sFec))
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "Contexto: SincronizarEstadosProyecto (id=" & Server.HTMLEncode(id) & ")<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+End Sub
+
+' opt=actapl
+Sub ActualizarApl(cn, id, nombre, idCliente, idAplic, responEnvio, fechaEnvio, _
+					fechaTest, fechaProd, motivo, incidente, proyecto, sec, tipoApl)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_Apl_Actualizar"
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, CLng(id))
+	cmd.Parameters.Append cmd.CreateParameter("@nombre", 200, 1, 200, nombre)
+	cmd.Parameters.Append cmd.CreateParameter("@id_cliente", 3, 1, 4, CLng(idCliente))
+	cmd.Parameters.Append cmd.CreateParameter("@id_aplic", 3, 1, 4, CLng(idAplic))
+	cmd.Parameters.Append cmd.CreateParameter("@respon_envio", 200, 1, 100, responEnvio)
+	cmd.Parameters.Append cmd.CreateParameter("@fecha_envio", 3, 1, 4, CLng(fechaEnvio))
+	cmd.Parameters.Append cmd.CreateParameter("@fecha_instalacion_test", 3, 1, 4, CLng(fechaTest))
+	cmd.Parameters.Append cmd.CreateParameter("@fecha_instalacion_prod", 3, 1, 4, CLng(fechaProd))
+	cmd.Parameters.Append cmd.CreateParameter("@motivo_apl", 200, 1, 4000, motivo)
+	cmd.Parameters.Append cmd.CreateParameter("@incidente", 3, 1, 4, CLng(incidente))
+	cmd.Parameters.Append cmd.CreateParameter("@proyecto", 3, 1, 4, CLng(proyecto))
+	cmd.Parameters.Append cmd.CreateParameter("@sec", 3, 1, 4, CLng(sec))
+	cmd.Parameters.Append cmd.CreateParameter("@tipo_apl", 3, 1, 4, CLng(tipoApl))
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+		Response.Write "<b>ERROR DE BASE DE DATOS</b><br>"
+		Response.Write "Contexto: ActualizarApl (id=" & Server.HTMLEncode(id) & ")<br>"
+		Response.Write "Codigo: " & Err.Number & "<br>"
+		Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+		Response.End
+	End If
+	On Error Goto 0
+End Sub
+
+Sub InsertarClientesDet(cn, id, servidor, ambiente, db_rqt, licencia)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_clientes_det"
+	cmd.Parameters.Append cmd.CreateParameter("@modo", 200, 1, 200, "insertar")
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, null )
+	cmd.Parameters.Append cmd.CreateParameter("@id_cliente", 3, 1, 4, CLng(id))
+	cmd.Parameters.Append cmd.CreateParameter("@servidor", 200, 1, 200, servidor)
+	cmd.Parameters.Append cmd.CreateParameter("@ambiente", 200, 1, 200, ambiente)
+	cmd.Parameters.Append cmd.CreateParameter("@db_rqt", 200, 1, 200, db_rqt)
+	cmd.Parameters.Append cmd.CreateParameter("@licencia", 200, 1, 200, licencia)
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "ERROR insertar clientes_det: " & Err.Number & ": " & Err.Description & " DATOS (" & CLng(id) & "," & servidor & "," & ambiente & "," & db_rqt & "," & licencia & ")"
+		Response.End
+	End If
+	On Error Goto 0
+End Sub
+
+
+Sub ActualizarClientesDet(cn, id, id_cliente, servidor, ambiente, db_rqt, licencia)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_clientes_det"
+	cmd.Parameters.Append cmd.CreateParameter("@modo", 200, 1, 200, "modificar")
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, CLng(id))
+	cmd.Parameters.Append cmd.CreateParameter("@id_cliente", 3, 1, 4, CLng(id_cliente))
+	cmd.Parameters.Append cmd.CreateParameter("@servidor", 200, 1, 200, servidor)
+	cmd.Parameters.Append cmd.CreateParameter("@ambiente", 200, 1, 200, ambiente)
+	cmd.Parameters.Append cmd.CreateParameter("@db_rqt", 200, 1, 200, db_rqt)
+	cmd.Parameters.Append cmd.CreateParameter("@licencia", 200, 1, 200, licencia)
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "ERROR actualizar clientes_det: " & Err.Number & ": " & Err.Description & " DATOS (" & CLng(id) & "," & servidor & "," & ambiente & "," & db_rqt & "," & licencia & ")"
+		Response.End
+	End If
+	On Error Goto 0
+End Sub
+
+Sub EliminarClientesDet(cn, id_cliente)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4
+	cmd.CommandText = "dbo.sp_cg_clientes_det"
+	cmd.Parameters.Append cmd.CreateParameter("@modo", 200, 1, 200, "eliminar_x_cliente")
+	cmd.Parameters.Append cmd.CreateParameter("@id", 3, 1, 4, CLng(id_cliente))
+	cmd.Parameters.Append cmd.CreateParameter("@id_cliente", 3, 1, 4, CLng(id_cliente))
+	On Error Resume Next
+	cmd.Execute
+	If Err.Number <> 0 Then
+		Response.Write "ERROR eliminar clientes_det: " & Err.Number & ": " & Err.Description
+		Response.End
+	End If
+	On Error Goto 0
+End Sub
+
+
+%>

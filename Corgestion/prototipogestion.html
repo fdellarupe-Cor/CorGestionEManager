@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipo Dashboard Moderno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Fuente personalizada */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex overflow-hidden">
+
+    <aside class="w-64 bg-slate-900 text-white flex flex-col flex-shrink-0 transition-all duration-300">
+        <div class="h-16 flex items-center px-6 bg-slate-950 border-b border-slate-800">
+            <i class="fa-solid fa-layer-group text-blue-500 text-xl mr-3"></i>
+            <span class="font-bold text-lg tracking-wide">GestiónDoc</span>
+        </div>
+
+        <nav class="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+            <a href="#" class="flex items-center px-3 py-3 bg-blue-600 text-white rounded-lg group shadow-lg shadow-blue-900/20">
+                <i class="fa-solid fa-home w-6 text-center mr-2"></i>
+                <span class="font-medium">Inicio</span>
+            </a>
+            <a href="#" class="flex items-center px-3 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+                <i class="fa-solid fa-box-open w-6 text-center mr-2"></i>
+                <span class="font-medium">Inventario</span>
+            </a>
+            <a href="#" class="flex items-center px-3 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+                <i class="fa-solid fa-chart-pie w-6 text-center mr-2"></i>
+                <span class="font-medium">Estadísticas</span>
+            </a>
+            <div class="pt-4 pb-2">
+                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Gestión</p>
+            </div>
+            <a href="#" class="flex items-center px-3 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+                <i class="fa-solid fa-file-signature w-6 text-center mr-2"></i>
+                <span class="font-medium">Autorizaciones</span>
+                <span class="ml-auto bg-red-500 text-white py-0.5 px-2 rounded-full text-xs">6</span>
+            </a>
+            <a href="#" class="flex items-center px-3 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+                <i class="fa-solid fa-search w-6 text-center mr-2"></i>
+                <span class="font-medium">Buscador</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800">
+            <a href="#" class="flex items-center text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-right-from-bracket w-6 text-center mr-2"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+            <div class="flex-1 max-w-2xl">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-search text-gray-400"></i>
+                    </span>
+                    <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Buscar documento, normativa o circular...">
+                </div>
+            </div>
+
+            <div class="ml-4 flex items-center space-x-6">
+                <button class="relative text-gray-400 hover:text-gray-500">
+                    <i class="fa-solid fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-red-500"></span>
+                </button>
+                <div class="flex items-center">
+                    <img class="h-9 w-9 rounded-full object-cover border border-gray-200" src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Avatar">
+                    <div class="ml-3 hidden md:block">
+                        <p class="text-sm font-medium text-gray-700">Administrador</p>
+                        <p class="text-xs text-gray-500">Dpto. Sistemas</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-auto bg-gray-50 p-8">
+            
+            <div class="mb-8">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">Panel de Control</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center">
+                        <div class="p-3 rounded-full bg-orange-100 text-orange-600 mr-4">
+                            <i class="fa-solid fa-clock text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Pendientes de Firma</p>
+                            <p class="text-2xl font-bold text-gray-800">6</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                            <i class="fa-solid fa-folder-open text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Consultas Recientes</p>
+                            <p class="text-2xl font-bold text-gray-800">11</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                            <i class="fa-solid fa-check-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Normativas Nuevas</p>
+                            <p class="text-2xl font-bold text-gray-800">3</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-800">Autorizaciones y Observaciones</h3>
+                            <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Ver todas</a>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-left text-sm whitespace-nowrap">
+                                <thead class="uppercase tracking-wider border-b border-gray-200 bg-gray-50 text-gray-500 font-medium text-xs">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">Solicitud</th>
+                                        <th scope="col" class="px-6 py-3">Descripción</th>
+                                        <th scope="col" class="px-6 py-3">Estado</th>
+                                        <th scope="col" class="px-6 py-3 text-right">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-900">#0040</td>
+                                        <td class="px-6 py-4 text-gray-500">Solicitud de Normativas - Paso Final</td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                Pendiente
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button class="text-blue-600 hover:text-blue-900 font-medium">Revisar</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-900">#0039</td>
+                                        <td class="px-6 py-4 text-gray-500">Aprobación Chequeras Digitales</td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Aprobado
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-ellipsis-v"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-900">#0031</td>
+                                        <td class="px-6 py-4 text-gray-500">Alta de Personal F161-0</td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Rechazado
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button class="text-blue-600 hover:text-blue-900 font-medium">Ver motivo</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Accesos Rápidos</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <a href="#" class="flex flex-col items-center justify-center p-3 bg-gray-50 hover:bg-blue-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-all text-center group">
+                                <i class="fa-solid fa-shield-alt text-blue-500 mb-2 text-xl group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-blue-700">Ciberseguridad</span>
+                            </a>
+                            <a href="#" class="flex flex-col items-center justify-center p-3 bg-gray-50 hover:bg-blue-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-all text-center group">
+                                <i class="fa-solid fa-university text-blue-500 mb-2 text-xl group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-blue-700">Auditoría</span>
+                            </a>
+                            <a href="#" class="flex flex-col items-center justify-center p-3 bg-gray-50 hover:bg-blue-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-all text-center group">
+                                <i class="fa-solid fa-credit-card text-blue-500 mb-2 text-xl group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-blue-700">Créditos</span>
+                            </a>
+                            <a href="#" class="flex flex-col items-center justify-center p-3 bg-gray-50 hover:bg-blue-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-all text-center group">
+                                <i class="fa-solid fa-users text-blue-500 mb-2 text-xl group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium text-gray-600 group-hover:text-blue-700">RRHH</span>
+                            </a>
+                        </div>
+                        <button class="w-full mt-4 text-center text-sm text-gray-500 hover:text-gray-700 border-t border-gray-100 pt-3">
+                            Ver todo el índice <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Últimas Consultas</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-400 mr-3"></div>
+                                <div class="text-sm">
+                                    <p class="text-gray-700 hover:text-blue-600 cursor-pointer">F54-3 Pedido de Formulario</p>
+                                    <span class="text-xs text-gray-400">Hace 2 horas</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-gray-300 mr-3"></div>
+                                <div class="text-sm">
+                                    <p class="text-gray-700 hover:text-blue-600 cursor-pointer">Seguros Celular (O)</p>
+                                    <span class="text-xs text-gray-400">Ayer</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+    </main>
+</body>
+</html>

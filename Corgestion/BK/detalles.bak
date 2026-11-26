@@ -1,0 +1,2461 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+
+html = "<html>"
+html = html & "<head>"
+
+html = html & "<title>Cor Gestion</title>"
+html = html & "<meta charset='utf-8' />"
+html = html & "<meta name='viewport' content='width=device-width, initial-scale=1' />"
+html = html & "<link rel='stylesheet' href='assets/css/main.css' />"
+html = html & "<link rel='stylesheet' href='assets/js/jquery-ui.css'>"
+html = html & "<script type='text/javascript' src='assets/js/jquery.min.js'></script>"
+html = html & "<script type='text/javascript' src='assets/js/jquery-ui.js'></script>"
+html = html & "</head>"
+html = html & "<body>"
+
+'fini = clng(Date())-clng(CDate("01-01-1900"))
+'response.write(fini)
+'response.write(GTFechadorsh(fini))
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.Open scon1
+'response.write request.querystring
+
+
+
+id = request.querystring("id")
+opc = request.querystring("opc")
+sol = request.querystring("sol")
+tipo = request.querystring("tipo")
+idproy = request.querystring("idproy")
+vue = request.querystring("vue")
+cons = request.querystring("cons")
+xtipo = request.querystring("xtipo")
+cli = request.querystring("cli")
+relainc = request.querystring("relainc")
+estado = request.querystring("estado")
+aplic = request.querystring("aplic")
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+
+titP = getName(cnn,"titulo","proyectos",id)
+tit = getName(cnn,"titulo","incidentes",id)
+
+Dim st0,st1,st3
+'st0 = "font-family:verdana;font-size:7.5pt;padding-left:5px;background-color:#ececec;border-radius:5px;border-style:solid;border-color:fff;height:27.5px;border-width:2px;"
+'st1 = "font-family:arial;font-size:7.75pt;padding-left:5px;letter-spacing:0.25px;"
+'st3 = "font-family:arial;font-size:8pt;border-style:solid;border-radius:2.5px;border-color:#ececec;width:90%;height:25px;letter-spacing:0.5px;"
+
+nFecini = 0
+
+If nFecini < CLng(CDate("01-01-1900")) Then
+	nFecini = CLng(CDate("01-01-1900"))
+Else
+	nFecini = 0
+End If
+
+If ( opc = "acti" Or opc = "actp" Or opc = "veri" Or opc = "verp" ) Then
+
+	html = html & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+	html = html & "<div >"
+
+	html = html & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+	html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+	html = html & "<img src='images/iso_cor.png' style='width:6rem;' >"
+	html = html & "<font style='font-size:15pt;font-family:sans-serif;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+	html = html & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+	html = html & "<nav>"
+	html = html & "<ul>"
+	'html = html & "<li><a href='#menu'></a></li>"
+	html = html & "</ul>"
+	html = html & "</nav>"
+	html = html & "</td>"
+
+	html = html & "</tr></table>"
+
+	html = html & "</div>"
+
+	html = html & "</header>"
+	'html = html & "<div style='height:8%;width:80%;border-top:solid 5px #FF3D3D;border-bottom:double 6px #001BFF;margin: 0 auto;'>"
+	html = html & "<table style='width:100%;padding:0 2rem;background-color:#e8edff;' >"
+	html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+	If opc = "veri" Then
+
+		html = html & "<td><font style='font-size:20pt;font-family:sans-serif;color:#000000;letter-spacing:0.2em;'><b>'" & LEFT(tit,40) & "'</b></font></td>"
+
+	ElseIf opc = "acti" Then
+
+		html = html & "<td><font style='font-size:20pt;font-family:sans-serif;color:#000000;letter-spacing:0.2em;'><b>'" & LEFT(tit,40) & "'</b></font></td>"
+		'cliente = request.querystring("cli")
+		cliente = request.form("cli")
+		form5 = "<form id='form5' style='height:70%;' method='post' action='incidentes.asp?opc=listar&cli=" & cliente & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+		boton5 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('form5').submit();"">"
+		html = html & "<td>" & boton5 & "</td>"
+
+	ElseIf opc = "actp" Then
+
+		If tipo = "cons" Then
+
+			html = html & "<td><font style='font-size:20pt;font-family:sans-serif;color:#000000;letter-spacing:0.2em;'><b>'" & LEFT(titP,40) & "'</b></font></td>"
+
+		Else
+
+			sol = request.querystring("sol")
+			html = html & "<td><font style='font-size:20pt;font-family:sans-serif;color:#000000;letter-spacing:0.2em;'>" & LEFT(titP,40) & "</font></td>"
+
+		End If
+
+		'cliente = request.querystring("cli")
+		cliente = request.form("cli")
+		formz1 = "<form id='formz1' style='height:70%;' method='post' action='proyectos.asp?opc=listar&cli=" & cliente & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+		botonz1 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('formz1').submit();"">"
+		html = html & "<td>" & botonz1 & "</td>"
+
+	ElseIf opc = "verp" Then
+
+		If tipo = "cons" Then
+
+			html = html & "<td><font style='margin-left:5%;font-size:20pt;font-family:Serif;color:#000000;letter-spacing:0.2em;'><b>'" & LEFT(titP,40) & "'</b></font></td>"
+
+		Else
+
+			html = html & "<td><font style='margin-left:1%;font-size:10pt;font-family:helvetica;color:#000000;yletter-spacing:0.2em;line-height:35px;'>" & ucase(LEFT(titP,40)) & "</font></td>"
+
+		End If
+
+	End If
+
+	If opc = "veri" Then
+
+		If tipo = "cons" Then
+
+			cli = request.querystring("cli")
+			est = request.querystring("est")
+			aplic = request.querystring("apli")
+			relainc = request.querystring("relainc")
+			fec = request.querystring("fec")
+			descri = request.querystring("desc")
+			form7 = "<form id='form7' style='height:70%;' method='post' action='incidentes.asp?opc=consi&cli=" & cli & "&est=" & est & "&apli=" & aplic & "&fec=" & fec & "&desc=" & descri & "&relainc=" & relainc& "&xmenu=12&xtmenu=INICIO'>"
+			boton7 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='VOLVER' onclick=""document.getElementById('form7').submit();""></form>"
+
+			html = html & "<td>" & form7 & boton7 & "</td>"
+
+		ElseIf tipo = "relac" Then
+
+			form7 = "<form id='form7' style='height:70%;' method='post' action='detalles.asp?opc=verp&id=" & idproy & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+			boton7 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='VOLVER' onclick=""document.getElementById('form7').submit();""></form>"
+			html = html & "<td>" & form7 & boton7 & "</td>"
+
+		ElseIf tipo = "incxp" Then
+
+			form7 = "<form id='form7' style='height:70%;' method='post' action='proyRelac.asp?" & request.querystring & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+			boton7 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='VOLVER' onclick=""document.getElementById('form7').submit();""></form>"
+			html = html & "<td>" & form7 & boton7 & "</td>"
+
+		Else
+			cli = request.querystring("cli")
+			tit = request.querystring("tit")
+			aplic = request.querystring("apli")  'agregado 4/11/2025
+
+			ACTpuede = puedeAct(cnn,id)
+
+			If ACTpuede = "SI" Then
+				xform7 = "<form id='xform7' style='height:70%;' method='post' action='detalles.asp?opc=acti&id=" & id & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+				If getPermisos(xmenu,xtmenu,"MODIF") = 1  Then
+					xboton7 = "<input class='bot' type='button' value='ACTUALIZAR INCIDENTE' onclick=""document.getElementById('xform7').submit();"">"
+				Else
+					xboton7 = "<input class='botsp' type='button' value='ACTUALIZAR INCIDENTE' onclick=""alert('Sin permiso para modificar.');"">"
+				End If
+				html = html & "<td>" & xboton7 & "</td>"
+			End If
+
+			form7 = "<form id='form7' style='height:70%;' method='post' action='incidentes.asp?opc=listar&cli=" & cli & "&tit=" & tit & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+			boton7 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('form7').submit();"">"
+			html = html & "<td >" & boton7 & "</td>"
+
+		End If
+
+	ElseIf opc = "verp" Then
+
+		If tipo = "cons" Then
+
+			cli = request.querystring("cli")
+			est = request.querystring("est")
+			apli = request.querystring("apli")
+			fecha = request.querystring("fec")
+			descri = request.querystring("desc")
+			form8 = "<form id='form8' style='height:70%;' method='post' action='proyectos.asp?sel=1&cli=" & cli & "&est=" & est & "&apli=" & apli & "&fec=" & fecha & "&desc=" & descri & "&opc=consi&xmenu=12&xtmenu=INICIO'>"
+			boton8 = "<input class='bot' style='height:70%;font-size:13pt;' type='button' value='VOLVER' onclick=""document.getElementById('form8').submit();""></form>"
+			html = html & "<td>" & form8 & boton8 & "</td>"
+			'html = html & "recordset(2) & recordset (3) "
+		Else
+			cli = request.querystring("cli")
+			tit = request.querystring("tit")
+			aplic = request.querystring("apli")
+
+			xform7 = "<form id='xform7' style='height:70%;' method='post' action='detalles.asp?opc=actp&id=" & id & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+
+			If getPermisos(xmenu,xtmenu,"MODIF") = 1 Then
+				response.write(UserLogon())
+				xboton7 = "<input class='bot' type='button' value='	 PROYECTO' onclick=""document.getElementById('xform7').submit();"">"
+			Else
+				xboton7 = "<input class='botsp' type='button' value='ACTUALIZAR PROYECTO' onclick=""alert('Sin permiso para modificar.');"">"
+			End If
+			html = html & "<td>" & xboton7 & "</td>"
+
+			form8 = "<form id='form8' style='height:70%;' method='post' action='proyectos.asp?cli=" & cli & "&tit=" & tit & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+			boton8 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('form8').submit();"">"
+			html = html & "<td>" & boton8 & "</td>"
+
+		End If
+
+
+	End If
+
+	html = html & "</tr>"
+
+	html = html & "</table>"
+
+	html = html & "</div>"
+
+	If opc = "veri" Then
+
+		zzz = ObjAcc(id,"I",cnn,"D")
+		XXX = SYSLOGON(cnn,"CONSULTA_INC_" & id)
+
+		sql = " select a.id,b.descripcion,c.nombre + ' ' + c.apellido,d.descripcion,a.detalles,e.descripcion,f.nombre + ' ' + f.apellido, "
+		sql = sql & " g.nombre + ' ' + g.apellido,a.req_presup,h.descripcion,i.descripcion,a.fecha_ingreso,j.descripcion,k.descripcion,a.id_proyecto,c.id, "
+		sql = sql & " a.ok_desarrollo,a.ok_funcional,a.ok_cliente,a.ruta,a.creacion,a.avances,a.titulo,l.nombre,a.id_apl,m.solic_nro,m.titulo "
+		sql = sql & " from incidentes a "
+		sql = sql & " inner join clientes b on (a.id_cliente=b.id) "
+		sql = sql & " inner join contactos c on (a.contacto=c.id) "
+		sql = sql & " inner join aplicativos d on (a.id_aplic=d.id) "
+		sql = sql & " inner join prioridades e on (a.prioridad=e.id) "
+		sql = sql & " inner join cor_responsables f on (a.respon_gestion=f.id and f.funcion='FUNC') "
+		sql = sql & " left join cor_responsables g on (a.respon_tec=g.id and g.funcion='TEC') "
+		sql = sql & " inner join estados h on (a.estado_desa=h.id) "
+		sql = sql & " inner join estados i on (a.estado_func=i.id) "
+		sql = sql & " inner join browsers j on (a.browser=j.id) "
+		sql = sql & " inner join via_pedido k on (a.via_pedido=k.id) "
+		sql = sql & " left join apl l on (a.id_apl=l.id) "
+		sql = sql & " left join proyectos m on (a.id_proyecto = m.id) "
+		sql = sql & " where a.id=" & id
+
+		'response.write(sql)
+		Set rs = Cnn.Execute(sql)
+
+		If Not rs.eof Then
+
+			'html = html & "<div style='height:80%;width:100%;float:left;'>"
+			html = html & "<div style='width:100%;'>" ' Limpiamos el float y el height forzado
+
+			'html = html & "<div id='tabs' style='border-style: none;'>"
+			html = html & "<div id='tabs' style='border-style: none;'>"
+
+			' --- PESTAÑAS (Mantenemos la estructura ul/li para no romper el JS, pero inyectamos el CSS moderno) ---
+			'html = html & "<ul>"
+			'html = html & "<li><a href='#fragment-1'>DATOS</a></li>"
+			'html = html & "<li><a href='#fragment-2'>DETALLE</a></li>"
+			'html = html & "<li><a href='#fragment-3'>AVANCE</a></li>"
+			'html = html & "<li><a href='#fragment-4'>APLs RELACIONADOS</a></li>"
+			'html = html & "</ul>"
+			html = html & "<ul class='nav-tabs' style='list-style: none; padding: 0; margin: 0; margin-bottom: 1.5rem;'>"
+			html = html & "<li><a class='nav-tab active' style='display: block;' href='#fragment-1'>DATOS</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#fragment-2'>DETALLE</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#fragment-3'>AVANCE</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#fragment-4'>APLs RELACIONADOS</a></li>"
+			html = html & "</ul>"
+
+
+			' ==========================================
+			' PESTAÑA 1: DATOS
+			' ==========================================
+			html = html & "<div id='fragment-1'>"
+			
+			' Envolvemos en nuestro bloque moderno y aplicamos la grilla doble
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body grid-datos-doble'>"
+
+			'html = html & "<table class='tablDet' cellspacing=0 cellpadding=3 align=center>"
+
+			' FILA 1
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>NRO</b></td><td class='fil'>" & rs(0) & "</td>"
+			'html = html & "<td class='fil'><b>TITULO</b></td><td class='fil'>" & rs(22) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>NRO</div><div class='dato-value'>" & rs(0) & "</div>"
+			html = html & "<div class='dato-label'>TITULO</div><div class='dato-value'>" & rs(22) & "</div>"
+
+			' FILA 2
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>CLIENTE</b></td><td class='fil'>" & rs(1) & "</td>"
+			'html = html & "<td class='fil'><b>CONTACTO</b></td>"
+			'html = html & "<td class='fil'><a class='red' href='detalleCont.asp?idcon=" & rs(15) & "&id=" & rs(0) & "&opc=veri&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'><font style='color:#FF0000;'>" & rs(2) & "</font></a></td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>CLIENTE</div><div class='dato-value'>" & rs(1) & "</div>"
+			html = html & "<div class='dato-label'>CONTACTO</div><div class='dato-value'><a class='col-link' style='text-decoration: none;' href='detalleCont.asp?idcon=" & rs(15) & "&id=" & rs(0) & "&opc=veri&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>" & rs(2) & "</a></div>"
+
+			sRelPro = ""
+			If rs(14) <> 0 Then sRelPro = "ID: " & rs(14)
+
+			' FILA 3
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>APLICACION</b></td><td class='fil'>" & rs(3) & "</td>"
+			'html = html & "<td class='fil'><b>RELACIONADO A PROY</b></td><td class='fil'><a class='red' href='detalles.asp?id=" & rs(14) & "&opc=verp&sol=" & rs(25) & "&xmenu=10&xtmenu=INICIO'><font style='color:#FF0000;'>" & sRelPro & "</font></a></td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>APLICACION</div><div class='dato-value'>" & rs(3) & "</div>"
+			html = html & "<div class='dato-label'>RELACIONADO A PROY</div><div class='dato-value'><a class='col-link' style='text-decoration: none;' href='detalles.asp?id=" & rs(14) & "&opc=verp&sol=" & rs(25) & "&xmenu=10&xtmenu=INICIO'>" & sRelPro & "</a></div>"
+
+			' FILA 4
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>PRIORIDAD</b></td><td class='fil'>" & rs(5) & "</td>"
+			'html = html & "<td class='fil'><b>RESPONSABLE GESTION</b></td><td class='fil'>" & rs(6) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>PRIORIDAD</div><div class='dato-value'>" & rs(5) & "</div>"
+			html = html & "<div class='dato-label'>RESPONSABLE GESTION</div><div class='dato-value'>" & rs(6) & "</div>"
+			
+			rp = ""
+			If rs(7) & "" = "" Then
+				rp = "---"
+			Else
+				rp = rs(7)
+			End If
+			
+			' FILA 5
+			'html = html & "<td class='fil'><b>RESPONSABLE TECNICO</b></td><td class='fil'>" & rp & "</td>"
+			'html = html & "<td class='fil'><b>REQUIERE PRESUPUESTO</b></td><td class='fil'>" & rs(8) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>RESPONSABLE TECNICO</div><div class='dato-value'>" & rp & "</div>"
+			html = html & "<div class='dato-label'>REQUIERE PRESUPUESTO</div><div class='dato-value'>" & rs(8) & "</div>"
+
+			' FILA 6
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>ESTADO DESARROLLO</b></td><td class='fil'>" & rs(9) & "</td>"
+			'html = html & "<td class='fil'><b>ESTADO FUNCIONAL</b></td><td class='fil'>" & rs(10) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>ESTADO DESARROLLO</div><div class='dato-value'>" & rs(9) & "</div>"
+			html = html & "<div class='dato-label'>ESTADO FUNCIONAL</div><div class='dato-value'>" & rs(10) & "</div>"
+
+			sFec = Fechador(rs(11) + nFecini)
+
+			' FILA 7
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>FECHA CREACION</b></td><td class='fil'>" & sFec & "</td>"
+			'html = html & "<td class='fil'><b>BROWSER</b></td><td class='fil'>" & rs(12) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>FECHA CREACION</div><div class='dato-value'>" & sFec & "</div>"
+			html = html & "<div class='dato-label'>BROWSER</div><div class='dato-value'>" & rs(12) & "</div>"
+
+			od = ""
+			If rs(16) & "" = "0" Then
+				od = "---"
+			Else
+				od = Fechador(rs(16) + nFecini)
+			End If
+
+			' FILA 8
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>VIA PEDIDO</b></td><td class='fil'>" & rs(13) & "</td>"
+			'html = html & "<td class='fil'><b>OK DESARROLLO</b></td><td class='fil'>" & od & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>VIA PEDIDO</div><div class='dato-value'>" & rs(13) & "</div>"
+			html = html & "<div class='dato-label'>OK DESARROLLO</div><div class='dato-value'>" & od & "</div>"
+
+			of = ""
+			If rs(17) & "" = "0" Then
+				of = "---"
+			Else
+				of = Fechador(rs(17) + nFecini)
+			End If
+
+			' FILA 9
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>OK FUNCIONAL</b></td><td class='fil'>" & of & "</td>"
+			'html = html & "<td class='fil'><b>OK CLIENTE</b></td><td class='fil'>" & rs(18) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>OK FUNCIONAL</div><div class='dato-value'>" & of & "</div>"
+			html = html & "<div class='dato-label'>OK CLIENTE</div><div class='dato-value'>" & rs(18) & "</div>"
+
+			' FILA 10 (Solo tiene un Label-Value, cerramos con dos divs vacíos para mantener la grilla perfecta)
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><b>LINK DOCUMENTO</b></td>"   & "<td class='fil'>"
+			xruta="http://" & replace(rs("ruta") & "","\\","")
+			xruta=replace(xruta,"\","/")
+			'html = html & "<a href='" & xruta & "' target='_new'><font style='color:#FF0000;'>" & Left(rs("ruta"),30) & "</font></a>"
+			'html = html & "</td>"
+			'html = html & "<td class='fil'>&nbsp;</td>"
+			'html = html & "<td class='fil'>&nbsp;</td>"
+			'html = html & "</tr>"
+			
+			html = html & "<div class='dato-label'>LINK DOCUMENTO</div><div class='dato-value' style='word-break: break-all;'>"
+			html = html & "<a class='col-link' style='text-decoration: none;' href='" & xruta & "' target='_new'>" & Left(rs("ruta"),30) & "</a>"
+			html = html & "</div>"
+			html = html & "<div></div><div></div>" ' Estos reemplazan a los "&nbsp;" viejos
+
+			'html = html & "</table>"
+
+			' Cerramos bloque-body y bloque-datos
+			html = html & "</div>" 
+			html = html & "</div>" 
+			
+			html = html & "</div>" ' Cierre de fragment-1
+
+			' ==========================================
+			' PESTAÑA 2: DETALLES
+			' ==========================================
+			html = html & "<div id='fragment-2'>"
+
+			'html = html & "<table class='tabldet' style='border-style: none;' cellspacing=0 align=left>"
+			' Usamos nuestro envase estándar y flex-column para apilar los elementos
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body' style='display: flex; flex-direction: column; gap: 1.5rem;'>"
+
+			' --- BLOQUE DE TEXTO (DETALLE) ---
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:11pt;'>" & Replace(rs(4) & "",Chr(13),"<br>") & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div>"
+			html = html & "<div class='dato-value' style='line-height: 1.6; color: #334155; font-size: 0.95rem;'>" & Replace(rs(4) & "",Chr(13),"<br>") & "</div>"
+			html = html & "</div>"
+
+
+			' --- BLOQUE DE PATH ---
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:12pt;'><BR><u><b>PATH</b></u></td>"
+			'html = html & "</tr>"
+			html = html & "<div>" 
+			html = html & "<div style='font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; letter-spacing: 0.05em;'>PATH</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><BR>"
+			XPATH="\\" & request.servervariables("SERVER_NAME") &  RIGHT(RUTA,LEN(RUTA)-2)
+			'html = html & XPATH & "INCIDENTES\" & Rs(0)
+			'html = html  & "<BR></td></tr>"
+			html = html & "<div class='dato-value' style='word-break: break-all; color: #475569;'>"
+			html = html & XPATH & "INCIDENTES\" & Rs(0)
+			html = html & "</div>"
+			html = html & "</div>"
+
+
+			' --- BLOQUE DE ARCHIVOS ---
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:12pt;'><BR><u><b>ARCHIVOS</b></u></td>"
+			'html = html & "</tr>"
+			html = html & "<div>"
+			html = html & "<div style='font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; letter-spacing: 0.05em;'>ARCHIVOS</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>"
+			RUTA=RUTA & "\INCIDENTES\" & Rs(0)
+
+			'html = html & LISTARDIRTORIO(RUTA,Rs(0),"INCIDENTES")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-value'>"
+			html = html & LISTARDIRTORIO(RUTA,Rs(0),"INCIDENTES")
+			html = html & "</div>"
+			html = html & "</div>"
+
+			'html = html & "</table>"
+			
+			' Cerramos el bloque-body y bloque-datos
+			html = html & "</div>" 
+			html = html & "</div>" 
+
+			html = html & "</div>" ' Cierre de fragment-2
+
+			' ==========================================
+			' PESTAÑA 3: AVANCES
+			' ==========================================
+			html = html & "<div id='fragment-3'>"
+
+			'response.write(UserLogon())
+
+			' Envolvemos en nuestra tarjeta moderna
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body'>"
+
+			'html = html & "<table class='tablDet' style='border-style: none;' cellspacing=0 align=left>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:11pt;'>" & Replace(rs(21) & "",Chr(13),"<br>") & "</td>"
+			
+			' Texto de avances con buen interlineado y color de lectura cómodo
+			html = html & "<div class='dato-value' style='line-height: 1.6; color: #334155; font-size: 0.95rem;'>"
+			html = html & Replace(rs(21) & "",Chr(13),"<br>")
+			html = html & "</div>"
+
+			' --- Restos del código viejo comentados tal cual los pasaste ---
+			'response.write(request.querystring(rs3))
+			'		html = html & "</tbody>"
+			'		html = html & "</table>"
+
+			'html = html & "</tr>"
+
+			'html = html & "</table>"
+
+			' Cerramos bloque-body y bloque-datos
+			html = html & "</div>"
+			html = html & "</div>"
+
+			html = html & "</div>" ' Cierre de fragment-3
+
+			' ==========================================
+			' PESTAÑA 4: APLs RELACIONADOS
+			' ==========================================
+			html = html & "<div id='fragment-4'>"
+
+			'html = html & "<table style='border:solid 1px #aaaaaa;' cellspacing=0 cellpadding=3 align=center>"
+			' Abrimos nuestra tarjeta estándar
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body'>"
+
+			sql = "select a.id, a.ID_APL, a.ID_RELAC, a.TIPO_RELAC, b.NOMBRE "
+			sql = sql & "from apl_relac a inner join APL b on (a.ID_APL = b.ID) "
+			sql = sql & "where a.id_relac=" & id & " and a.tipo_relac='I' "
+			sql = sql & "order by b.nombre"
+			'response.write sql
+
+			Set rz = Cnn.Execute(sql)
+
+			' --- TÍTULO DE LA SECCIÓN ---
+			'html = html & "<tr>"
+			'html = html & "<td style='text-align:center'><font style='font-size:20pt;color:#000000;'>APLs</font></td>"
+			'html = html & "</tr>"
+			'html = html & "<tr>"
+			'html = html & "<td> </td>"
+			'html = html & "</tr>"
+			html = html & "<div style='font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;'>APLs Relacionados</div>"
+
+			' Contenedor flexible para apilar los links como si fuera una lista
+			html = html & "<div style='display: flex; flex-direction: column;'>"
+
+			If Not rz.eof Then
+
+				Do While Not rz.eof
+
+					'html = html & "<tr>"
+					'ref = "<a class='red2' style='font-size:12pt;' href='detalles2.asp?opc=ver&id=" & rz(1) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>" & rz(4) & "</a>"
+					'html = html & "<td align=left>" & ref & "</td>"
+					'html = html & "</tr>"
+					
+					' Aplicamos .col-link y armamos una "fila" div limpia con un borde sutil abajo
+					ref = "<a class='col-link' style='text-decoration: none; font-size: 1rem;' href='detalles2.asp?opc=ver&id=" & rz(1) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>" & rz(4) & "</a>"
+					html = html & "<div style='padding: 0.75rem 0; border-bottom: 1px solid #f1f5f9;'>" & ref & "</div>"
+
+					rz.movenext
+				Loop
+
+			Else
+
+				'html = html & "<tr>"
+				'html = html & "<td>-----</td>"
+				'html = html & "</tr>"
+				html = html & "<div class='dato-value' style='color: #94a3b8; font-style: italic; padding: 1rem 0;'>-----</div>"
+
+			End If
+
+			'html = html & "</table>"
+			html = html & "</div>" ' Cierra el contenedor de la lista
+
+			html = html & "</div>" ' Cierra bloque-body
+			html = html & "</div>" ' Cierra bloque-datos
+
+			html = html & "</div>" ' Cierra fragment-4
+
+			html = html & "</div>" ' Cierra el div general de los tabs (el float:left original del primer fragmento)
+
+		End If
+
+		'rs.close
+
+	ElseIf opc = "verp" Then
+
+		zzz = ObjAcc(id,"P",cnn,"D")
+		XXX = SYSLOGON(cnn,"CONSULTA_PROY_" & id)
+
+		sql = "select a.id,a.solic_nro,a.titulo,a.descripcion,b.descripcion,c.nombre + ' ' + c.apellido,d.descripcion,f.nombre + ' ' + f.apellido, "
+		sql = sql & " g.nombre + ' ' + g.apellido,a.fecha_ingreso,a.fecha_entrega,h.descripcion,i.descripcion,e.descripcion,a.tiempo_relevamiento,a.tiempo_diseno, "
+		sql = sql & " a.tiempo_desarr,a.tiempo_test, "
+		sql = sql & " j.descripcion,k.descripcion,a.req_presup,SUM(a.tiempo_diseno + a.tiempo_desarr + a.tiempo_relevamiento + a.tiempo_test),c.id, "
+		sql = sql & " a.ok_desarrollo,a.ok_funcional,a.ok_cliente,a.ruta,a.avances,l.nombre,a.id_apl "
+		sql = sql & " from proyectos a "
+		sql = sql & " inner join clientes b on (a.id_cliente=b.id) "
+		sql = sql & " inner join contactos c on (a.contacto=c.id) "
+		sql = sql & " inner join aplicativos d on (a.id_aplic = d.id) "
+		sql = sql & " inner join prioridades e on (a.prioridad=e.id) "
+		sql = sql & " inner join cor_responsables f on (a.respon_gestion=f.id and f.funcion='FUNC') "
+		sql = sql & " inner join cor_responsables g on (a.respon_tec=g.id and g.funcion='TEC') "
+		sql = sql & " inner join estados h on (a.estado_desa=h.id) "
+		sql = sql & " inner join estados i on (a.estado_func=i.id) "
+		sql = sql & " inner join browsers j on (a.browser=j.id) "
+		sql = sql & " inner join via_pedido k on (a.via_pedido=k.id) "
+		sql = sql & " left join apl l on (a.id_apl = l.id) "
+		sql = sql & " where a.id=" & id
+		sql = sql & " group by a.id,a.solic_nro,a.titulo,a.descripcion,b.descripcion,c.nombre + ' ' + c.apellido,d.descripcion,"
+		sql = sql & " f.nombre + ' ' + f.apellido,g.nombre + ' ' + g.apellido, a.fecha_ingreso,a.fecha_entrega,h.descripcion,"
+		sql = sql & " i.descripcion,e.descripcion,a.tiempo_relevamiento,a.tiempo_diseno,a.tiempo_desarr,a.tiempo_test, "
+		sql = sql & " j.descripcion,k.descripcion,a.req_presup,a.id_cliente,a.contacto,a.id_aplic,a.respon_gestion,a.respon_tec,"
+		sql = sql & " a.estado_func,a.estado_desa,a.prioridad, a.browser,a.via_pedido,a.req_presup,c.id,a.ok_desarrollo,a.ok_funcional, "
+		sql = sql & " a.ok_cliente,a.ruta,a.avances,l.nombre,a.id_apl"
+
+		Set rs = Cnn.Execute(sql)
+					'response.write(sql)
+		If Not rs.eof Then
+
+			'html = html & "<div style='height:80%;width:80%;xfloat:left;margin:0 auto;'>"
+			html = html & "<div style='width:100%;'>"
+
+			html = html & "<div id='tabs' style='border-style: none;'>"
+
+			html = html & "<ul class='nav-tabs' style='list-style: none; padding: 0; margin: 0; margin-bottom: 1.5rem;'>"
+			html = html & "<li><a class='nav-tab active' style='display: block;' href='#fragment-1'>DATOS</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#fragment-2'>DETALLE</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#fragment-3'>AVANCE</a></li>"
+			html = html & "<li><a class='nav-tab' style='display: block;' href='#fragment-4'>INCIDENTES Y APLs RELACIONADOS</a></li>"
+			html = html & "</ul>"
+
+			'DATOS
+
+			html = html & "<div id='fragment-1'>"
+
+			' --- INICIO NORMALIZACION: CONTENEDOR PRINCIPAL ---
+			'html = html & "<table class='tablDet' cellspacing=0 cellpadding=0 align=center style='border-style:none;'>"
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body grid-datos-doble'>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "' >ID</td><td class='fil' style='" & st1 & "' >" & rs(0) & "</td>"
+			html = html & "<div class='dato-label'>ID</div>"
+			html = html & "<div class='dato-value' style='font-weight: 600;'>" & rs(0) & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>TITULO PROYECTO</td><td class='fil' style='" & st1 & "' >" & UCASE(rs(2)) & "</td>"
+			html = html & "<div class='dato-label'>TITULO PROYECTO</div>"
+			html = html & "<div class='dato-value'>" & UCASE(rs(2)) & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>CONTACTO</td>"
+			'html = html & "<td class='fil' style='" & st1 & "' ><a class='red' href='detalleCont.asp?id=" & id & "&opc=" & opc & "&sol=" & sol & "&idcon=" & rs(22) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'><font style='color:#FF0000;'>" & rs(5) & "</font></a></td>"
+			html = html & "<div class='dato-label'>CONTACTO</div>"
+			html = html & "<div class='dato-value'>"
+			html = html & "<a class='red' href='detalleCont.asp?id=" & id & "&opc=" & opc & "&sol=" & sol & "&idcon=" & rs(22) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "' style='text-decoration: none;'>"
+			html = html & "<span style='color:#FF0000;cursor:pointer;'>" & rs(5) & "</span></a>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>RESPON GESTION</td><td class='fil' style='" & st1 & "' >" & rs(7) & "</td>"
+			html = html & "<div class='dato-label'>RESPON GESTION</div>"
+			html = html & "<div class='dato-value'>" & rs(7) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>SOLICITUD NUMERO</td><td class='fil' style='" & st1 & "' >" & rs(1) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>SOLICITUD NUMERO</div>"
+			html = html & "<div class='dato-value'>" & rs(1) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>CLIENTE</td><td class='fil' style='" & st1 & "' >" & rs(4) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>CLIENTE</div>"
+			html = html & "<div class='dato-value'>" & rs(4) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>APLICACION</td><td class='fil' style='" & st1 & "' >" & rs(6) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>APLICACION</div>"
+			html = html & "<div class='dato-value'>" & rs(6) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>RESPON TEC</td><td class='fil' style='" & st1 & "' >" & rs(8) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>RESPON TEC</div>"
+			html = html & "<div class='dato-value'>" & rs(8) & "</div>"
+
+			sFec = ""
+			If rs(9) <> 0 Then
+				sFec = Fechador(rs(9) + nFecini)
+			End If
+
+			sFecEn = ""
+			If rs(10) <> 0 Then
+				sFecEn = Fechador(rs(10) + nFecini)
+			End If
+
+			' --- SECCION: FILA FECHAS ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>FECHA CREACION</td><td class='fil' style='" & st1 & "' >" & sFec & "</td>"
+			html = html & "<div class='dato-label'>FECHA CREACION</div>"
+			html = html & "<div class='dato-value'>" & sFec & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>FECHA ENTREGA</td><td class='fil' style='" & st1 & "' >" & sFecEn & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>FECHA ENTREGA</div>"
+			html = html & "<div class='dato-value'>" & sFecEn & "</div>"
+
+			' --- SECCION: FILA ESTADOS ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>ESTADO FUNCIONAL</td><td class='fil' style='" & st1 & "' >" & rs(12) & "</td>"
+			html = html & "<div class='dato-label'>ESTADO FUNCIONAL</div>"
+			html = html & "<div class='dato-value'>" & rs(12) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>ESTADO DESARROLLO</td><td class='fil' style='" & st1 & "' >" & rs(11) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>ESTADO DESARROLLO</div>"
+			html = html & "<div class='dato-value'>" & rs(11) & "</div>"
+
+			' --- SECCION: FILA PRIORIDAD Y RELEVAMIENTO ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>PRIORIDAD</td><td class='fil' style='" & st1 & "' >" & rs(13) & "</td>"
+			html = html & "<div class='dato-label'>PRIORIDAD</div>"
+			html = html & "<div class='dato-value'>" & rs(13) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>RELEV Y DEFINICION (hs)</td><td class='fil' style='" & st1 & "' >" & rs(14) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>RELEV Y DEFINICION (hs)</div>"
+			html = html & "<div class='dato-value'>" & rs(14) & "</div>"
+
+			' --- SECCION: FILA DISEÑO Y DESARROLLO ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>DISE&Ntilde;O (hs)</td><td class='fil' style='" & st1 & "' >" & rs(15) & "</td>"
+			html = html & "<div class='dato-label'>DISE&Ntilde;O (hs)</div>"
+			html = html & "<div class='dato-value'>" & rs(15) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>DESARROLLO (hs)</td><td class='fil' style='" & st1 & "' >" & rs(16) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>DESARROLLO (hs)</div>"
+			html = html & "<div class='dato-value'>" & rs(16) & "</div>"
+
+			' --- SECCION: FILA TESTEO Y TOTAL ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>TESTEO (hs)</td><td class='fil' style='" & st1 & "' >" & rs(17) & "</td>"
+			html = html & "<div class='dato-label'>TESTEO (hs)</div>"
+			html = html & "<div class='dato-value'>" & rs(17) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>TOTAL (hs)</td><td class='fil' style='" & st1 & "' >" & rs(21) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>TOTAL (hs)</div>"
+			html = html & "<div class='dato-value'>" & rs(21) & "</div>"
+
+			' --- SECCION: FILA BROWSER Y VIA PEDIDO ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>BROWSER</td><td class='fil' style='" & st1 & "' >" & rs(18) & "</td>"
+			html = html & "<div class='dato-label'>BROWSER</div>"
+			html = html & "<div class='dato-value'>" & rs(18) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>VIA PEDIDO</td><td class='fil' style='" & st1 & "' >" & rs(19) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>VIA PEDIDO</div>"
+			html = html & "<div class='dato-value'>" & rs(19) & "</div>"
+
+			od = ""
+			If rs(23) & "" = "0" Then
+				od = "---"
+			Else
+				od = Fechador(rs(23) + nFecini)
+			End If
+			
+			' --- SECCION: FILA REQ PRESUPUESTO Y OK DESARROLLO ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>REQ PRESUPUESTO</td><td class='fil' style='" & st1 & "' >" & rs(20) & "</td>"
+			html = html & "<div class='dato-label'>REQ PRESUPUESTO</div>"
+			html = html & "<div class='dato-value'>" & rs(20) & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>OK DESARROLLO</td><td class='fil' style='" & st1 & "' >" & od & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>OK DESARROLLO</div>"
+			html = html & "<div class='dato-value'>" & od & "</div>"
+
+			of = ""
+			If rs(24) & "" = "0" Then
+				of = "---"
+			Else
+				of = Fechador(rs(24) + nFecini)
+			End If
+			
+			' --- SECCION: FILA OK FUNCIONAL Y OK CLIENTE ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>OK FUNCIONAL</td><td class='fil' style='" & st1 & "' >" & of & "</td>"
+			html = html & "<div class='dato-label'>OK FUNCIONAL</div>"
+			html = html & "<div class='dato-value'>" & of & "</div>"
+
+			'html = html & "<td class='fil' style='" & st0 & "'>OK CLIENTE</td><td class='fil' style='" & st1 & "' >" & rs(25) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>OK CLIENTE</div>"
+			html = html & "<div class='dato-value'>" & rs(25) & "</div>"
+
+			' --- SECCION: FILA LINK DOCUMENTO ---
+			'html = html & "<tr>"
+			
+			'html = html & "<td class='fil' style='" & st0 & "'>LINK DOCUMENTO</td><td class='fil' style='" & st1 & "' >"
+			'html = html & "<a href='" & rs("ruta") & "' target='_new'><font style='color:#FF0000;'>" & Left(rs("ruta"),30) & "</font></a>"
+			'html = html & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>LINK DOCUMENTO</div>"
+			html = html & "<div class='dato-value' style='word-break:break-all;'>"
+			html = html & "<a href='" & rs("ruta") & "' target='_new' style='text-decoration: none;'>"
+			html = html & "<span style='color:#FF0000; cursor:pointer;'>" & Left(rs("ruta"),30) & "</span></a>"
+			html = html & "</div>"
+			html = html & "</div>"
+
+			' --- SECCION: CIERRE DE CONTENEDOR PRINCIPAL ---
+			'html = html & "</table>"
+			html = html & "</div>"
+			html = html & "</div>" ' Fin padding interno (2rem)
+			html = html & "</div>" ' Fin .bloque-datos
+
+			'html = html & "</div>"
+			html = html & "</div>" ' Fin #fragment-1
+
+			'DETALLES
+			html = html & "<div id='fragment-2'>"
+
+			' --- INICIO NORMALIZACION: CONTENEDOR PRINCIPAL DETALLES ---
+			'html = html & "<table cellspacing=0 align=left>"
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body' style='display: flex; flex-direction: column; gap: 1.5rem;'>"
+
+			' --- SECCION: TEXTO DESCRIPTIVO ---
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:9.25pt;font-family:arial;letter-spacing:0.25px;'>" & Replace(rs(3) & "",Chr(13),"<br>") & "</td>"
+			html = html & "<div>"
+			html = html & "<div class='dato-value' style='width: 100%;'>" & Replace(rs(3) & "",Chr(13),"<br>") & "</div>"
+			html = html & "</div>"
+
+			' --- SECCION: CIERRE DE CONTENEDOR ---
+			'html = html & "</tr>"
+			'html = html & "</table>"
+			html = html & "</div>" ' Fin padding interno
+			html = html & "</div>" ' Fin .bloque-datos
+
+			html = html & "</div>" ' Fin #fragment-2
+
+			'AVANCES
+			html = html & "<div id='fragment-3'>"
+
+			' --- INICIO NORMALIZACION: CONTENEDOR PRINCIPAL AVANCES ---
+			'html = html & "<table cellspacing=0 align=left>"
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body'>"
+
+			' --- SECCION: TEXTO DE AVANCES ---
+			'html = html & "<tr>"
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:9.25pt;font-family:arial;letter-spacing:0.25px;'>" & Replace(rs(27) & "",Chr(13),"<br>") & "</td>"
+			html = html & "<div class='dato-value' style='width: 100%;'>" & Replace(rs(27) & "",Chr(13),"<br>") & "</div>"
+
+			' --- SECCION: CIERRE DE CONTENEDOR ---
+			'html = html & "</tr>"
+			'html = html & "</table>"
+			html = html & "</div>" ' Fin padding interno
+			html = html & "</div>" ' Fin .bloque-datos
+
+			html = html & "</div>" ' Fin #fragment-3
+
+			html = html & "<table class='tablDet' style='margin-top:50px;width:80%;' cellspacing=0 align=left>"
+
+					html = html & "<tr>"
+					html = html & "<td class='fil' style='font-size:12pt;'><b><u>AVANCES / COMENTARIOS</u></b></td>"
+					html = html & "</tr>"
+
+					'----------------------------CONEXION A COMENTARIOS---------------------------------------------------
+			        ' LIMPIEZA: Definimos la variable desde cero, quitamos el doble 'select' y corregimos la sintaxis
+					sqlcomentario = "select a.descripcion, a.fecha, a.hora, b.nombre + ' ' +b.apellido as usuario "
+					sqlcomentario = sqlcomentario & " FROM relainc as a "
+					sqlcomentario = sqlcomentario & " inner join cor_responsables b on (b.id=a.idusuario)"
+					sqlcomentario = sqlcomentario & " inner join incidentes c on (c.id=a.codobjeto) "
+					sqlcomentario = sqlcomentario & " where c.id=" & id & " AND a.tipoobjeto='inc' AND a.codobjeto="& id '
+					sqlcomentario = sqlcomentario & " order by a.fecha desc, a.hora desc"
+
+					Set rs3 = Cnn.Execute(sqlcomentario)
+
+					'-------------------------------------------------------------------------------
+
+					html = html & "<tr>"
+					html = html & "<td class='fil'>"
+
+			        ' VERIFICAMOS SI HAY DATOS PARA MOSTRAR LA TABLA
+					If Not rs3.eof Then
+			            ' Estilos CSS inline para que la tabla se vea bien dentro del diseño existente
+						html = html & "<table border='1' style='width:100%; border-collapse: collapse; border-color:#ececec;'>"
+						html = html & "<thead>"
+						html = html & "<tr style='background-color:#ececec; color:#000; font-family:arial; font-size:9pt;'>"
+						html = html & "<th style='padding:5px;'>Usuario</th>"
+						html = html & "<th style='padding:5px;'>Detalle</th>"
+						html = html & "<th style='padding:5px;'>Fecha</th>"
+						html = html & "<th style='padding:5px;'>Hora</th>"
+						html = html & "</tr>"
+						html = html & "</thead>"
+						html = html & "<tbody>"
+
+						Do While Not rs3.eof
+							html = html & "<tr>"
+							html = html & "<td class='fil' style='padding:4px;'>" & rs3("usuario") & "</td>"
+							html = html & "<td class='fil' style='padding:4px;'>" & rs3("descripcion") & "</td>"
+
+			                ' Formateo básico de fecha si tienes la función, sino muestra directo
+			                sFechaCom = rs3("fecha")
+			                ' Si usas GTFechadorsh descomenta la linea de abajo
+			                ' sFechaCom = GTFechadorsh(rs3("fecha"))
+
+							html = html & "<td class='fil' style='padding:4px;'>" & sFechaCom & "</td>"
+							html = html & "<td class='fil' style='padding:4px;'>" & rs3("hora") & "</td>"
+							html = html & "</tr>"
+							rs3.MoveNext
+						Loop
+
+						html = html & "</tbody>"
+						html = html & "</table>"
+					Else
+			            html = html & "<font style='font-family:arial; font-size:9pt; color:gray;'>No hay comentarios registrados.</font>"
+					End if
+
+			        ' IMPORTANTE: Cierra el objeto recordset si ya no se usa
+			        ' rs3.close
+
+					html = html & "<br><br><b>Nuevo comentario:</b><br>"
+					html = html & "<textarea class='txtar' id='avances' name='avances' style='height:100px;width:100%;'></textarea>"
+					html = html & "</td>"
+			html = html & "</tr>"
+
+			'este es el apartado de avances que muestra los comentarios hechos previamente
+			'se deberÃ­a recorrer el recordset y asÃ­ podes leerlos
+
+			html = html & "<div id='fragment-4' style='width:300px;' align=center>"
+			html = html & "<table style='border:solid 1px #aaaaaa;float:left;' cellspacing=0 cellpadding=3 align=center>"
+			html = html & "<tr>"
+			html = html & "<td><font style='font-size:20pt;color:#000000;'>APLs</font></td>"
+			html = html & "</tr>"
+
+			'Quere para obtener el nombre del APL
+			'relacionado al proyecto
+
+			sql = "select a.id, a.id_apl, a.id_relac, a.tipo_relac, b.ID, b.NOMBRE, b.ID_CLIENTE, b.ID_APLIC,b.RESPON_ENVIO,b.FECHA_ENVIO,b.FECHA_INSTALACION_PROD,b.FECHA_INSTALACION_TEST MOTIVO_APL,b.VER,b.FECHA_CREACION,b.INCIDENTE,b.PROYECTO,b.sec "
+			sql = sql & " from apl_relac a "
+			sql = sql & " inner join apl b on ( a.id_apl = b.id ) "
+			sql = sql & " where a.id_relac=" & id & " and a.tipo_relac='P' "
+
+			Set rz = Cnn.Execute(sql)
+
+			If Not rz.eof Then
+
+				Do While Not rz.eof
+
+					'Link al APL
+					'En la descripciï¿½n del link figura el nombre del APL
+					html = html & "<tr>"
+					ref = "<a class='red2' href='detalles2.asp?opc=ver&id=" & rz(1) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>" & rz(5) & "</a>"
+					html = html & "<td align=center>"  & ref & "</td>"
+					html = html & "</tr>"
+
+
+
+					rz.movenext
+				Loop
+
+			Else
+
+				html = html & "<tr>"
+				html = html & "<td>-----</td>"
+				html = html & "</tr>"
+
+			End If
+
+			html = html & "</table>"
+
+			html = html & "<br><br><br><br><br>"
+
+			html = html & "</table>"
+
+			html = html & "<table style='border:solid 1px #aaaaaa;float:right;' cellspacing=0 cellpadding=3 align=center>"
+
+
+			html = html & "<tr>"
+			html = html & "<td><font style='font-size:20pt;color:#000000;'>INCIDENTES</font></td>"
+			html = html & "</tr>"
+
+			sql = "select * from incidentes where id_proyecto=" & id
+			Set rz = Cnn.Execute(sql)
+
+			If Not rz.eof Then
+
+				Do While Not rz.eof
+
+					html = html & "<tr>"
+					ref = "<a class='red2' href='detalles.asp?opc=veri&id=" & rz(0) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>" & rz(0) & "</a>"
+					html = html & "<td align=center>" & ref & "</td>"
+					html = html & "</tr>"
+
+					rz.movenext
+				Loop
+
+			Else
+
+				html = html & "<tr>"
+				html = html & "<td>-----</td>"
+				html = html & "</tr>"
+
+			End If
+
+			html = html & "</table>"
+
+			html = html & "</div>"
+
+
+			'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+			html = html & "</div>"
+
+			html = html & "<div style='height:100%;width:50%;float:right'><br>"
+
+
+
+
+
+
+		End If
+
+		html = html & "</table>"
+
+	ElseIf opc = "acti" Then
+
+		zzz = ObjAcc(id,"I",cnn,"A")
+		XXX = SYSLOGON(cnn,"ACTUALIZA_INC_" & id)
+		
+		html = html & "<div class='layout-principal'>"
+		'html = html & "<div style='height:80%;width:50%;float:left;'><br>"
+		html = html & "<div class='columna-izquierda'><br>"
+
+		'html = html & "<form id='sForm' method='post' action='actualizar_v2.asp?tabla=incidentes&id=" & id & "&opt=actinc&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=detalles.asp?opc=acti' >" 'agregado por update relainc
+		' Se agregó &relainc=relainc para que la siguiente página sepa qué tabla usar
+		html = html & "<form id='sForm' method='post' action='actualizar_v2.asp?tabla=incidentes&relainc=relainc&id=" & id & "&opt=actinc&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=detalles.asp?opc=acti' >"
+		'html = html & "<table class='tablDet' style='width:70%;' cellspacing=0 align=center>"
+		html = html & "<div class='bloque-datos'>"
+
+		sql = " select a.id,b.id,b.descripcion,c.id,c.nombre + ' ' + c.apellido,d.id,d.descripcion,e.id,a.detalles,e.descripcion, " '9
+		sql = sql & " f.id,f.nombre + ' ' + f.apellido,ISNULL(g.id,'0'),ISNULL(g.nombre + ' ' + g.apellido,'0'),a.req_presup,h.id,h.descripcion,i.id,i.descripcion,a.fecha_ingreso, " '20
+		sql = sql & " j.id,j.descripcion,k.id,k.descripcion,a.id_proyecto,a.ok_cliente,a.ruta,a.avances,a.titulo,a.id_apl,m.solic_nro,m.titulo,a.creacion "
+		sql = sql & " from incidentes a "
+		sql = sql & " inner join clientes b on (a.id_cliente=b.id) "
+		sql = sql & " left join contactos c on (a.contacto=c.id) "
+		sql = sql & " inner join aplicativos d on (a.id_aplic=d.id) "
+		sql = sql & " inner join prioridades e on (a.prioridad=e.id) "
+		sql = sql & " inner join cor_responsables f on (a.respon_gestion=f.id and f.funcion='FUNC') "
+		sql = sql & " left join cor_responsables g on (a.respon_tec=g.id and g.funcion='TEC') "
+		sql = sql & " inner join estados h on (a.estado_desa=h.id) "
+		sql = sql & " inner join estados i on (a.estado_func=i.id) "
+		sql = sql & " inner join browsers j on (a.browser=j.id) "
+		sql = sql & " inner join via_pedido k on (a.via_pedido=k.id) "
+		sql = sql & " left join proyectos m on (a.id_proyecto=m.id) "
+		sql = sql & " where a.id=" & id
+
+		Set rx = Cnn.Execute(sql)
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil' colspan=2 style='font-size:12pt;'><b><u>DATOS</u></b></td>"
+		'html = html & "</tr>"
+		
+		html = html & "<div class='bloque-header'>"
+		html = html & "DATOS"
+		html = html & "</div>"
+		html = html & "<div class='bloque-body'>"
+		html = html & "<div class='grid-datos'>"
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil'>NRO</td><td id='nid' class='fil'>" & id & "</td>"
+		'html = html & "</tr>"
+		html = html & "<div class='dato-label'>NRO</div><div id='nid' class='dato-value'>" & id & "</div>"
+		'html = html & "</tr>"
+
+		If rx(10) = session("USUARIO") And session("FUNC") = "FUNC" Then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>CLIENTE</td><td class='fil'>"
+			'html = html & armaCombo("select * from clientes",Cnn,rx(1),0,1,"id_cliente")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>CLIENTE</div><div class='dato-value'>"
+			html = html & armaCombo("select * from clientes",Cnn,rx(1),0,1,"id_cliente")
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>TITULO</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='titulo' name='titulo' type='text' style='width:90%;' value='" & rx(28) & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>TITULO</div><div class='dato-value'>"
+			html = html & "<input class='inpu' id='titulo' name='titulo' type='text' style='width:90%;' value='" & rx(28) & "'>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>CONTACTO</td><td class='fil'>"
+			'html = html & armaCombo("select id,nombre + ' ' + apellido from contactos",Cnn,rx(3),0,1,"contacto")
+			'html = html &"</td></tr>"
+			html = html & "<div class='dato-label'>CONTACTO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,nombre + ' ' + apellido from contactos",Cnn,rx(3),0,1,"contacto")
+			html = html &"</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>APLICACION</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from aplicativos",Cnn,rx(5),0,1,"id_aplic")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>APLICACION</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from aplicativos",Cnn,rx(5),0,1,"id_aplic")
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>RELACIONADO A PROYECTO</td><td class='fil'>"
+			'html = html & armaCombo("select id,solic_nro + ' - ' + titulo from proyectos where id_cliente=" & rx(1),Cnn,rx(24),0,1,"id_proyecto")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RELACIONADO A PROYECTO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,solic_nro + ' - ' + titulo from proyectos where id_cliente=" & rx(1),Cnn,rx(24),0,1,"id_proyecto")
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>PRIORIDAD</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from prioridades",Cnn,rx(7),0,1,"prioridad")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>PRIORIDAD</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from prioridades",Cnn,rx(7),0,1,"prioridad")
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>RESPONSABLE GESTION</td><td class='fil'>"
+			'html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='FUNC'",Cnn,rx(10),0,1,"respon_gestion")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RESPONSABLE GESTION</div><div class='dato-value'>"
+			html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='FUNC'",Cnn,rx(10),0,1,"respon_gestion")
+			html = html & "</div>"
+
+		Else
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>CLIENTE</td><td class='fil'>"
+			'html = html & rx(2)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>CLIENTE</div><div class='dato-value'>"
+			html = html & rx(2)
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>CONTACTO</td><td class='fil'>"
+			'html = html & rx(4)
+			'html = html &"</td></tr>"
+			html = html & "<div class='dato-label'>CONTACTO</div><div class='dato-value'>"
+			html = html & rx(4)
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>APLICACION</td><td class='fil'>"
+			'html = html & rx(6)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>APLICACION</div><div class='dato-value'>"
+			html = html & rx(6)
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>RELAC A PROY</td><td class='fil'>"
+			'html = html & rx(30) & "-" & rx(31)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RELAC A PROY</div><div class='dato-value'>"
+			html = html & rx(30) & "-" & rx(31)
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>PRIORIDAD</td><td class='fil'>"
+			'html = html & rx(9)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>PRIORIDAD</div><div class='dato-value'>"
+			html = html & rx(9)
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>RESPONSABLE GESTION</td><td class='fil'>"
+			'html = html & rx(11)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RESPONSABLE GESTION</div><div class='dato-value'>"
+			html = html & rx(11)
+			html = html & "</div>"
+
+		End If
+
+		If (rx(12) = session("USUARIO") And session("FUNC") = "TEC") Then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>RESPONSABLE TECNICO</td><td class='fil'>"
+			'html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='TEC'",Cnn,rx(12),0,1,"respon_tec")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RESPONSABLE TECNICO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='TEC'",Cnn,rx(12),0,1,"respon_tec")
+			html = html & "</div>"
+
+		Else
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>RESPONSABLE TECNICO</td><td class='fil'>"
+			html = html & "<div class='dato-label'>RESPONSABLE TECNICO</div><div class='dato-value'>"
+			rp = ""
+			If rx(13) & "" = "0" Then
+				rp = "---"
+			Else
+				rp = rx(13)
+			End If
+			html = html & rp
+			'html = html & "</td></tr>"
+			html = html & "</div>"
+
+		End If
+
+		If rx(10) = session("USUARIO") And session("FUNC") = "FUNC" Then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>REQUIERE PRESUPUESTO</td><td class='fil'>"
+			'html = html & "<select class='selec' style='width:90%;' id='req_presup' name='req_presup'>"
+			html = html & "<div class='dato-label'>REQUIERE PRESUPUESTO</div><div class='dato-value'>"
+			html = html & "<select class='selec' style='width:90%;' id='req_presup' name='req_presup'>"
+
+			If rx(14) = "SI" Then
+
+				html = html & "<option value='SI' selected>SI</option>"
+				html = html & "<option value='NO'>NO</option>"
+
+			Else
+
+				html = html & "<option value='SI'>SI</option>"
+				html = html & "<option value='NO' selected>NO</option>"
+
+			End If
+
+			'html = html & "</select></td></tr>"
+			html = html & "</select></div>"
+
+			sFec = Fechador(rx(19) + nFecini)
+
+			'html = html & "<td class='fil'>FECHA INGRESO</td><td class='fil'>"
+			'html = html & sFec
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>FECHA INGRESO</div><div class='dato-value'>"
+			html = html & sFec
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>BROWSER</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from browsers",Cnn,rx(20),0,1,"browser")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>BROWSER</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from browsers",Cnn,rx(20),0,1,"browser")
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>VIA PEDIDO</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from via_pedido",Cnn,rx(22),0,1,"via_pedido")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>VIA PEDIDO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from via_pedido",Cnn,rx(22),0,1,"via_pedido")
+			html = html & "</div>"
+
+		Else
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>REQUIERE PRESUPUESTO</td><td class='fil'>"
+			'html = html & rx(14) & "</td></tr>"
+			html = html & "<div class='dato-label'>REQUIERE PRESUPUESTO</div><div class='dato-value'>"
+			html = html & rx(14)
+			html = html & "</div>"
+
+			sFec = Fechador(rx(19) + nFecini)
+
+			'html = html & "<td class='fil'>FECHA INGRESO</td><td class='fil'>"
+			'html = html & sFec
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>FECHA INGRESO</div><div class='dato-value'>"
+			html = html & sFec
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>BROWSER</td><td class='fil'>"
+			'html = html & rx(21)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>BROWSER</div><div class='dato-value'>"
+			html = html & rx(21)
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>VIA PEDIDO</td><td class='fil'>"
+			'html = html & rx(23)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>VIA PEDIDO</div><div class='dato-value'>"
+			html = html & rx(23)
+			html = html & "</div>"
+
+		End If
+
+		If rx(12) = session("USUARIO") And session("FUNC") = "TEC" Then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>ESTADO DESARROLLO</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from estados",Cnn,rx(15),0,1,"estado_desa")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>ESTADO DESARROLLO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from estados",Cnn,rx(15),0,1,"estado_desa")
+			html = html & "</div>"
+
+		Else
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>ESTADO DESARROLLO</td><td class='fil'>"
+			'html = html & rx(16)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>ESTADO DESARROLLO</div><div class='dato-value'>"
+			html = html & rx(16)
+			html = html & "</div>"
+
+		End If
+
+		If rx(10) = session("USUARIO") And session("FUNC") = "FUNC" Then
+
+			If rx(16) & "" = "OK" Or rx(16) & "" = "BAJA" Or rx(16) & "" = "---" Then
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil'>ESTADO FUNCIONAL</td><td class='fil'>"
+				'html = html & armaCombo("select id,descripcion from estados",Cnn,rx(17),0,1,"estado_func")
+				'html = html & "</td></tr>"
+				'html = html & "<tr>"
+				html = html & "<div class='dato-label'>ESTADO FUNCIONAL</div><div class='dato-value'>"
+				html = html & armaCombo("select id,descripcion from estados",Cnn,rx(17),0,1,"estado_func")
+				html = html & "</div>"
+
+			Else
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil'>ESTADO FUNCIONAL</td><td class='fil'>"
+				'html = html & rx(18)
+				'html = html & "</td></tr>"
+				'html = html & "<tr>"
+				html = html & "<div class='dato-label'>ESTADO FUNCIONAL</div><div class='dato-value'>"
+				html = html & rx(18)
+				html = html & "</div>"
+
+			End If
+
+			If rx(16) & "" = "OK" And rx(18) & "" = "OK" Then
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil'>FECHA OK CLIENTE</td><td class='fil'>"
+				'html = html & "<input id='ok_cliente' name='ok_cliente' type='text' class='inpu' style='width:90%;' value='" & rx(25) & "'>"
+				'html = html & "</td></tr>"
+				html = html & "<div class='dato-label'>FECHA OK CLIENTE</div><div class='dato-value'>"
+				html = html & "<input id='ok_cliente' name='ok_cliente' type='text' class='inpu' style='width:90%;' value='" & rx(25) & "'>"
+				html = html & "</div>"
+
+			Else		
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil'>FECHA OK CLIENTE</td><td class='fil'>"
+				'html = html & rx(25)
+				'html = html & "</td></tr>"
+				html = html & "<div class='dato-label'>FECHA OK CLIENTE</div><div class='dato-value'>"
+				html = html & rx(25)
+				html = html & "</div>"
+
+			End If
+
+		Else
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>ESTADO FUNCIONAL</td><td class='fil'>"
+			'html = html & rx(18)
+			'html = html & "</td></tr>"
+			'html = html & "<tr>"
+			html = html & "<div class='dato-label'>ESTADO FUNCIONAL</div><div class='dato-value'>"
+			html = html & rx(18)
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>FECHA OK CLIENTE</td><td class='fil'>"
+			'html = html & rx(25)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>FECHA OK CLIENTE</div><div class='dato-value'>"
+			html = html & rx(25)
+			html = html & "</div>"
+
+		End If
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil'>LINK DOCUMENTO</td><td class='fil'>"
+		test = "<a href='" & rx("ruta") & "'><font style='color:#FF0000;'>Test</font></a>"
+		'html = html & "<input class='inpu' style='width:90%;' id='ruta' name='ruta' size=50 type='text' value='" & rx("ruta") & "'>" & test
+		'html = html & "</td>"
+		'html = html & "</tr>"
+		html = html & "<div class='dato-label'>LINK DOCUMENTO</div><div class='dato-value'>"
+		html = html & "<input class='inpu' style='width:90%;' id='ruta' name='ruta' size=50 type='text' value='" & rx("ruta") & "'>" & test
+		html = html & "</div>"
+
+
+		' --- LA MAGIA DE LOS CIERRES Y EL BOTÓN ---
+
+		'html = html & "<tr>"
+		'html = html & "<td colspan=2>&nbsp;</td>"
+		'html = html & "</tr>"
+
+		' 1. Cierra el grid-datos para salir de las dos columnas
+		html = html & "</div>" 
+
+		'html = html & "<tr>"
+		'html = html & "<td id='sAgre' class='fil' colspan=2 align=center><font style='color:#FF0000;'>RELACIONAR APL</font></td>"
+		'html = html & "</tr>"
+		
+		' Creamos el botón centrado (con un margin-top de 1.5rem reemplazamos ese &nbsp; viejo para que respire)
+		html = html & "<div id='sAgre' style='text-align: center; margin-top: 1.5rem; cursor: pointer;'>"
+		html = html & "  <font style='color:#FF0000;'>RELACIONAR APL</font>"
+		html = html & "</div>"
+
+		' 2 y 3. Cerramos el cuerpo y la tarjeta principal
+		html = html & "</div>" ' Cierra bloque-body
+		html = html & "</div>" ' Cierra bloque-datos
+
+		html = html & "<br><font style='color:#000000;font-size:12pt;margin-left:100px;'>"
+		html = html & "<u>ejemplo link:</u> 'http://server-40/registroincidente/' + nombre documento"
+		html = html & "</font>"
+
+		html = html & "</div>"
+
+		'html = html & "<div style='height:100%;width:50%;float:right;'><br>"
+		html = html & "<div class='columna-derecha'><br>"
+
+		'html = html & "<table class='tablDet' style='width:80%;' cellspacing=0 align=left>"
+		' Reutilizamos nuestra tarjeta base
+		html = html & "<div class='bloque-datos'>"
+		' Usamos flex-column con un gap (espacio) para separar los 3 bloques sin usar <br>
+		html = html & "<div class='bloque-body' style='display: flex; flex-direction: column; gap: 1.5rem;'>"
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil' style='font-size:12pt;'><u><b>DETALLES</b></u></td>"
+		'html = html & "</tr>"
+		html = html & "<div>" ' Abrimos el contenedor de DETALLES
+		html = html & "<div style='font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; letter-spacing: 0.05em;'>DETALLES</div>"
+
+		If rx(10) = session("USUARIO") And session("FUNC") = "FUNC" Then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>"
+			'html = html & "<textarea class='txtar' id='detalles' name='detalles' type='text' style='height:200px;width:100%;'>" & rx(8) & "</textarea>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-value'>"
+			html = html & "<textarea class='txtar input-moderno' id='detalles' name='detalles' type='text' style='height:200px;width:100%; resize: vertical;'>" & rx(8) & "</textarea>"
+			html = html & "</div>"
+
+		Else
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>"
+			'html = html & rx(8)
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-value' style='line-height: 1.6;'>"
+			html = html & rx(8)
+			html = html & "</div>"
+
+		End If
+		
+		html = html & "</div>" ' Cerramos el contenedor de DETALLES
+
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil' style='font-size:12pt;'><BR><u><b>PATH</b></u></td>"
+		'html = html & "</tr>"
+		html = html & "<div>" ' Abrimos el contenedor de PATH
+		html = html & "<div style='font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; letter-spacing: 0.05em;'>PATH</div>"
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil'><BR>"
+		XPATH="\\" & request.servervariables("SERVER_NAME") &  RIGHT(RUTA,LEN(RUTA)-2)
+		'html = html & XPATH & "INCIDENTES\" & RX(0)
+		'html = html  & "<BR></td></tr>"
+		html = html & "<div class='dato-value' style='word-break: break-all; color: #475569;'>"
+		html = html & XPATH & "INCIDENTES\" & RX(0)
+		html = html & "</div>"
+		
+		html = html & "</div>" ' Cerramos el contenedor de PATH
+
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil' style='font-size:12pt;'><BR><u><b>ARCHIVOS</b></u></td>"
+		'html = html & "</tr>"
+		html = html & "<div>" ' Abrimos el contenedor de ARCHIVOS
+		html = html & "<div style='font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; letter-spacing: 0.05em;'>ARCHIVOS</div>"
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil'>"
+		RUTA=RUTA & "\INCIDENTES\" & RX(0)
+
+		'html = html & LISTARDIRTORIO(RUTA,RX(0),"INCIDENTES")
+		'html = html & "</td></tr>"
+		html = html & "<div class='dato-value'>"
+		html = html & LISTARDIRTORIO(RUTA,RX(0),"INCIDENTES")
+		html = html & "</div>"
+		
+		html = html & "</div>" ' Cerramos el contenedor de ARCHIVOS
+
+		'html = html & "</table>"
+		html = html & "</div>" ' Cerramos el bloque-body
+		html = html & "</div>" ' Cerramos el bloque-datos principal
+
+		'html = html & "<table class='tablDet' style='margin-top:50px;width:80%;' cellspacing=0 align=left>"
+		html = html & "<div class='bloque-datos' >"
+		html = html & "<div class='bloque-body' style='display: flex; flex-direction: column; gap: 1.5rem;'>"
+
+		'html = html & "<tr>"
+		'html = html & "<td class='fil' style='font-size:12pt;'><b><u>AVANCES </u></b></td>"
+		'html = html & "</tr>"
+		html = html & "<div>" ' Contenedor general del título y contenido
+		html = html & "<div style='font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem; letter-spacing: 0.05em;'>AVANCES</div>"
+
+
+		'----------------------------CONEXION A COMENTARIOS---------------------------------------------------
+		sqlcomentario = sqlcomentario &" select a.descripcion, a.fecha, a.hora, b.nombre + ' ' +b.apellido as usuario "
+		sqlcomentario = sqlcomentario &" FROM relainc as a "
+		sqlcomentario = sqlcomentario &" inner join cor_responsables b on (b.id=a.idusuario)"
+		sqlcomentario = sqlcomentario &" inner join incidentes c on (c.id=a.codobjeto) and a.tipoobjeto='inc'"
+		sqlcomentario = sqlcomentario & "where c.id=" & id & " AND a.tipo='cmd'"
+		sqlcomentario = sqlcomentario & "order by a.fecha desc"
+
+		Set rs3 = Cnn.Execute(sqlcomentario)
+
+		'-------------------------------------------------------------------------------
+
+
+		If (rx(10) = session("USUARIO") And session("FUNC") = "FUNC") Or (rx(12) = session("USUARIO") And session("FUNC") = "TEC") Then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' xstyle='border:solid 1px #001BFF;'>"
+			html = html & "<div class='dato-value' style='width: 100%; overflow-x: auto;'>" ' Agregamos overflow por si la tabla de comentarios es muy ancha
+
+				Set rs3 = Cnn.Execute(sqlcomentario)
+				If Not rs3.eof Then
+					' Mantenemos tu tabla interna intacta porque es semánticamente correcta para este historial
+					html = html & "<table class='mi-tabla' border='1' style='width:100%; border-collapse: collapse; border-color: #e2e8f0; text-align: left;'>"
+					html = html & "<thead>"
+					html = html & "<tr style='background-color:#f8fafc; color: #475569; font-size: 0.85rem; text-transform: uppercase;'>"
+					'html = html & "<th>ID Comentario</th>"
+					html = html & "<th style='padding: 0.5rem;'>Usuario</th>"
+					html = html & "<th style='padding: 0.5rem;'>Detalle</th>"
+					html = html & "<th style='padding: 0.5rem;'>Fecha</th>"
+					html = html & "<th style='padding: 0.5rem;'>Hora</th>"
+					html = html & "</tr>"
+					html = html & "</thead>"
+
+					html = html & "<tbody>"
+
+					Do While Not rs3.eof
+					' Crea una nueva fila <tr> para este registro
+					html = html & "<tr style='border-bottom: 1px solid #e2e8f0; font-size: 0.9rem;'>"
+
+					' Añade una celda <td> por cada campo del recordset
+					'html = html & "<td class='fil'>" & rs3("idcomentario") & "</td>"
+					html = html & "<td style='padding: 0.5rem;'>" & rs3("usuario") & "</td>"
+
+					' Nota: Usamos Server.HTMLEncode para evitar que HTML en el comentario rompa la tabla
+					html = html & "<td style='padding: 0.5rem;'>" & rs3("descripcion") & "</td>"
+
+					html = html & "<td style='padding: 0.5rem;'>" & GTFechadorsh(rs3("fecha")) & "</td>"
+					html = html & "<td style='padding: 0.5rem;'>" & GETtimeHMS(rs3("hora")) & "</td>"
+					html = html & "</tr>"
+					response.write(request.querystring(rs3))
+					rs3.MoveNext
+
+					Loop
+					html = html & "</tbody>"
+					html = html & "</table>"
+
+				End if
+				'rs3.close
+				
+			'html = html & "<textarea class='txtar' id='avances' name='avances' type='text' style='height:200px;width:100%;'>"& request.querystring(rs3) & "</textarea>" 'agregado el 11/11/2025
+			' Al textarea le agregamos un margin-top para separarlo de la tablita de arriba
+			html = html & "<textarea class='txtar input-moderno' id='avances' name='avances' type='text' style='height:150px; width:100%; margin-top: 1.5rem; resize: vertical;' placeholder='Escribir un nuevo avance...'>"& request.querystring(rs3) & "</textarea>"
+			
+			'html = html & "</td>"
+			'html = html & "</tr>"
+			html = html & "</div>" ' Cierra el dato-value
+
+		Else
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' xstyle='border:solid 1px #001BFF;'>" &response.write(request.querystring(rs3))& "</td>"
+			'html = html & "</tr>"
+
+		End If
+
+		'html = html & "<tr>"
+		'html = html & "<td>&nbsp;</td>"
+		'html = html & "</tr>"
+
+		'html = html & "<tr>"
+		'html = html & "<td>"
+		'html = html & "<input class='bot' type='button' xstyle='border-radius:10px;border:solid 2px;border-color:#FF0000;height:100%;width:100%;' value='ACTUALIZAR' onclick=""actualizar('sForm');"">"
+		'html = html & "</td></tr>"
+		
+		' Botón de Actualizar alineado y limpio
+		html = html & "<div style='margin-top: 0.5rem;'>"
+		html = html & "<input class='bot' type='button' style='padding: 0.6rem 1.5rem; background-color: #3b82f6; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;' value='ACTUALIZAR' onclick=""actualizar('sForm');"">"
+		html = html & "</div>"
+
+		'html = html & "</table>"
+		
+		html = html & "</div>" ' Cierra el contenedor general que abrimos arriba del título
+		html = html & "</div>" ' Cierra bloque-body
+		html = html & "</div>" ' Cierra bloque-datos
+		html = html & "</div>" 'Cierra layout-principal
+
+		html = html & "</form>"
+
+
+		'rx.close
+
+	ElseIf opc = "actp" Then
+
+		zzz = ObjAcc(id,"P",cnn,"A")
+		XXX = SYSLOGON(cnn,"ACTUALIZA_PROY_" & id)
+
+		sql = "select a.id,a.solic_nro,a.titulo,a.descripcion,b.descripcion,c.nombre + ' ' + c.apellido,d.descripcion,f.nombre + ' ' + f.apellido, "
+		sql= sql & " g.nombre + ' ' + g.apellido,a.fecha_ingreso,a.fecha_entrega,h.descripcion,i.descripcion,e.descripcion,a.tiempo_relevamiento,a.tiempo_diseno, "
+		sql= sql & " a.tiempo_desarr,a.tiempo_test,j.descripcion,k.descripcion,a.req_presup,a.id_cliente,a.contacto,id_aplic,a.respon_gestion,a.respon_tec, "
+		sql= sql & " a.estado_func,a.estado_desa,a.prioridad,a.browser,a.via_pedido,a.req_presup, "
+		sql= sql & " SUM(a.tiempo_diseno + a.tiempo_desarr + a.tiempo_relevamiento + a.tiempo_test),a.ok_cliente,a.ruta,a.avances,a.id_apl "
+		sql= sql & " from proyectos a "
+		sql= sql & " inner join clientes b on (a.id_cliente=b.id) "
+		sql= sql & " inner join contactos c on (a.contacto=c.id) "
+		sql= sql & " inner join aplicativos d on (a.id_aplic=d.id) "
+		sql= sql & " inner join prioridades e on (a.prioridad=e.id) "
+		sql= sql & " inner join cor_responsables f on (a.respon_gestion=f.id and f.funcion='FUNC') "
+		sql= sql & " inner join cor_responsables g on (a.respon_tec=g.id and g.funcion='TEC') "
+		sql= sql & " inner join estados h on (a.estado_desa=h.id) "
+		sql= sql & " inner join estados i on (a.estado_func=i.id) "
+		sql= sql & " inner join browsers j on (a.browser=j.id) "
+		sql= sql & " inner join via_pedido k on (a.via_pedido=k.id) "
+		sql= sql & " where a.id=" & id
+		sql= sql & " group by a.id,a.solic_nro,a.titulo,a.descripcion,b.descripcion,c.nombre + ' ' + c.apellido,d.descripcion,"
+		sql= sql & " f.nombre + ' ' + f.apellido,g.nombre + ' ' + g.apellido, a.fecha_ingreso,a.fecha_entrega,h.descripcion,"
+		sql= sql & " i.descripcion,e.descripcion,a.tiempo_relevamiento,a.tiempo_diseno,a.tiempo_desarr,a.tiempo_test, "
+		sql= sql & " j.descripcion,k.descripcion,a.req_presup,a.id_cliente,a.contacto,id_aplic,a.respon_gestion,a.respon_tec,"
+		sql= sql & " a.estado_func,a.estado_desa,a.prioridad, a.browser,a.via_pedido,a.req_presup,a.ok_cliente,a.ruta,a.avances,a.id_apl"
+
+		Set rs = Cnn.Execute(sql)
+			'response.write(sql) ' comentado 6/11/2025
+		If Not rs.eof Then
+
+			' --- COLUMNA IZQUIERDA (CONTENEDOR Y FORMULARIO) ---
+
+			' Abrimos el contenedor global con padding
+			html = html & "<div class='inner' style='padding: 2rem;'>"
+			
+			'html = html & "<div style='height:85%;width:50%;float:left;'><br>"
+			' Mantenemos el float por ahora para no romper tu maquetación general, pero le damos padding derecho para que respire con la otra columna
+			html = html & "<div style='width: 50%; float: left; padding-right: 1.5rem;'>"
+
+			html = html & "<form id='sForm' method='post' action='actualizar_v2.asp?tabla=proyectos&id=" & id & "&opt=actproy&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=detalles.asp?opc=actp&sol=" & rs(1) & "' >" 'agregado para probar update relainc
+
+			'html = html & "<table class='tablDet' style='width:70%;border-style:none;' cellspacing=0 align=center>"
+			' Abrimos nuestra tarjeta y la grilla
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body'>"
+			html = html & "<div class='grid-datos-doble'>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil' style='font-size:12pt;' colspan=2><b><u>DATOS</u></b></td>"
+			' html = html & "</tr>"
+
+			' --- DATOS DE LA GRILLA ---
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "width:40%;'>ID</td><td id='nid' class='fil' style='" & st1 & "'>" & rs(0) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>ID</div>"
+			html = html & "<div class='dato-value' id='nid' style='font-weight: 600;'>" & rs(0) & "</div>"
+
+			'if rs(24) = session("USUARIO") then 'and session("FUNC") = "FUNC" then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>SOLICITUD NUMERO</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='solic_nro' name='solic_nro' type='text' style='" & st3 & "width:90%;' value='" & rs(1) & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>SOLICITUD NUMERO</div>"
+			html = html & "<div class='dato-value'><input class='input-moderno' id='solic_nro' name='solic_nro' type='text' value='" & rs(1) & "'></div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>TITULO PROYECTO</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='titulo' name='titulo' type='text' style='" & st3 & "width:90%;' value='" & rs(2) & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>TITULO PROYECTO</div>"
+			html = html & "<div class='dato-value'><input class='input-moderno' id='titulo' name='titulo' type='text' value='" & rs(2) & "'></div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>CLIENTE</td><td class='fil'>"
+			'html = html & armaCombo("select * from clientes",Cnn,rs(21),0,1,"id_cliente")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>CLIENTE</div><div class='dato-value'>"
+			html = html & armaCombo("select * from clientes",Cnn,rs(21),0,1,"id_cliente")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>CONTACTO</td><td class='fil' >"
+			'html = html & armaCombo("select id,nombre + ' ' + apellido from contactos WHERE id_cliente = " & rs(21) ,Cnn,rs(22),0,1,"contacto")
+			'html = html &"</td></tr>"
+			html = html & "<div class='dato-label'>CONTACTO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,nombre + ' ' + apellido from contactos WHERE id_cliente = " & rs(21) ,Cnn,rs(22),0,1,"contacto")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>APLICACION</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from aplicativos",Cnn,rs(23),0,1,"id_aplic")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>APLICACION</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from aplicativos",Cnn,rs(23),0,1,"id_aplic")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>RESPONSABLE GESTION</td><td class='fil'>"
+			'html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='FUNC'",Cnn,rs(24),0,1,"respon_gestion")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RESPONSABLE GESTION</div><div class='dato-value'>"
+			html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='FUNC'",Cnn,rs(24),0,1,"respon_gestion")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			'else
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil' style='" & st0 & "'>SOLICITUD NUMERO</td><td class='fil'>"
+			' html = html & rs(1)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil' style='" & st0 & "'>TITULO PROYECTO</td><td class='fil'>"
+			' html = html & rs(2)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>CLIENTE</td><td class='fil'>"
+			' html = html & rs(4)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>CONTACTO</td><td class='fil'>"
+			' html = html & rs(5)
+			' html = html &"</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>APLICACION</td><td class='fil'>"
+			' html = html & rs(6)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>RESPONSABLE GESTION</td><td class='fil'>"
+			' html = html & rs(7)
+			' html = html & "</td></tr>"
+
+			'end if
+
+			'if rs(25) = session("USUARIO") and session("FUNC") = "TEC" then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>RESPONSABLE TECNICO</td><td class='fil'>"
+			'html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='TEC'",Cnn,rs(25),0,1,"respon_tec")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RESPONSABLE TECNICO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,nombre + ' ' + apellido from cor_responsables where funcion='TEC'",Cnn,rs(25),0,1,"respon_tec")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			' else
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>RESPONSABLE TECNICO</td><td class='fil'>"
+			' html = html & rs(8)
+			' html = html & "</td></tr>"
+
+			' end if
+
+			'if rs(24) = session("USUARIO") and session("FUNC") = "FUNC" then
+
+			sFec = ""
+			If rs(9) <> 0 Then
+				sFec = Fechador(rs(9) + nFecini)
+			End If
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>FECHA INGRESO</td><td class='fil' style='" & st3 & "border-style:none;padding:10px;'>"
+			'html = html & sFec
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>FECHA INGRESO</div>"
+			html = html & "<div class='dato-value'>" & sFec & "</div>"
+
+			sFecEn = ""
+			If rs(10) <> 0 Then
+				sFecEn = Fechador(rs(10) + nFecini)
+			End If
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>FECHA ENTREGA</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='fecha_entrega' name='fecha_entrega' type='text' style='" & st3 & "' value='" & sFecEn & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>FECHA ENTREGA</div>"
+			html = html & "<div class='dato-value'><input class='input-moderno' id='fecha_entrega' name='fecha_entrega' type='text' value='" & sFecEn & "'></div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>PRIORIDAD</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from prioridades",Cnn,rs(28),0,1,"prioridad")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>PRIORIDAD</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from prioridades",Cnn,rs(28),0,1,"prioridad")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>RELEV Y DEFINICION (hs)</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='tiempo_relevamiento' name='tiempo_relevamiento' type='text' style='" & st3 & "' value='" & rs(14) & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>RELEV Y DEFINICION (hs)</div>"
+			html = html & "<div class='dato-value'><input class='input-moderno' id='tiempo_relevamiento' name='tiempo_relevamiento' type='text' value='" & rs(14) & "'></div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>DISENO (hs)</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='tiempo_diseno' name='tiempo_diseno' type='text' style='" & st3 & "' value='" & rs(15) & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>DISENO (hs)</div>"
+			html = html & "<div class='dato-value'><input class='input-moderno' id='tiempo_diseno' name='tiempo_diseno' type='text' value='" & rs(15) & "'></div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>DESARROLLO (hs)</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='tiempo_desarr' name='tiempo_desarr' type='text' style='" & st3 & "' value='" & rs(16) & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>DESARROLLO (hs)</div>"
+			html = html & "<div class='dato-value'><input class='input-moderno' id='tiempo_desarr' name='tiempo_desarr' type='text' value='" & rs(16) & "'></div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>TESTEO (hs)</td><td class='fil'>"
+			'html = html & "<input class='inpu' id='tiempo_test' name='tiempo_test' type='text' style='" & st3 & "' value='" & rs(17) & "'>"
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>TESTEO (hs)</div>"
+			html = html & "<div class='dato-value'><input class='input-moderno' id='tiempo_test' name='tiempo_test' type='text' value='" & rs(17) & "'></div>"
+
+			' else
+
+			' sFec = Fechador(rs(9) + nFecini)
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>FECHA INGRESO</td><td class='fil'>"
+			' html = html & sFec
+			' html = html & "</td></tr>"
+
+			' sFecEn = ""
+			' if rs(10) <> 0 then
+			' sFecEn = Fechador(rs(10) + nFecini)
+			' end if
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>FECHA ENTREGA</td><td class='fil'>"
+			' html = html & sFecEn
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>PRIORIDAD</td><td class='fil'>"
+			' html = html & rs(13)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>RELEV Y DEFINICION (hs)</td><td class='fil'>"
+			' html = html & rs(14)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>DISENO (hs)</td><td class='fil'>"
+			' html = html & rs(15)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>DESARROLLO (hs)</td><td class='fil'>"
+			' html = html & rs(16)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>TESTEO (hs)</td><td class='fil'>"
+			' html = html & rs(17)
+			' html = html & "</td></tr>"
+
+			' end if
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>TOTAL (hs)</td><td class='fil' style='" & st1 & "padding-left:12px;'>" & rs(32) & "</td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label'>TOTAL (hs)</div>"
+			html = html & "<div class='dato-value' style='font-weight: 600; padding-left: 0.5rem;'>" & rs(32) & "</div>"
+
+			'if rs(24) = session("USUARIO") and session("FUNC") = "FUNC" then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>BROWSER</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from browsers",Cnn,rs(29),0,1,"browser")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>BROWSER</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from browsers",Cnn,rs(29),0,1,"browser")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>VIA PEDIDO</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from via_pedido",Cnn,rs(30),0,1,"via_pedido")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>VIA PEDIDO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from via_pedido",Cnn,rs(30),0,1,"via_pedido")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>REQUIERE PRESUPUESTO</td><td class='fil' >"
+			'html = html & "<select class='selec' style='" & st3 & "' id='req_presup' name='req_presup'>"
+			html = html & "<div class='dato-label'>REQUIERE PRESUPUESTO</div>"
+			html = html & "<div class='dato-value'><select class='input-moderno' id='req_presup' name='req_presup'>"
+
+			If rs(20) = "SI" Then
+
+				html = html & "<option value='SI' selected>SI</option>"
+				html = html & "<option value='NO'>NO</option>"
+
+			Else
+
+				html = html & "<option value='SI'>SI</option>"
+				html = html & "<option value='NO' selected>NO</option>"
+
+			End If
+
+			'html = html & "</select></td></tr>"
+			html = html & "</select></div>"
+
+			' else
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>BROWSER</td><td class='fil'>"
+			' html = html & rs(18)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>VIA PEDIDO</td><td class='fil'>"
+			' html = html & rs(19)
+			' html = html & "</td></tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>REQUIERE PRESUPUESTO</td><td class='fil'>"
+			' html = html & rs(20) & "</td></tr>"
+
+			' end if
+
+			'if rs(25) = session("USUARIO") and session("FUNC") = "TEC" then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>ESTADO DESARROLLO</td><td class='fil'>"
+			'html = html & armaCombo("select id,descripcion from estados",Cnn,rs(27),0,1,"estado_desa")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-label'>ESTADO DESARROLLO</div><div class='dato-value'>"
+			html = html & armaCombo("select id,descripcion from estados",Cnn,rs(27),0,1,"estado_desa")
+			html = html & "</select>"
+			html = html & "</div>"
+
+			' else
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>ESTADO DESARROLLO</td><td class='fil'>"
+			' html = html & rs(11)
+			' html = html & "</td></tr>"
+
+			' end if
+
+			'if rs(24) = session("USUARIO") and session("FUNC") = "FUNC" then
+
+			If rs(11) & "" = "OK" Or rs(11) & "" = "BAJA" Then
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil'  style='" & st0 & "'>ESTADO FUNCIONAL</td><td class='fil'>"
+				'html = html & armaCombo("select id,descripcion from estados",Cnn,rs(26),0,1,"estado_func")
+				'html = html & "</td></tr>"
+				'html = html & "<tr>"
+				html = html & "<div class='dato-label'>ESTADO FUNCIONAL</div>"
+				html = html & "<div class='dato-value'>" & armaCombo("select id,descripcion from estados",Cnn,rs(26),0,1,"estado_func") & "</div>"
+
+			Else
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil' style='" & st0 & "'>ESTADO FUNCIONAL</td><td class='fil'>"
+				'html = html & rs(12)
+				'html = html & "</td></tr>"
+				'html = html & "<tr>"
+				html = html & "<div class='dato-label'>ESTADO FUNCIONAL</div>"
+				html = html & "<div class='dato-value' style='padding-left: 0.5rem;'>" & rs(12) & "</div>"
+
+			End If
+
+			If rs(11) & "" = "OK" And rs(12) & "" = "OK" Then
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil' style='" & st0 & "'>FECHA OK CLIENTE</td><td class='fil'>"
+				'html = html & "<input id='ok_cliente' name='ok_cliente' type='text' style='" & st3 & "' value='" & rs(33) & "'>"
+				'html = html & "</td></tr>"
+				html = html & "<div class='dato-label'>FECHA OK CLIENTE</div>"
+				html = html & "<div class='dato-value'><input class='input-moderno' id='ok_cliente' name='ok_cliente' type='text' value='" & rs(33) & "'></div>"
+
+			Else
+
+				'html = html & "<tr>"
+				'html = html & "<td class='fil' style='" & st0 & "'>FECHA OK CLIENTE</td><td class='fil'>"
+				'html = html & rs(33)
+				'html = html & "</td></tr>"
+				html = html & "<div class='dato-label'>FECHA OK CLIENTE</div>"
+				html = html & "<div class='dato-value' style='padding-left: 0.5rem;'>" & rs(33) & "</div>"
+
+			End If
+
+			' else
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>ESTADO FUNCIONAL</td><td class='fil'>"
+			' html = html & rs(12)
+			' html = html & "</td></tr>"
+			' html = html & "<tr>"
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>FECHA OK CLIENTE</td><td class='fil'>"
+			' html = html & rs(33)
+			' html = html & "</td></tr>"
+
+			' end if
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "'>LINK DOCUMENTO</td><td class='fil' >"
+			'test = "<a style='" & st3 & "' href='" & rs("ruta") & "'>Test</a>"
+			'html = html & "<input class='inpu' style='" & st3 & "' id='ruta' name='ruta' size=50 type='text' value='" & rs("ruta") & "'>" & test
+			'html = html & "</td>"
+			'html = html & "</tr>"
+			
+			' Al test le sacamos el style viejo y usamos col-link, le damos un margen para que no se pegue al input
+			test = "<a class='col-link' style='margin-left: 10px; font-weight: 600; text-decoration: none;' href='" & rs("ruta") & "'>Test</a>"
+			html = html & "<div class='dato-label'>LINK DOCUMENTO</div>"
+			' Usamos Flexbox para alinear el input y el link "Test" en la misma línea
+			html = html & "<div class='dato-value' style='display: flex; align-items: center;'><input class='input-moderno' id='ruta' name='ruta' type='text' value='" & rs("ruta") & "'>" & test & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td colspan=2>&nbsp;</td>"
+			'html = html & "</tr>"
+			
+			' Cerramos la grilla de datos acá porque "RELACIONAR APL" rompe las 2 columnas
+			html = html & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td id='sAgre' class='fil' colspan=2 align=center><font style='color:#FF0000;'>RELACIONAR APL</font></td>"
+			'html = html & "</tr>"
+			' Sacamos el <font> obsoleto y usamos estilos CSS modernos
+			html = html & "<div style='text-align:center;margin-top:1.5rem;'><span id='sAgre' style='text-decoration:underline;cursor:pointer;color:blue;'>RELACIONAR APL</span></div>"
+
+			'html = html & "</table>"
+			'html = html & "</div>"
+			
+			' Cerramos los contenedores de la tarjeta y la columna izquierda
+			html = html & "</div>" ' Cierra bloque-body
+			html = html & "</div>" ' Cierra bloque-datos
+			html = html & "</div>" ' Cierra columna izquierda (width: 50%)
+
+			' --- COLUMNA DERECHA ---
+
+			'html = html & "<div style='height:100%;width:50%;float:right'><br>"
+			html = html & "<div style='width: 50%; float: right; padding-left: 1.5rem;'>"
+
+			'html = html & "<table class='tablDet' style='width:80%;border-style:none;' cellspacing=0 align=left>"
+			' Envolvemos en nuestra tarjeta, pero le sacamos el borde y la sombra para que se vea más limpio como en tu captura
+			html = html & "<div class='bloque-datos'>"
+			html = html & "<div class='bloque-body'>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' ystyle='font-size:12pt;' style='" & st0 & "padding:5px;height:30px;' ><b><u>DETALLES</u></b></td>"
+			'html = html & "</tr>"
+			html = html & "<div class='bloque-header' style='margin-bottom: 0.5rem;'>DETALLES</div>"
+
+			'if rs(24) = session("USUARIO") and session("FUNC") = "FUNC" then
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' >"
+			'html = html & "<textarea class='txtar' id='descripcion' name='descripcion' type='text' style='height:200px;width:100%;font-family:arial;font-size:9pt;padding:5px;border-style:none;' >" & rs(3) & "</textarea>"
+			'html = html & "</td></tr>"
+			html = html & "<div style='margin-bottom: 2rem;'><textarea class='input-moderno' id='descripcion' name='descripcion' style='height: 200px; resize: vertical;' >" & rs(3) & "</textarea></div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:12pt;'><BR><u><b>PATH</b></u></td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label' style='font-size: 1.1rem; margin-bottom: 0.5rem;'>PATH</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'><BR>"
+			
+			' --- LOGICA VBSCRIPT INTACTA ---
+			XPATH="\\" & request.servervariables("SERVER_NAME") &  RIGHT(RUTA,LEN(RUTA)-2)
+			
+			'html = html & XPATH & "proyectos\" & Rs(0)
+			'html = html  & "<BR></td></tr>"
+			html = html & "<div class='dato-value' style='word-break: break-all; margin-bottom: 2rem;'>" & XPATH & "proyectos\" & Rs(0) & "</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='font-size:12pt;'><BR><u><b>ARCHIVOS</b></u></td>"
+			'html = html & "</tr>"
+			html = html & "<div class='dato-label' style='font-size: 1.1rem; margin-bottom: 0.5rem;'>ARCHIVOS</div>"
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>"
+			
+			' --- LOGICA VBSCRIPT INTACTA ---
+			RUTA=RUTA & "\proyectos\" & Rs(0)
+
+			'html = html & LISTARDIRTORIO(RUTA,Rs(0),"proyectos")
+			'html = html & "</td></tr>"
+			html = html & "<div class='dato-value lista-archivos-moderna'>" & LISTARDIRTORIO(RUTA,Rs(0),"proyectos") & "</div>"
+
+			' else
+
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>"
+			' html = html & rs(3)
+			' html = html & "</td></tr>"
+
+			' end if
+
+			'html = html & "</table><br><br><br><br><br><br><br>"
+			' Cerramos los contenedores en lugar de la tabla y sacamos los <br> innecesarios
+			'html = html & "</div>" ' Cierra bloque-body
+			'html = html & "</div>" ' Cierra bloque-datos
+			'html = html & "</div>" ' Cierra columna derecha (width: 50%)
+			
+
+			' --- ESPACIADOR FINAL ---
+
+			'html = html & "<table class='tablDet' style='margin-top:50px;width:80%;border-style:none;' cellspacing=0 align=left>"
+			'html = html & "<tr>"
+			'html = html & "<td class='fil' style='" & st0 & "border-style:none;height:30px;' ><b><u></u></b></td>"
+			'html = html & "</tr>"
+			
+			' Reemplazamos toda la tabla estructural por un simple div espaciador moderno
+			html = html & "<div style='margin-top: 3rem; width: 100%;'></div>"
+
+
+			'if (rs(24) = session("USUARIO") and session("FUNC") = "FUNC") or (rs(25) = session("USUARIO") and session("FUNC") = "TEC") then
+
+			' --- CAMPO AVANCES Y BOTÓN ACTUALIZAR ---
+
+			'html = html & "<tr>"
+			'html = html & "<td class='fil'>"
+			'html = html & "<textarea class='txtar' id='avances' name='avances' type='text' style='height:50px;width:100%;font-family:arial;font-size:9pt;border-style:none;padding:5px;'>" & rs(35) & "</textarea>"
+			'html = html & "</td>"
+			'html = html & "</tr>"
+			
+			html = html & "<div class='dato-label' style='font-size: 1.1rem; margin-bottom: 0.5rem;'>AVANCES</div>"
+			html = html & "<div style='margin-bottom: 2rem;'><textarea class='input-moderno' id='avances' name='avances' style='height: 80px; resize: vertical;'>" & rs(35) & "</textarea></div>"
+
+			' else
+			
+			' html = html & "<tr>"
+			' html = html & "<td class='fil'>" & rs(35) & "</td>"
+			' html = html & "</tr>"
+			
+			' end if
+
+			'html = html & "<tr>"
+			'html = html & "<td>&nbsp;</td>"
+			'html = html & "</tr>"
+
+			'html = html & "<tr>"
+			'html = html & "<td align=left>"
+			'html = html & "<input class='bot' type='button' value='ACTUALIZAR' onclick=""actualizar('sForm');"">"
+			'html = html & "</td></tr>"
+
+			' Contenedor del botón con el mismo estilo dinámico (hover/click) que el botón "Agregar"
+			html = html & "<div>"
+			html = html & "<input type='button' style='padding: 0.6rem 2.5rem; background-color: #3b82f6; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;' value='ACTUALIZAR' onclick=""actualizar('sForm');"" onmouseover=""this.style.backgroundColor='#2563eb'"" onmouseout=""this.style.backgroundColor='#3b82f6'"" onmousedown=""this.style.transform='scale(0.95)'"" onmouseup=""this.style.transform='scale(1)'"">"
+			html = html & "</div>"
+
+		End If
+
+		'html = html & "</table>"
+		' ==========================================
+		' AHORA SÍ: CERRAMOS LA COLUMNA DERECHA 
+		' ==========================================
+		html = html & "</div>" ' Cierra bloque-body
+		html = html & "</div>" ' Cierra bloque-datos
+		html = html & "</div>" ' Cierra columna derecha (width: 50%)
+		
+		' Y finalmente limpiamos los floats para que el contenedor general no colapse
+		html = html & "<div style='clear: both;'></div>"
+		
+		' Cerramos el contenedor global .inner
+		html = html & "</div>"
+
+		html = html & "</form>"
+
+		'rs.close
+
+	End If
+
+	html = html & "</div>"
+
+	html = html & "<script type='text/javascript'>"
+	html = html & " function actualizar(formu){ "
+	html = html & " var r = confirm('Desea actualizar ?'); "
+	html = html & " if (r){ "
+	html = html & " document.getElementById(formu).submit(); "
+	html = html & " }else{ "
+	html = html & " return false;"
+	html = html & " }} "
+	html = html & "</script>"
+
+Else
+
+	If opc = "veri" Then
+
+		vuel = request.querystring("vuel")
+
+		html = html & "<div>"
+
+		html = html & "<header id='header' style='height:16%'>"
+
+		html = html & "<div>"
+
+		html = html & "<a href='index.asp' class='logo'>"
+
+		html = html & "<img src='images/logocorP4.gif' width=10% >"
+		html = html & "<font style='font-size:40pt;align:center;valign:center;font-family:Serif;color:#000000;'>Cor Consulting</font>"
+
+		html = html & "</a>"
+
+		html = html & "</div>"
+
+		html = html & "</header>"
+
+		html = html & "</div>"
+
+		html = html & "<div><br><br>"
+
+		html = html & "<table style='height:50%;width:90%;' align=center>"
+
+		html = html & "<tr>"
+
+		html = html & "<td style='height:100%;width:100%;' ><font style='color:#000000;font-size:30pt;'>INCIDENTE NO ENCONTRADO</font></td>"
+
+		html = html & "</tr>"
+
+		html = html & "<tr>"
+
+		html = html & "<td style='height:100%;width:100%;' >"
+		html = html & "<form id='xfrm' method='post' action='consultas.asp?sel=" & vuel & "' >"
+		html = html & "<input style='border-radius:10px;border:solid 2px;border-color:blue;height:100%;width:50%;' value='VOLVER' type='button' onclick=""document.getElementById('xfrm').submit();"">"
+		html = html & "</form>"
+		html = html & "</td>"
+
+		html = html & "</tr>"
+
+		html = html & "</table>"
+
+		html = html & "</div>"
+
+	ElseIf opc = "verp" Then
+
+		vuel = request.querystring("vuel")
+
+		html = html & "<div>"
+
+		html = html & "<header id='header' style='height:16%'>"
+
+		html = html & "<div>"
+
+		html = html & "<a href='index.asp' class='logo'>"
+
+		html = html & "<img src='images/logocorP4.gif' width=10% >"
+		html = html & "<font style='font-size:40pt;align:center;valign:center;font-family:Serif;color:#000000;'>Cor Consulting</font>"
+
+		html = html & "</a>"
+
+		html = html & "</div>"
+
+		html = html & "</header>"
+
+		html = html & "</div>"
+
+		html = html & "<div><br><br>"
+
+		html = html & "<table style='height:50%;width:90%;' align=center>"
+
+		html = html & "<tr>"
+
+		html = html & "<td style='height:100%;width:100%;' ><font style='color:#000000;font-size:30pt;'>PROYECTO NO ENCONTRADO</font></td>"
+
+		html = html & "</tr>"
+
+		html = html & "<tr>"
+
+		html = html & "<td style='height:100%;width:100%;' >"
+		html = html & "<form id='xfrm' method='post' action='consultas.asp?sel=" & vuel & "' >"
+		html = html & "<input style='border-radius:10px;border:solid 2px;border-color:blue;height:100%;width:50%;' value='VOLVER' type='button' onclick=""document.getElementById('xfrm').submit();"">"
+		html = html & "</form>"
+		html = html & "</td>"
+
+		html = html & "</tr>"
+
+		html = html & "</table>"
+
+		html = html & "</div>"
+
+	End If
+
+
+End If
+
+html = html & "<div id='dialog' title='' >"
+html = html & "</div>"
+
+html = html & "<script>"
+html = html & "  $( function() {"
+
+html = html & "$.datepicker.regional['es'] = {"
+html = html & "closeText: 'Cerrar',"
+html = html & "prevText: '< Ant',"
+html = html & "nextText: 'Sig >',"
+html = html & "currentText: 'Hoy',"
+html = html & "monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],"
+html = html & "monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],"
+html = html & "dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],"
+html = html & "dayNamesShort: ['Dom','Lun','Mar','Miï¿½','Juv','Vie','Sï¿½b'],"
+html = html & "dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sa'],"
+html = html & "weekHeader: 'Sm',"
+html = html & "dateFormat: 'dd/mm/yy',"
+html = html & "firstDay: 1,"
+html = html & "isRTL: false,"
+html = html & "showMonthAfterYear: false,"
+html = html & "yearSuffix: ''"
+html = html & "};"
+html = html & "$.datepicker.setDefaults($.datepicker.regional['es']);"
+
+html = html & "    $( ""#fecha_ingreso"" ).datepicker();"
+html = html & "    $( ""#fecha_entrega"" ).datepicker();"
+html = html & "    $( ""#ok_cliente"" ).datepicker();"
+html = html & "  } );"
+html = html & "  </script>"
+
+html = html & "<script>"
+
+html = html & "$( '#tabs' ).tabs();"
+
+html = html & "$( '#dialog' ).dialog({"
+html = html & "title: 'Agregar relacion',"
+html = html & "autoOpen: false,"
+html = html & "resizable: false,"
+html = html & "buttons: {"
+html = html & "'Aceptar': function () {"
+html = html & "$.get('agreParam.asp?param=APL&dato1=' + $('#valor1').val() + '&dato2=' + $('#nid').text() + '&dato3=' + '" & opc & "', function( data ) {"
+html = html & "});"
+html = html & "alert('Agregado exitosamente');"
+html = html & "$(this).dialog('close');"
+html = html & "},"
+html = html & "'Cerrar': function () {"
+html = html & "$(this).dialog('close');"
+html = html & "}"
+html = html & "},"
+html = html & "show: {"
+html = html & "effect: 'blind',"
+html = html & "duration: 100"
+html = html & "      },"
+html = html & "hide: {"
+html = html & "effect: 'blind',"
+html = html & "duration: 100"
+html = html & "}"
+html = html & "});"
+
+html = html & "$( '#sAgre' ).click(function() {"
+html = html & "$.get('armaCargaParam.asp?param=APL', function( data ) {"
+html = html & "$( '#dialog' ).html(data);"
+html = html & "});"
+html = html & "$( '#dialog' ).dialog( 'open' );"
+html = html & "});"
+
+html = html & "</script>"
+
+html = html & sformz & form7 & xform7 & form5 & xform7 & form8 & formz1 & "</body>"
+html = html & "</html>"
+
+Function armaCombo(sql,cn,clave,valor,texto,comboid)
+
+	Set nrs = cn.Execute(sql)
+
+	'html = html & "<select class='selec' style='font-size:9pt;width:90%;color:#000000;border:solid 1px #000000;' id='" & comboid & "' name='" & comboid & "'>"
+
+	html = html & "<select class='selec' style='" & st3 & "' id='" & comboid & "' name='" & comboid & "'>"
+
+	If comboid <> "estado_desa" And comboid <> "estado_func" Then
+		html = html & "<option value='0'>S/D</option>"
+	End If
+	Do While Not nrs.eof
+
+		If cstr(clave) = cstr(nrs(valor)) Then
+
+			html = html & "<option value='" & nrs(valor) & "' selected>" & nrs(texto) & "</option>"
+
+		Else
+
+			html = html & "<option value='" & nrs(valor) & "'>" & nrs(texto) & "</option>"
+
+		End If
+
+		nrs.movenext
+	Loop
+
+	armarCombo = html & "</select>"
+
+End Function
+
+Function puedeAct(cn,id)
+
+	oSql = "select respon_gestion,respon_tec from incidentes where id=" & id
+	'response.write osql & " " &  session("USUARIO")
+	Set fcs = cn.Execute(oSql)
+
+	sPuede = "NO"
+
+	If fcs(0) = session("USUARIO") Or fcs(1) = session("USUARIO") Then sPuede = "SI"
+
+	puedeAct = sPuede
+
+End Function
+Function LISTARDIRTORIO(DIR,id,d)
+	Set FSO = server.createObject("Scripting.FileSystemObject")
+	'RESPONSE.WRITE DIR
+	If Not fso.FolderExists(DIR ) Then
+		fso.CreateFolder (DIR)
+	End If
+
+	Set carpeta= FSO.GetFolder(DIR)
+
+
+
+
+	Set archivos = carpeta.Files
+
+	For Each nombre_archivo In archivos
+		surl="<a target=_new href='" &  shttp & d& "/" & id & "/"  & nombre_archivo.name & "'>" & nombre_archivo.name & "</a><br>"
+		LISTARDIRTORIO=LISTARDIRTORIO & surl
+	Next
+End Function
+
+response.write html
+
+%>

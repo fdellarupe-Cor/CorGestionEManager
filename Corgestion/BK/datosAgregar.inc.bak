@@ -1,0 +1,158 @@
+<%
+'==============================================================================
+' IncFile/datosAgregar.inc
+' Capa de ACCESO A DATOS especifica de agregar2.asp.
+'
+' Parte A: los 3 altas (Incidente/Proyecto/Licencia), antes armadas con SQL
+'          concatenado desde request.form (vulnerable a inyeccion SQL), ahora
+'          via los SP nuevos (ver sp_agregar2.sql) con parametros tipados.
+' Parte B: los combos de catalogo (clientes, aplicativos, prioridades,
+'          responsables, via_pedido, browsers, contactos). Se dejo el mismo
+'          SELECT que tenia el original (no se inventaron columnas), solo se
+'          saco de la vista. No requieren SP porque no reciben datos del
+'          usuario (no hay riesgo de inyeccion), pero si preferis unificarlos
+'          con sp_Obtener_Catalogo (el de detalles.asp), avisame la forma
+'          real de esa SP para no romper columnas (aca hay combos que leen 3
+'          columnas -id, nombre, apellido- no solo 2).
+'==============================================================================
+
+Function EjecutarSP_ADO(cn, spName, paramDefs)
+	' Helper interno generico: paramDefs es un array de arrays
+	' {nombre, tipoADO, tamano, valor}. Devuelve el Command ya armado
+	' (sin ejecutar) para reusar tanto en SELECT como en INSERT/UPDATE.
+	Dim cmd, i
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 4 ' adCmdStoredProc
+	cmd.CommandText = spName
+
+	For i = 0 To UBound(paramDefs)
+		cmd.Parameters.Append cmd.CreateParameter(paramDefs(i)(0), paramDefs(i)(1), 1, paramDefs(i)(2), paramDefs(i)(3))
+	Next
+
+	Set EjecutarSP_ADO = cmd
+End Function
+
+Sub EjecutarSP_NonQuery(cn, spName, paramDefs)
+	Dim cmd
+	Set cmd = EjecutarSP_ADO(cn, spName, paramDefs)
+	cmd.Execute
+End Sub
+
+'------------------------------------------------------------------------
+' Parte A - Altas (INSERT via SP)
+' Tipos ADO usados: 3 = adInteger, 5 = adDouble, 200 = adVarChar
+'------------------------------------------------------------------------
+
+Sub InsertarIncidente(cn, idCliente, contacto, idAplic, detalles, prioridad, _
+						responGestion, responTec, reqPresup, fechaIngreso, browser, viaPedido, titulo)
+
+	Dim p(11)
+	p(0)  = Array("@id_cliente", 3, 4, CLng(idCliente))
+	p(1)  = Array("@contacto", 3, 4, CLng(contacto))
+	p(2)  = Array("@id_aplic", 3, 4, CLng(idAplic))
+	p(3)  = Array("@detalles", 200, 4000, CStr(detalles))
+	p(4)  = Array("@prioridad", 3, 4, CLng(prioridad))
+	p(5)  = Array("@respon_gestion", 3, 4, CLng(responGestion))
+	p(6)  = Array("@respon_tec", 3, 4, CLng(responTec))
+	p(7)  = Array("@req_presup", 200, 10, CStr(reqPresup))
+	p(8)  = Array("@fecha_ingreso", 3, 4, CLng(fechaIngreso))
+	p(9)  = Array("@browser", 3, 4, CLng(browser))
+	p(10) = Array("@via_pedido", 3, 4, CLng(viaPedido))
+	p(11) = Array("@titulo", 200, 200, CStr(titulo))
+
+	EjecutarSP_NonQuery cn, "dbo.sp_Incidentes_Insertar", p
+
+End Sub
+
+Sub InsertarProyecto(cn, solicNro, tituloP, descripcion, contacto, idCliente, idAplic, _
+						responGestion, responTec, fechaIngreso, fechaEntrega, prioridad, _
+						tRelev, tDiseno, tDesarr, tTest, browser, viaPedido, reqPresup)
+
+	Dim p(17)
+	p(0)  = Array("@solic_nro", 200, 50, CStr(solicNro))
+	p(1)  = Array("@titulo", 200, 200, CStr(tituloP))
+	p(2)  = Array("@descripcion", 200, 4000, CStr(descripcion))
+	p(3)  = Array("@contacto", 3, 4, CLng(contacto))
+	p(4)  = Array("@id_cliente", 3, 4, CLng(idCliente))
+	p(5)  = Array("@id_aplic", 3, 4, CLng(idAplic))
+	p(6)  = Array("@respon_gestion", 3, 4, CLng(responGestion))
+	p(7)  = Array("@respon_tec", 3, 4, CLng(responTec))
+	p(8)  = Array("@fecha_ingreso", 3, 4, CLng(fechaIngreso))
+	p(9)  = Array("@fecha_entrega", 3, 4, CLng(fechaEntrega))
+	p(10) = Array("@prioridad", 3, 4, CLng(prioridad))
+	p(11) = Array("@tiempo_relevamiento", 5, 8, CDbl(tRelev))
+	p(12) = Array("@tiempo_diseno", 5, 8, CDbl(tDiseno))
+	p(13) = Array("@tiempo_desarr", 5, 8, CDbl(tDesarr))
+	p(14) = Array("@tiempo_test", 5, 8, CDbl(tTest))
+	p(15) = Array("@browser", 3, 4, CLng(browser))
+	p(16) = Array("@via_pedido", 3, 4, CLng(viaPedido))
+	p(17) = Array("@req_presup", 200, 10, CStr(reqPresup))
+
+	EjecutarSP_NonQuery cn, "dbo.sp_Proyectos_Insertar", p
+
+End Sub
+
+Sub InsertarLicencia(cn, idRespon, fInicio, fFin, motivo)
+
+	Dim p(3)
+	p(0) = Array("@id_respon", 200, 50, CStr(idRespon))
+	p(1) = Array("@f_inicio", 3, 4, CLng(fInicio))
+	p(2) = Array("@f_fin", 3, 4, CLng(fFin))
+	p(3) = Array("@motivo", 200, 4000, CStr(motivo))
+
+	EjecutarSP_NonQuery cn, "dbo.sp_Licencias_Insertar", p
+
+End Sub
+
+'------------------------------------------------------------------------
+' Parte B - Combos de catalogo (mismo SELECT que el original, solo se
+' saco de la vista). Cada uno respeta la cantidad de columnas que ya
+' consumia agregar2.asp (algunos leen 2 columnas, otros 3).
+'------------------------------------------------------------------------
+
+Function ObtenerClientes(cn)
+	Set ObtenerClientes = cn.Execute("select * from clientes")
+End Function
+
+Function ObtenerAplicativos(cn)
+	Set ObtenerAplicativos = cn.Execute("select * from aplicativos")
+End Function
+
+Function ObtenerPrioridades(cn)
+	Set ObtenerPrioridades = cn.Execute("select * from prioridades")
+End Function
+
+' funcion: "FUNC" o "TEC" (mismo filtro que usaba el original)
+Function ObtenerResponsables(cn, funcion)
+	Dim cmd
+	Set cmd = Server.CreateObject("ADODB.Command")
+	cmd.ActiveConnection = cn
+	cmd.CommandType = 1 ' adCmdText
+	cmd.CommandText = "select * from cor_responsables where funcion = ?"
+	cmd.Parameters.Append cmd.CreateParameter("@funcion", 200, 1, 10, funcion)
+	Set ObtenerResponsables = cmd.Execute()
+End Function
+
+Function ObtenerViaPedido(cn)
+	Set ObtenerViaPedido = cn.Execute("select * from VIA_PEDIDO")
+End Function
+
+Function ObtenerBrowsers(cn)
+	Set ObtenerBrowsers = cn.Execute("select * from BROWSERS")
+End Function
+
+' Variante usada en el form de INCIDENTE (con join a clientes, aunque el
+' join no se usa para el order by; se preserva tal cual estaba)
+Function ObtenerContactosParaIncidente(cn)
+	Set ObtenerContactosParaIncidente = cn.Execute( _
+		"select a.id,a.nombre + ' ' + a.apellido from contactos a " & _
+		"inner join clientes b on (a.id_cliente = b.id) order by tipo,nombre,apellido")
+End Function
+
+' Variante usada en el form de PROYECTO (sin join)
+Function ObtenerContactosParaProyecto(cn)
+	Set ObtenerContactosParaProyecto = cn.Execute( _
+		"SELECT id, nombre + ' ' + apellido FROM contactos order by tipo,nombre,apellido")
+End Function
+%>

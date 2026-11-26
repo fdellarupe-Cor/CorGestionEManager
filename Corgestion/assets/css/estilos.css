@@ -1,0 +1,17 @@
+body{
+	no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	background-image: url(../images/imagenes_portadas/fondo.jpg);
+	background-attachment: fixed;
+	background-repeat: no-repeat;
+	background-position: center center;
+	padding: 1px;
+	height: 98%;
+	width: 98%;
+	position: absolute;
+	overflow: hidden;
+	margin:0;
+}

@@ -1,0 +1,345 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<!-- #INCLUDE FILE="IncFile/ui_componentes.inc" -->
+<%
+' [CG] Control de usuario E-Manager (igual que CorEManager/Acciones.asp)
+cgOk = ofv.CheckUsuario()
+If cgOk <> "Y" Then
+	cgUv = ofv.uv
+	If cgUv = "NO" Then cgOk = ofv.ValidarUsuario
+	Response.Write cgOk
+	Response.End
+End If
+
+'[UI-ANT] html = "<html>"
+'[UI-ANT] html = html & "<head>"
+
+'[UI-ANT] html = html & "<title>Cor Gestion</title>"
+'[UI-ANT] html = html & "<meta charset='utf-8' />"
+'[UI-ANT] html = html & "<meta name='viewport' content='width=device-width, initial-scale=1' />"
+'[UI-ANT] html = html & "<link rel='stylesheet' href='assets/css/main.css' />"
+
+'[UI-ANT] html = html & "</head>"
+'[UI-ANT] html = html & "<body>"
+' [UI] Encabezado comun del sistema: el propio no cargaba el CSS ni las tipografias, y declaraba
+' [UI] UTF-8 aunque la pagina sale en ANSI (las tildes de la base se podian ver rotas).
+html = headhtml()
+html = html & "<body>"
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+sel = request.querystring("sel")
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+XXX = SYSLOGON(cnn,"CONSULTA_INCxPROY")
+
+nFecini = 0
+
+If nFecini < CLng(CDate("01-01-1900")) Then
+	nFecini = CLng(CDate("01-01-1900"))
+Else
+	nFecini = 0
+End If
+
+'[UI-ANT] ' ===== Vista anterior completa: reemplazada por el bloque [UI] que sigue. Se borra entera buscando [UI-ANT] =====
+'[UI-ANT] html = html & "<div>"
+
+'[UI-ANT] html = html & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+'[UI-ANT] html = html & "<div >"
+
+'[UI-ANT] html = html & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+'[UI-ANT] html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+'[UI-ANT] html = html & "<img src='images/iso_cor.png' style='width:6rem;' >"
+'[UI-ANT] html = html & "<font style='font-size:15pt;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+'[UI-ANT] html = html & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+'[UI-ANT] html = html & "<nav>"
+'[UI-ANT] html = html & "<ul>"
+'[UI-ANT] 'html = html & "<li><a href='#menu'></a></li>"
+'[UI-ANT] html = html & "</ul>"
+'[UI-ANT] html = html & "</nav>"
+'[UI-ANT] html = html & "</td>"
+
+'[UI-ANT] html = html & "</tr></table>"
+
+'[UI-ANT] html = html & "</div>"
+
+'[UI-ANT] html = html & "</header>"
+
+'[UI-ANT] html = html & "<table class='titulo-seccion' >"
+'[UI-ANT] html = html & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+'[UI-ANT] html = html & "<td><h2>INCIDENTES RELACIONADOS X PROYECTO</h2></td>"
+
+'[UI-ANT] formx2 = "<form id='formx2' style='height:70%;' method='post' action='consultas.asp?sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+'[UI-ANT] botonx2 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('formx2').submit();"">"
+'[UI-ANT] html = html & "<td style='width:10%;' align=center>" & botonx2 & "</td>"
+
+'[UI-ANT] html = html & "</tr>"
+
+'[UI-ANT] html = html & "</table>"
+
+'[UI-ANT] html = html & "</div>"
+
+'[UI-ANT] ' --- INICIO NORMALIZACION: LISTADO DE PROYECTOS E INCIDENTES RELACIONADOS ---
+
+'[UI-ANT] 'html = html & "<div style='height:75%;width:100%;'>"
+'[UI-ANT] html = html & "<div class='inner' style='padding: 2rem;'>"
+'[UI-ANT] ' Centramos la vista y limitamos el ancho para que la lista sea facil de leer
+'[UI-ANT] html = html & "<div class='bloque-datos table-responsive' style='max-width: 800px; margin: 0 auto;'>"
+
+'[UI-ANT] sql = "sp_cg_ProyectosRelacionados @Modo='listar'"
+
+'[UI-ANT] cliente = request.form("cli")
+'[UI-ANT] if cliente & "" = "" then cliente = request.querystring("cli")
+'[UI-ANT] estado = request.form("est")
+'[UI-ANT] if estado & "" = "" then estado = request.querystring("est")
+'[UI-ANT] aplic = request.form("apli")
+'[UI-ANT] if aplic & "" = "" then aplic = request.querystring("apli")
+'[UI-ANT] fecha = request.form("fec")
+'[UI-ANT] if fecha & "" = "" then fecha = request.querystring("fec")
+
+'[UI-ANT] 'where cliente
+'[UI-ANT] if cliente <> 0 then
+	'[UI-ANT] sql = sql & ", @Cli=" & cliente
+'[UI-ANT] else
+	'[UI-ANT] sql = sql & ", @Cli=0"
+'[UI-ANT] end if
+
+'[UI-ANT] 'where estado
+'[UI-ANT] if estado <> 0 then
+	'[UI-ANT] sql = sql & ", @Estado=" & estado
+'[UI-ANT] else
+	'[UI-ANT] sql = sql & ", @Estado=0"
+'[UI-ANT] end if
+
+'[UI-ANT] 'where aplicativo
+'[UI-ANT] if aplic <> 0 then
+	'[UI-ANT] sql = sql & ", @Aplic=" & aplic
+'[UI-ANT] else
+	'[UI-ANT] sql = sql & ", @Aplic=0"
+'[UI-ANT] end if
+
+'[UI-ANT] 'where fecha
+'[UI-ANT] if fecha & "" <> "" then
+	'[UI-ANT] fecha = clng(cdate(fecha)) - nFecini
+	'[UI-ANT] sql = sql & ", @Fec=" & fecha
+'[UI-ANT] end if
+
+'[UI-ANT] Set rs = Exec(Cnn, sql)
+
+'[UI-ANT] 'html = html & "<table style='width:50%;' align=center>"
+'[UI-ANT] html = html & "<table class='tabla-moderna' style='width: 100%; border-collapse: collapse;'>"
+
+'[UI-ANT] html = html & "<tbody>"
+
+'[UI-ANT] if not rs.eof then
+
+	'[UI-ANT] do while not rs.eof
+
+		'[UI-ANT] 'TITULO DEL PROYECTO CON INCIDENTES RELACIONADOS
+		'[UI-ANT] 'html = html & "<tr>"
+		'[UI-ANT] html = html & "<tr>"
+		
+		'[UI-ANT] 'html = html & "<td class='fil' style='font-size:12pt;' colspan=2><b>-PROYECTO: " & rs(1) & " - " & rs(2) & "</b></td>"
+		'[UI-ANT] ' Le damos un fondo sutil a la fila del proyecto para que actue como un separador/encabezado claro
+		'[UI-ANT] html = html & "<th colspan='2' class='bloque-header'>&#128194; PROYECTO: " & rs(1) & " - " & rs(2) & "</th>"
+		
+		'[UI-ANT] 'html = html & "</tr>"
+		'[UI-ANT] html = html & "</tr>"
+
+		'[UI-ANT] sql = "sp_cg_ProyectosRelacionados @Modo='incidentes', @Id=" & rs(0)
+		'[UI-ANT] Set rx = Exec(Cnn, sql)
+
+		'[UI-ANT] cont = 1
+
+		'[UI-ANT] do while not rx.eof
+
+			'[UI-ANT] 'html = html & "<tr>"
+			'[UI-ANT] html = html & "<tr>"
+			
+			'[UI-ANT] 'html = html & "<td style='width:5%;'></td>"
+			'[UI-ANT] ' Cambiamos la celda vacia por un indicador visual de sub-item
+			'[UI-ANT] html = html & "<td style='width: 40px; text-align: right; padding-right: 1rem; color: #94a3b8; font-size: 1.2rem;'>&#8627;</td>"
+			
+			'[UI-ANT] 'html = html & "<td class='regis' style='width:45%;'><a class='red' href='detalles.asp?id=" & rx(0) & "&opc=veri&sel=" & sel & "&tipo=incxp&" & REQUEST.FORM & "'>>INCIDENTE: " & rx(0) & " - " & rx(1) & "</a></td>"
+			'[UI-ANT] ' Aplicamos el color azul estandar para enlaces como acordamos
+			'[UI-ANT] html = html & "<td style='padding: 0.75rem 0;'><a class='col-link' href='detalles.asp?id=" & rx(0) & "&opc=veri&sel=" & sel & "&tipo=incxp&" & REQUEST.FORM & "'>INCIDENTE: " & rx(0) & " - " & rx(1) & "</a></td>"
+			
+			'[UI-ANT] 'html = html & "</tr>"
+			'[UI-ANT] html = html & "</tr>"
+
+			'[UI-ANT] cont = cont + 1
+
+		'[UI-ANT] rx.movenext
+		'[UI-ANT] loop
+
+	'[UI-ANT] rs.movenext
+	'[UI-ANT] loop
+
+'[UI-ANT] else
+
+	'[UI-ANT] 'html = html & "<tr>"
+	'[UI-ANT] html = html & "<tr>"
+	
+	'[UI-ANT] 'html = html & "<td style='border:solid 2px #FF0000;'><b>NO SE ENCONTRARON PROYECTOS CON INCIDENTES RELACIONADOS PARA ESTA BUSQUEDA</b></td>"
+	'[UI-ANT] html = html & "<td colspan='2' style='text-align: center; padding: 3rem; color: #64748b; font-style: italic; background-color: #f8fafc; border-radius: 8px;'>No se encontraron proyectos con incidentes relacionados para esta busqueda.</td>"
+	
+	'[UI-ANT] 'html = html & "</tr>"
+	'[UI-ANT] html = html & "</tr>"
+
+'[UI-ANT] end if
+
+'[UI-ANT] html = html & "</tbody>"
+
+'[UI-ANT] 'html = html & "</table>"
+'[UI-ANT] html = html & "</table>"
+
+'[UI-ANT] 'html = html & "</div>"
+'[UI-ANT] html = html & "</div>" ' Cierre de .bloque-datos
+'[UI-ANT] html = html & "</div>" ' Cierre de .inner
+
+'[UI-ANT] html = html & "<script src='assets/js/jquery.min.js'></script>"
+'[UI-ANT] html = html & "<script src='assets/js/skel.min.js'></script>"
+'[UI-ANT] html = html & "<script src='assets/js/util.js'></script>"
+'[UI-ANT] html = html & "<script src='assets/js/main.js'></script>"
+
+'[UI-ANT] html = html & formx2 & "</body>"
+'[UI-ANT] html = html & "</html>"
+
+' =========================================================================
+' [UI] VISTA con el sistema visual (IncFile/ui_componentes.inc)
+' El bloque anterior completo queda arriba, comentado con '[UI-ANT].
+' =========================================================================
+Dim accTop, cantProyRel, itemsInc, cantInc
+
+' DEPURADO [UI]: la cabecera propia de esta pantalla (logo e imagen armados a mano) se reemplaza
+' por cabecera(), la misma de todo el sistema
+html = html & "<div id='wrapper' role='banner'>" & cabecera() & "</div>"
+
+formx2 = "<form id='formx2' class='form-oculto' method='post' action='consultas.asp?sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+accTop = UiBoton("Volver", "secondary", "document.getElementById('formx2').submit();", True, "")
+html = html & UiPantallaAbre("Proyectos con incidentes relacionados", accTop, "")
+
+' --- Consulta (mismos filtros de antes) ---
+sql = "sp_cg_ProyectosRelacionados @Modo='listar'"
+
+cliente = request.form("cli")
+if cliente & "" = "" then cliente = request.querystring("cli")
+estado = request.form("est")
+if estado & "" = "" then estado = request.querystring("est")
+aplic = request.form("apli")
+if aplic & "" = "" then aplic = request.querystring("apli")
+fecha = request.form("fec")
+if fecha & "" = "" then fecha = request.querystring("fec")
+
+' [UI] Filtros validados como numero antes de ir a la consulta: antes se pegaban tal cual
+' (permitia inyeccion SQL) y una fecha mal escrita rompia la pagina.
+If IsNumeric(cliente & "") Then cliente = CLng(cliente) Else cliente = 0
+If IsNumeric(estado & "") Then estado = CLng(estado) Else estado = 0
+If IsNumeric(aplic & "") Then aplic = CLng(aplic) Else aplic = 0
+sql = sql & ", @Cli=" & cliente & ", @Estado=" & estado & ", @Aplic=" & aplic
+If IsDate(fecha & "") Then
+	fecha = clng(cdate(fecha)) - nFecini
+	sql = sql & ", @Fec=" & fecha
+End If
+
+Set rs = Exec(Cnn, sql)
+
+' [CONSULTA] Paginado de a 10 proyectos (igual que las demas consultas). Los filtros se reenvian con un formulario oculto.
+Dim fechaTxtR, cantRegMoverR, cantRegMostrarR, idxPagR, hastaR, botonAntR, botonSigR, urlConsR
+fechaTxtR = request.form("fec")
+If fechaTxtR & "" = "" Then fechaTxtR = request.querystring("fec")
+cantRegMostrarR = 10
+cantRegMoverR = request.querystring("cantregmover")
+If Not IsNumeric(cantRegMoverR & "") Or Trim(cantRegMoverR & "") = "" Then cantRegMoverR = 0
+cantRegMoverR = CLng(cantRegMoverR)
+If cantRegMoverR < 0 Then cantRegMoverR = 0
+idxPagR = 0
+urlConsR = "proyRelac.asp?sel=" & sel & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu
+formx2 = formx2 & "<form id='formFiltros' class='form-oculto' method='post' action='" & urlConsR & "'>" & _
+	"<input type='hidden' name='cli' value='" & Server.HTMLEncode(cliente & "") & "'>" & _
+	"<input type='hidden' name='est' value='" & Server.HTMLEncode(estado & "") & "'>" & _
+	"<input type='hidden' name='apli' value='" & Server.HTMLEncode(aplic & "") & "'>" & _
+	"<input type='hidden' name='fec' value='" & Server.HTMLEncode(fechaTxtR & "") & "'></form>"
+
+html = html & UiCardAbre("Resultados", "")
+cantProyRel = 0
+
+If Not rs.eof Then
+	html = html & "<ul class='ui-relac'>"
+	Do While Not rs.eof
+	  If cantProyRel >= cantRegMoverR And idxPagR < cantRegMostrarR Then
+
+		' Incidentes relacionados de cada proyecto (la misma consulta de antes)
+		sql = "sp_cg_ProyectosRelacionados @Modo='incidentes', @Id=" & rs(0)
+		Set rx = Exec(Cnn, sql)
+		itemsInc = ""
+		cantInc = 0
+		Do While Not rx.eof
+			itemsInc = itemsInc & "<li class='ui-relac__inc'><a class='ui-relac__link' href='detalles.asp?id=" & rx(0) & "&opc=veri&sel=" & sel & "&tipo=incxp&" & REQUEST.FORM & "'>" & _
+				"<span class='ui-tag-id'>INC-" & rx(0) & "</span> " & UiTexto(rx(1)) & "</a></li>"
+			cantInc = cantInc + 1
+			rx.movenext
+		Loop
+
+		html = html & "<li class='ui-relac__proy'>"
+		html = html & "<div class='ui-relac__head'><span class='ui-tag-id ui-tag-id--pry'>PRY-" & rs(0) & "</span>" & _
+			"<span class='ui-relac__titulo'>" & UiTexto(rs(1)) & " &middot; " & UiTexto(rs(2)) & "</span>"
+		If cantInc = 1 Then
+			html = html & "<span class='ui-relac__cant'>1 incidente</span>"
+		Else
+			html = html & "<span class='ui-relac__cant'>" & cantInc & " incidentes</span>"
+		End If
+		html = html & "</div>"
+		If cantInc > 0 Then html = html & "<ul class='ui-relac__lista'>" & itemsInc & "</ul>"
+		html = html & "</li>"
+		idxPagR = idxPagR + 1
+	  End If
+
+		cantProyRel = cantProyRel + 1
+		rs.movenext
+	Loop
+	html = html & "</ul>"
+
+	hastaR = cantRegMoverR + idxPagR
+	If cantRegMoverR > 0 Then
+		botonAntR = UiBoton("Anterior", "secondary", "irConsulta('" & urlConsR & "&cantregmover=" & (cantRegMoverR - cantRegMostrarR) & "');", True, "")
+	Else
+		botonAntR = UiBoton("Anterior", "secondary", "", False, "Primera p&aacute;gina")
+	End If
+	If hastaR < cantProyRel Then
+		botonSigR = UiBoton("Siguiente", "secondary", "irConsulta('" & urlConsR & "&cantregmover=" & (cantRegMoverR + cantRegMostrarR) & "');", True, "")
+	Else
+		botonSigR = UiBoton("Siguiente", "secondary", "", False, "&Uacute;ltima p&aacute;gina")
+	End If
+	html = html & UiPaginacionDe(cantRegMoverR + 1, hastaR, cantProyRel, botonAntR, botonSigR)
+Else
+	html = html & "<div class='ui-empty'>No se encontraron proyectos con incidentes relacionados para esta b&uacute;squeda.</div>"
+End If
+
+html = html & UiCardCierra()
+html = html & UiPantallaCierra()
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+
+html = html & "<script>function irConsulta(url){ var f = document.getElementById('formFiltros'); if (!f) return false; f.action = url; f.submit(); return false; }</script>"
+html = html & formx2 & "</body>"
+html = html & "</html>"
+
+response.write html
+%>

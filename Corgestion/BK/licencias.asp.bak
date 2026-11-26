@@ -1,0 +1,199 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+
+
+xhtml = headhtml()
+
+xhtml = xhtml & "<body>"
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.open scon1
+
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+
+XXX = SYSLOGON(cnn,"MENU_LICENCIAS")
+
+xhtml = xhtml & "<div>"
+
+xhtml = xhtml & "<header id='header' style='background:#0e1949;padding:1rem 0;'>"
+
+xhtml = xhtml & "<div >"
+
+xhtml = xhtml & "<table style='width:100%;'><tr style='display:flex;padding: 0 1rem;'>"
+
+xhtml = xhtml & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+xhtml = xhtml & "<img src='images/iso_cor.png' style='width:6rem;' >"
+xhtml = xhtml & "<font style='font-size:15pt;color:white;'><b>Cor Gestion</b> | Sistema Administrativo</font></a></td>"
+xhtml = xhtml & "<td style='width:25%;display:flex;align-items:center;flex-direction:row-reverse;' align='right'>"
+xhtml = xhtml & "<nav>"
+xhtml = xhtml & "<ul>"
+'html = html & "<li><a href='#menu'></a></li>"
+xhtml = xhtml & "</ul>"
+xhtml = xhtml & "</nav>"
+xhtml = xhtml & "</td>"
+
+xhtml = xhtml & "</tr></table>"
+
+xhtml = xhtml & "</div>"
+
+xhtml = xhtml & "</header>"
+
+xhtml = xhtml & "<table class='titulo-seccion' >"
+xhtml = xhtml & "<tr style='display:flex;align-items:center;justify-content:space-between;'>"
+
+'xhtml = xhtml & "<tr>"
+
+xhtml = xhtml & "<td><h2>LICENCIAS</font></h2>"
+
+xform = "<form id='xform' style='height:70%;' method='post' action='agregar2.asp?tipo=LIC&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'></form>"
+if getPermisos(xmenu,xtmenu,"ALTA") = 1 then
+	xboton = "<input class='bot' type='button' value='CARGAR NUEVA LICENCIA' onclick=""document.getElementById('xform').submit();"">"
+else
+	xboton = "<input class='botsp' type='button' value='CARGAR NUEVA LICENCIA' onclick=""alert('Sin permiso para agregar.');"">"
+end if
+xhtml = xhtml & "<td align=right>" & xboton & "</td>"
+
+xform2 = "<form id='xform2' style='height:70%;' method='post' action='index.asp'></form>"
+xboton2 = "<input class='bot' type='button' value='VOLVER' onclick=""document.getElementById('xform2').submit();"">"
+xhtml = xhtml & "<td align=center>" & xboton2 & "</td>"
+
+xhtml = xhtml & "</tr>"
+
+xhtml = xhtml & "</table>"
+
+xhtml = xhtml & "</div>"
+
+' --- INICIO NORMALIZACION: TABLA DE LICENCIAS (ENCABEZADOS) ---
+	
+'xhtml = xhtml & "<div><br>"
+xhtml = xhtml & "<div class='inner' style='padding: 2rem;'>"
+xhtml = xhtml & "<div class='bloque-datos table-responsive'>"
+
+'xhtml = xhtml & "<table style='width:60%;color:#000000;font-family:Serif;text-align:center;' cellspacing=0 align=center>"
+xhtml = xhtml & "<table class='tabla-moderna'>"
+	
+'Agregamos THEAD por buenas prácticas y compatibilidad de exportación
+xhtml = xhtml & "<thead>"
+	
+'xhtml = xhtml & "<tr>"
+xhtml = xhtml & "<tr>"
+
+'xhtml = xhtml & "<td class='encabe' style='width:2%;'>*</td>"
+xhtml = xhtml & "<th style='width: 50px; text-align: center;'>&nbsp;</th>" ' Columna del botón eliminar
+
+'xhtml = xhtml & "<td class='encabe' style='width:15%;'>RESPONSABLE</td>"
+xhtml = xhtml & "<th>RESPONSABLE</th>"
+
+'xhtml = xhtml & "<td class='encabe' style='width:14%;'>FECHA DESDE</td>"
+xhtml = xhtml & "<th style='text-align: center;'>FECHA DESDE</th>"
+
+'xhtml = xhtml & "<td class='encabe' style='width:14%;'>FECHA HASTA</td>"
+xhtml = xhtml & "<th style='text-align: center;'>FECHA HASTA</th>"
+
+'xhtml = xhtml & "<td class='encabe' style='width:15%;'>MOTIVO</td>"
+xhtml = xhtml & "<th>MOTIVO</th>"
+
+'xhtml = xhtml & "</tr>"
+xhtml = xhtml & "</tr>"
+
+	sql = "sp_Licencias_Listar"
+	Set rs = Cnn.Execute(sql)
+
+	'rs.Move (CantRegMover)
+
+	'PosReg = 0
+
+	sColor = "#FFFFFF"
+	xform3 = ""
+
+	Do While (Not rs.eof) ' And (PosReg < CantRegMostrar)
+
+
+		xhtml = xhtml & "<tr>"
+
+		xform3 = xform3 & "<form id='formx" & rs(0) & "' style='height:1px;' method='post' action='eliminar.asp?opc=lic&id=" & rs(0) & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "&vuelta=licencias.asp'></form>"
+		if getPermisos(xmenu,xtmenu,"ELIM") = 1 then
+			'xboton3 = "<input class='bot' type='button' value='X' onclick=""borrar('formx" & rs(0) & "');"">"
+			xboton3 = "<input class='btn-accion btn-accion-peligro' type='button' value='X' onclick=""borrar('formx" & rs(0) & "');"">"
+		else
+			'xboton3 = "<input class='botsp' type='button' value='X' onclick=""alert('Sin permiso para eliminar.');"">"
+			xboton3 = "<input class='btn-accion btn-accion-deshabilitado' type='button' value='X' onclick=""alert('Sin permiso para eliminar.');"">"
+		end if
+
+		fIni = ""
+		if rs(2) <> 0 then
+			fIni = cdate(rs(2)) + CLng(CDate("01-01-1900"))
+		end if
+
+		fFin = ""
+		if rs(3) <> 0 then
+			fFin = cdate(rs(3)) + CLng(CDate("01-01-1900"))
+		end if
+
+		' --- RENDERIZADO DE FILA (LICENCIAS) ---
+		'xhtml = xhtml & "<td class='fil' >" & xboton3 & "</td>"
+		xhtml = xhtml & "<td style='text-align: center;'>" & xboton3 & "</td>"
+
+		'xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";' >" & rs(1) & "</td>"
+		xhtml = xhtml & "<td>" & rs(1) & "</td>"
+
+		'xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'>" & fIni & "</td>"
+		xhtml = xhtml & "<td style='text-align: center;'>" & fIni & "</td>"
+
+		'xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'>" & fFin & "</td>"
+		xhtml = xhtml & "<td style='text-align: center;'>" & fFin & "</td>"
+
+		'xhtml = xhtml & "<td class='fil' style='background-color:" & sColor & ";'>" & rs(4) & "</td>"
+		xhtml = xhtml & "<td>" & rs(4) & "</td>"
+
+		'xhtml = xhtml & "</tr>"
+		xhtml = xhtml & "</tr>"
+
+		'if sColor = "#FFFFFF" then
+			'sColor = "#ECECEC"
+		'elseif sColor = "#ECECEC" then
+			'sColor = "#FFFFFF"
+		'end if
+
+		'PosReg = PosReg + 1
+
+		rs.movenext
+	Loop
+
+	xhtml = xhtml & "</table>"
+
+xhtml = xhtml & "</div>"
+
+
+
+
+
+
+
+
+
+xhtml = xhtml & "</div>"
+
+
+xhtml = xhtml & "<script type='text/javascript'>"
+xhtml = xhtml & " function borrar(formu){ "
+xhtml = xhtml & " var r = confirm('Desea eliminar licencia?'); "
+xhtml = xhtml & " if (r){ "
+xhtml = xhtml & " document.getElementById(formu).submit(); "
+xhtml = xhtml & " }else{ "
+xhtml = xhtml & " return false;"
+xhtml = xhtml & " }} "
+xhtml = xhtml & "</script>"
+
+
+
+xhtml = xhtml & "<script src='assets/js/jquery.min.js'></script>"
+xhtml = xhtml & "<script src='assets/js/skel.min.js'></script>"
+xhtml = xhtml & "<script src='assets/js/util.js'></script>"
+xhtml = xhtml & "<script src='assets/js/main.js'></script>"
+
+xhtml = xhtml & xform & xform2 & xform3 & "</body></html>"
+
+response.write xhtml
+%>

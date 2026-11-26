@@ -1,0 +1,108 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<!-- #INCLUDE FILE="IncFile/datosDetalles.inc" -->
+<%
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+
+ html = headhtml()
+
+html = html & "<body>"
+
+idcon = request.querystring("idcon")
+id = request.querystring("id")
+opc = request.querystring("opc")
+sol = request.querystring("sol")
+xmenu = request.querystring("xmenu")
+xtmenu = request.querystring("xtmenu")
+
+Set Cnn = Server.CreateObject("ADODB.Connection")
+On Error Resume Next
+Cnn.open scon1
+If Err.Number <> 0 Then
+	Response.Write "<div style='color:red;font-family:monospace;padding:10px;border:1px solid red;margin:10px;'>"
+	Response.Write "<b>ERROR DE CONEXION A BASE DE DATOS</b><br>"
+	Response.Write "Codigo: " & Err.Number & "<br>"
+	Response.Write "Detalle: " & Server.HTMLEncode(Err.Description) & "</div>"
+	Response.End
+End If
+On Error Goto 0
+
+html = html & "<div>"
+
+html = html & "<header id='header' style='height:11%'>"
+
+html = html & "<div>"
+
+html = html & "<table style='width:100%;'><tr>"
+
+html = html & "<td style='width:75%;' valign=center><a href='index.asp' class='logo' >"
+html = html & "<img src='images/logocorP4.gif' width='10%' >"
+html = html & "<font style='margin-left:100px;font-size:30pt;align:center;valign:center;font-family:Serif;color:#000000;'>Cor Consulting</font>"
+html = html & "</a></td>"
+
+html = html & "</tr></table>"
+
+html = html & "</div>"
+
+html = html & "</header>"
+
+html = html & "<div style='height:9%;width:100%;border-top:solid 5px #FF3D3D;border-bottom:double 6px #001BFF;'>"
+
+html = html & "<table style='width:100%;'><tr>"
+
+html = html & "<td><font style='font-size:20pt;font-family:Serif;color:#000000;letter-spacing:0.2em;'><b>DETALLE CONTACTO</b></font></td>"
+
+formx5 = "<form id='formx5' style='height:70%;' method='post' action='detalles.asp?sol=" & sol & "&id=" & id & "&opc=" & opc & "&xmenu=" & xmenu & "&xtmenu=" & xtmenu & "'>"
+botonx5 = "<input class='bot' style='height:80%;font-size:13pt;' type='button' value='VOLVER' onclick=""document.getElementById('formx5').submit();""></form>"
+html = html & "<td align=center>" & formx5 & botonx5 & "</td>"
+
+html = html & "</tr></table>"
+
+html = html & "</div>"
+
+
+html = html & "<div style='height:71%;width:100%;'><br>"
+
+html = html & "<table class='tabl' style='height:30%;width:40%;' align=center cellspacing=0>"
+
+
+	
+Set rs = ObtenerContacto(Cnn, idcon )
+
+
+if not rs.eof then
+ 
+	nombre = rs(1) & " " & rs(2)
+
+	html = html & "<tr>"
+	html = html & "<td xclass='encabe' style='font-size:30pt;letter-spacing:3px;' colspan=2 align=center>" & nombre & "</td>"
+	html = html & "</tr>"
+	html = html & "<tr>"
+	html = html & "<td xclass='encabe' style='width:15%;' align=center>TELEFONO:</td>"
+	html = html & "<td xstyle='width:25%;font-size:18pt;border-bottom:solid 3px #001BFF;color:#000000;' align=center>" & rs(3) & "</td>"
+	html = html & "</tr>"
+	html = html & "<td xclass='encabe' style='width:15%;' align=center>MAIL:</td>"
+	html = html & "<td xstyle='width:25%;font-size:18pt;border-bottom:solid 3px #001BFF;color:#000000;' align=center>" & rs(4) & "</td>"
+	html = html & "</tr>"
+	html = html & "<td xclass='encabe' style='width:15%;' align=center>CLIENTE:</td>"
+	html = html & "<td xstyle='width:25%;font-size:18pt;border-bottom:solid 3px #001BFF;color:#000000;' align=center>" & rs(6) & "</td>"
+	html = html & "</tr>"
+
+	html = html & "</table>"
+
+end if
+
+html = html & "</div>"
+
+
+html = html & "</div>"
+
+html = html & "<script src='assets/js/jquery.min.js'></script>"
+html = html & "<script src='assets/js/skel.min.js'></script>"
+html = html & "<script src='assets/js/util.js'></script>"
+html = html & "<script src='assets/js/main.js'></script>"
+
+html = html & "</body>"
+html = html & "</html>"
+
+response.write html
+%>

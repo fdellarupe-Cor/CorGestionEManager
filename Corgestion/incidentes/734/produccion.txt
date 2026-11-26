@@ -1,0 +1,6 @@
+Microsoft VBScript runtime error '800a000d'
+
+Type mismatch
+
+/coremanager/ORMATRIXRTI.ASP, line 742
+

@@ -1,0 +1,61 @@
+<!-- #INCLUDE FILE="IncFile/funciones.inc" -->
+<%
+Set Cnn = Server.CreateObject("ADODB.Connection")
+Cnn.open scon1
+
+sParam = request.querystring("param")
+
+if sParam = "licli" then
+
+	sql = "sp_Catalogo_Listar @Catalogo='clientes'"
+
+elseif sParam = "liaplic" then
+
+	sql = "sp_Catalogo_Listar @Catalogo='aplicativos'"
+
+elseif sParam = "lirg" then
+
+	sql = "sp_Responsables @Modo='combo_funcion', @Funcion='FUNC'"
+
+elseif sParam = "livp" then
+
+	sql = "sp_Catalogo_Listar @Catalogo='via_pedido'"
+
+elseif sParam = "librow" then
+
+	sql = "sp_Catalogo_Listar @Catalogo='browsers'"
+
+elseif sParam = "liprio" then
+
+	sql = "sp_Catalogo_Listar @Catalogo='prioridades'"
+
+elseif sParam = "lirt" then
+
+	sql = "sp_Responsables @Modo='combo_funcion', @Funcion='TEC'"
+
+elseif sParam = "licon" then
+
+	sql = "sp_Combo_Listar @Origen='contacto'"
+
+end if
+
+
+if sParam <> "lirp" then
+
+	Set rc = Cnn.Execute(sql)
+	do while not rc.eof
+
+		shtml = shtml & "<li class='losli' data-padre='" & sParam & "' data-id='" & rc(0) & "' >" & rc(1) & "</li>"
+
+	rc.movenext
+	loop
+
+else
+
+	shtml = shtml & "<li id='1' class='losli' data-padre='lirp' data-id='NO'>NO</li>"
+	shtml = shtml & "<li id='2' class='losli' data-padre='lirp' data-id='SI'>SI</li>"
+
+end if
+
+response.write shtml
+%>

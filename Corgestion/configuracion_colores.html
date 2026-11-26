@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración de Apariencia</title>
+<style>
+    /* 1. DEFINICIÓN DE VARIABLES (Aquí ocurre la magia) */
+    :root {
+        /* Valores por defecto (Tema Azul Corporativo) */
+        --bg-app: #f3f4f6;          /* Fondo general de la página */
+        --bg-card: #ffffff;         /* Fondo de las cajas/tarjetas */
+        --primary: #0f4c81;         /* Color principal (Barra lateral, botones) */
+        --text-main: #1f2937;       /* Texto principal */
+        --text-sidebar: #ffffff;    /* Texto de la barra lateral */
+        --accent: #3b82f6;          /* Color de acento/interacción */
+    }
+
+    /* Estilos Generales usando las variables */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    
+    body { 
+        background-color: var(--bg-app); 
+        color: var(--text-main); 
+        display: flex; 
+        height: 100vh; 
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Layout */
+    .sidebar { 
+        width: 240px; 
+        background-color: var(--primary); 
+        color: var(--text-sidebar); 
+        display: flex; 
+        flex-direction: column; 
+        padding: 20px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .content { flex: 1; padding: 40px; overflow-y: auto; }
+
+    /* Componentes UI para la demo */
+    .nav-item { padding: 10px; margin-bottom: 5px; border-radius: 5px; opacity: 0.8; cursor: pointer; }
+    .nav-item.active { background-color: rgba(255,255,255,0.2); opacity: 1; font-weight: bold; }
+    
+    .card { 
+        background-color: var(--bg-card); 
+        padding: 25px; 
+        border-radius: 10px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        margin-bottom: 30px;
+        transition: background-color 0.3s ease;
+    }
+
+    h1 { margin-bottom: 10px; }
+    h2 { font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+
+    /* ---- CONTROLES DE PERSONALIZACIÓN ---- */
+    .theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    
+    .theme-btn {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        text-align: center;
+        background: white;
+        transition: transform 0.2s;
+    }
+    .theme-btn:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .theme-preview { height: 40px; width: 100%; border-radius: 4px; margin-bottom: 10px; display: flex; border: 1px solid #eee; }
+    .tp-left { width: 30%; height: 100%; }
+    .tp-right { width: 70%; height: 100%; }
+
+    .color-picker-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.03); border-radius: 6px; }
+    .color-label { font-weight: 500; }
+    input[type="color"] { border: none; width: 40px; height: 40px; cursor: pointer; background: none; }
+
+    .btn-save {
+        background-color: var(--accent);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+    .btn-save:hover { opacity: 0.9; }
+
+</style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 40px;">Mi Banco</div>
+        <div class="nav-item">Inicio</div>
+        <div class="nav-item">Documentos</div>
+        <div class="nav-item active">Configuración</div>
+    </div>
+
+    <div class="content">
+        <h1>Personalizar Apariencia</h1>
+        <p style="margin-bottom: 30px; opacity: 0.7;">Elige un tema predefinido o crea tu propia combinación de colores.</p>
+
+        <div class="card">
+            <h2>Temas Predefinidos</h2>
+            <div class="theme-grid">
+                
+                <div class="theme-btn" onclick="applyTheme('classic')">
+                    <div class="theme-preview">
+                        <div class="tp-left" style="background:#0f4c81"></div>
+                        <div class="tp-right" style="background:#f3f4f6"></div>
+                    </div>
+                    <span>Corporativo (Azul)</span>
+                </div>
+
+                <div class="theme-btn" onclick="applyTheme('dark')">
+                    <div class="theme-preview">
+                        <div class="tp-left" style="background:#111827"></div>
+                        <div class="tp-right" style="background:#1f2937"></div>
+                    </div>
+                    <span>Modo Oscuro</span>
+                </div>
+
+                <div class="theme-btn" onclick="applyTheme('minimal')">
+                    <div class="theme-preview">
+                        <div class="tp-left" style="background:#ffffff"></div>
+                        <div class="tp-right" style="background:#f9fafb"></div>
+                    </div>
+                    <span>Minimalista (Gris)</span>
+                </div>
+
+                <div class="theme-btn" onclick="applyTheme('contrast')">
+                    <div class="theme-preview">
+                        <div class="tp-left" style="background:#000000"></div>
+                        <div class="tp-right" style="background:#ffff00"></div>
+                    </div>
+                    <span>Alto Contraste</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Ajuste Manual de Colores</h2>
+            
+            <div class="color-picker-row">
+                <span class="color-label">Color Principal (Menú Lateral):</span>
+                <input type="color" id="pickerPrimary" value="#0f4c81" oninput="updateColor('--primary', this.value)">
+            </div>
+
+            <div class="color-picker-row">
+                <span class="color-label">Fondo de la Página:</span>
+                <input type="color" id="pickerBgApp" value="#f3f4f6" oninput="updateColor('--bg-app', this.value)">
+            </div>
+
+            <div class="color-picker-row">
+                <span class="color-label">Fondo de Tarjetas (Contenedores):</span>
+                <input type="color" id="pickerBgCard" value="#ffffff" oninput="updateColor('--bg-card', this.value)">
+            </div>
+
+            <div class="color-picker-row">
+                <span class="color-label">Color de Texto Principal:</span>
+                <input type="color" id="pickerText" value="#1f2937" oninput="updateColor('--text-main', this.value)">
+            </div>
+
+        </div>
+
+        <button class="btn-save" onclick="saveToDatabase()">Guardar Preferencias</button>
+
+    </div>
+
+    <script>
+        // Función para actualizar una variable CSS individualmente
+        function updateColor(variable, value) {
+            document.documentElement.style.setProperty(variable, value);
+            
+            // Lógica extra: Si el fondo lateral es blanco, cambiar texto a negro
+            if(variable === '--primary' && isLightColor(value)){
+                document.documentElement.style.setProperty('--text-sidebar', '#000000');
+            } else if(variable === '--primary') {
+                document.documentElement.style.setProperty('--text-sidebar', '#ffffff');
+            }
+        }
+
+        // Función para aplicar temas completos (sets de variables)
+        function applyTheme(themeName) {
+            const root = document.documentElement;
+
+            if (themeName === 'classic') {
+                setColors('#0f4c81', '#f3f4f6', '#ffffff', '#1f2937', '#ffffff');
+            } else if (themeName === 'dark') {
+                setColors('#111827', '#000000', '#1f2937', '#e5e7eb', '#e5e7eb');
+            } else if (themeName === 'minimal') {
+                setColors('#ffffff', '#f9fafb', '#ffffff', '#374151', '#374151'); // Ojo: texto sidebar oscuro
+                root.style.setProperty('--text-sidebar', '#111827'); // Ajuste manual
+            } else if (themeName === 'contrast') {
+                setColors('#000000', '#ffff00', '#000000', '#ffff00', '#ffff00');
+            }
+            
+            // Actualizar los inputs de color para que coincidan con el tema elegido
+            syncPickers();
+        }
+
+        function setColors(primary, bgApp, bgCard, textMain, textSide) {
+            const root = document.documentElement;
+            root.style.setProperty('--primary', primary);
+            root.style.setProperty('--bg-app', bgApp);
+            root.style.setProperty('--bg-card', bgCard);
+            root.style.setProperty('--text-main', textMain);
+            root.style.setProperty('--text-sidebar', textSide);
+        }
+
+        function syncPickers() {
+            const root = getComputedStyle(document.documentElement);
+            document.getElementById('pickerPrimary').value = root.getPropertyValue('--primary').trim();
+            document.getElementById('pickerBgApp').value = root.getPropertyValue('--bg-app').trim();
+            document.getElementById('pickerBgCard').value = root.getPropertyValue('--bg-card').trim();
+            document.getElementById('pickerText').value = root.getPropertyValue('--text-main').trim();
+        }
+
+        // Helper simple para detectar colores claros (y cambiar texto a negro)
+        function isLightColor(hex) {
+            const c = hex.substring(1);      // strip #
+            const rgb = parseInt(c, 16);   // convert rrggbb to decimal
+            const r = (rgb >> 16) & 0xff;  // extract red
+            const g = (rgb >>  8) & 0xff;  // extract green
+            const b = (rgb >>  0) & 0xff;  // extract blue
+            const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
+            return luma > 200; // si es muy claro devuelve true
+        }
+
+        function saveToDatabase() {
+            alert("Aquí conectarías con tu ASP: \nSe enviarán los códigos Hexadecimales a la BBDD para el usuario actual.");
+        }
+    </script>
+
+</body>
+</html>
