@@ -1,0 +1,23 @@
+select temadescri + '/' + stemadescri + '/' + isnull(expr1,'')
++ '/' +  isnull(expr2,'')
++ '/' +  isnull(expr3,'')
++ '/' +  isnull(expr4,'')
++ '/' +  isnull(expr5,'')
++ '/' +  isnull(expr6,'')
++ '/' +  isnull(expr7,'')
+
+,tobjdescri
+,
+c.estado,
+b.version,
+b.nrover,
+b.fecpublic,
+b.autor,
+d.objcopete,
+b1.objun,
+cobj
+ from csrelpathdescriex a
+ left join objetos  b1 on ( b1.codobjeto=a.cobj)
+ inner join objprty  b on (b.codobjeto=a.cobj)
+ inner join estados  c on ( b.estado=c.objid)
+ left join OBJINFO  d on ( d.codobjeto=a.cobj)

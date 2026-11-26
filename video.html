@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Intranet</title>
+    <style>
+        /* Contenedor principal del reproductor */
+        .video-container {
+            max-width: 800px;
+            margin: 20px auto;
+            position: relative;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Ocultamos absolutamente todos los controles nativos del navegador */
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+        video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        /* Barra de controles personalizados abajo */
+        .custom-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        /* Estilo limpio para los botones */
+        .btn-control {
+            background-color: #ffffff;
+            border: none;
+            color: #000000;
+            padding: 8px 16px;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-control:hover {
+            background-color: #dddddd;
+        }
+
+        .btn-control:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+<div class="video-container">
+    <!-- El video conectado de forma directa a Jellyfin -->
+    <video id="my-video">
+        <source src="http://server-2025:8096/Videos/308b56b840a94aaba01e85d5337eeadc/stream.mp4?ApiKey=ef2a190e82ab4e8186d22efcbc4f021b" type="video/mp4">
+        Tu navegador no soporta este video.
+    </video>
+
+    <!-- Tres botones independientes y dedicados -->
+    <div class="custom-controls">
+        <button id="btn-play" class="btn-control">▶ Reproducir</button>
+        <button id="btn-pause" class="btn-control">⏸ Pausar</button>
+        <button id="btn-stop" class="btn-control">■ Detener</button>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('my-video');
+    const playBtn = document.getElementById('btn-play');
+    const pauseBtn = document.getElementById('btn-pause');
+    const stopBtn = document.getElementById('btn-stop');
+
+    // Botón Reproducir: Arranca el video desde donde esté
+    playBtn.addEventListener('click', () => {
+        video.play();
+    });
+
+    // Botón Pausar: Congela el video en el segundo actual
+    pauseBtn.addEventListener('click', () => {
+        video.pause();
+    });
+
+    // Botón Detener: Pausa el video y lo regresa estrictamente al inicio (segundo 0)
+    stopBtn.addEventListener('click', () => {
+        video.pause();
+        video.currentTime = 0;
+    });
+</script>
+
+</body>
+</html>

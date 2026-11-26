@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("#findTextBtn").click(function(){
+    // Find all paragraph elements containing "important" and add a class
+    $("p:contains('important')").addClass("highlight");
+  });
+});
+</script>
+<style>
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<p>This is some text.</p>
+<p>This text contains imp<i>or</i>ta<br>nt information.sdfsdfsfsdsd imporwwwtant</p>
+<p>This div also has imposssrtant details.<p>
+<p>Another paragraph.</p>
+
+<button id="findTextBtn">Find "important" text</button>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+    <title>Highlight with window.find()</title>
+    <style>
+      /* Optional: You can add CSS to style the default highlight color if needed */
+      ::selection {
+        background-color: blue; /* Example: changes selection highlight to yellow */
+      }
+    </style>
+    </head>
+    <body>
+
+   <button id="myButtonId">Find</button>
+
+   <div id="myDivId1">
+   <p>
+   This is some text in a paragraph.<br>
+   It has Te<i>x</i>t placed in my first div.
+   </p>
+   </div>
+
+   <div id="myDivId2">
+   <p>
+   This is some t<b>ex</b>T in a paragraph.<br>textoooooooo
+   It has tExt placed in my second div.
+   </p>
+	</div>
+    <script src="hilitor.js"></script>
+    <script>
+
+var myButton = document.getElementById('myButtonId');
+myButton.addEventListener('click', function() {findString ('Text',1,0,0,0,0,0)});
+
+function findString (str) {
+    if (parseInt(navigator.appVersion)<4) return;
+    var strFound;
+    if (window.find) {
+
+        strFound=self.find(str);
+
+
+        if (!strFound) {
+            strFound=self.find(str,0,1);
+            while (self.find(str,0,1)) {continue};
+        }
+    }
+
+    if (!strFound) alert ("String '"+str+"' not found!")
+        return;
+}
+    </script>
+
+    </body>
+    </html>

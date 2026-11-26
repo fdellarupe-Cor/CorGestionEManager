@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="iso-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery Dialog con Multiselect y Limpiar</title>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #resultados {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Ejemplo de Dialog Box con Botón Limpiar</h1>
+    <button id="abrir-dialog">Abrir Buscador</button>
+
+    <div id="dialog-form" title="Realizar Búsqueda">
+        <form>
+            <fieldset>
+                <label for="tipobjeto">tipos de documentos</label>
+                <select id="tipobjeto" name="tipobjeto[]" multiple="multiple" style="width:100%;">
+                    <option value="tecnologia">Tecnología</option>
+                    <option value="deportes">Deportes</option>
+                    <option value="noticias">Noticias</option>
+                    <option value="arte">Arte y Cultura</option>
+                    <option value="gastronomia">Gastronomía</option>
+                    <option value="viajes">Viajes</option>
+                </select>
+
+                <br><br>
+
+                <label for="termino-busqueda">Nombre del documento</label>
+                <input type="text" id="termino-busqueda"  class="ui-widget-content ui-corner-all" style="width: 98%; padding: 5px;">
+
+            </fieldset>
+        </form>
+    </div>
+
+    <div id="resultados">
+        <p>Los resultados de la búsqueda aparecerán aquí.</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+    $(function() {
+        // Inicializar el plugin Select2
+        $('#tipobjeto').select2({
+            placeholder: "Puedes seleccionar varias opciones",
+            width: 'resolve'
+        });
+
+        // Inicializar el Dialog de jQuery UI
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 100,
+            width: 350,
+            modal: true,
+            buttons: {
+                // Botón principal
+                "Buscar": function() {
+                    const textoBusqueda = $("#termino-busqueda").val();
+                    const categoriasSeleccionadas = $("#tipobjeto").val();
+
+                    $("#resultados").empty();
+
+                    let htmlResultado = '<h3>Búsqueda Realizada</h3>';
+                    htmlResultado += `<p><strong>Término de búsqueda:</strong> ${textoBusqueda || 'Ninguno'}</p>`;
+
+                    if (categoriasSeleccionadas && categoriasSeleccionadas.length > 0) {
+                        htmlResultado += '<p><strong>Categorías seleccionadas:</strong></p><ul>';
+                        categoriasSeleccionadas.forEach(function(categoriaddd) {
+                            htmlResultado += `<li>${categoriaddd}</li>`;
+                        });
+                        htmlResultado += '</ul>';
+                    } else {
+                        htmlResultado += '<p><strong>No se seleccionó ninguna categoría.</strong></p>';
+                    }
+
+                    $("#resultados").html(htmlResultado);
+
+                },
+                // <<< NUEVO: Botón para limpiar los campos del formulario
+                "Limpiar Selección": function() {
+                    // Limpiar el input de texto
+                    $("#termino-busqueda").val("");
+
+                    // Limpiar la selección de Select2
+                    // Se establece su valor a 'null' y se dispara el evento 'change' para que se actualice visualmente.
+                    $("#tipobjeto").val(null).trigger('change');
+                }
+            }
+        });
+
+        // Abrir el dialog
+        $("#abrir-dialog").on("click", function() {
+            $("#dialog-form").dialog("open");
+        });
+    });
+    </script>
+
+</body>
+</html>

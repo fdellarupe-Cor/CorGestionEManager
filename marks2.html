@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+    <title>Highlight with window.find()</title>
+    <style>
+      /* Optional: You can add CSS to style the default highlight color if needed */
+      ::selection {
+        background-color: blue; /* Example: changes selection highlight to yellow */
+      }
+    </style>
+    </head>
+    <body>
+
+   <h3>Button 'Find' selects the 'p' tag containing 'tExt'.</h3>
+
+   <button id="myButtonId">Find</button>
+
+   <div id="myDivId1">
+   <p>
+   This is some text in a paragraph.<br>
+   It has Text placed in my first div.
+   </p>
+   </div>
+
+   <div id="myDivId2">
+   <p>
+   This is some t<i>ex</i>T in a paragraph.<br>
+   It has tExt placed in my second div.
+   </p>
+</div>
+    <script src="hilitor.js"></script>
+    <script>
+
+var myButton = document.getElementById('myButtonId');
+myButton.addEventListener('click', () => selectText());
+
+function selectText(node) {
+    var pSelect = document.querySelectorAll('div'), i;
+    for (i = 0; i < pSelect.length; ++i) {
+         if(pSelect[i].textContent.match('tExt')){
+         var node = pSelect[i];
+
+         }
+    }
+
+    if (window.getSelection) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        console.warn("Unsupported browser.");
+    }
+}
+    </script>
+
+    </body>
+    </html>

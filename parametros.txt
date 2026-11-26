@@ -1,0 +1,2004 @@
+truncate table  ECO
+GO
+set identity_insert ECO  on
+GO
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('1','Banca de Empresas','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('2','Grandes Empresas','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('3','Red de Sucursales','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('4','Gerencias Regionales','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('5','Análisis de Negocios y Productos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('6','Desarrollo de Productos y Campañas','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('7','Rentabilidad y Reciprocidad','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('8','Calificaciones y Excesos','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('9','Gestión de Pago de Haberes','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('10','Negocios Internacionales','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('11','Oficiales de Negocios Internacionales','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('12','Banca de Consumo','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('13','Productos, Marketing y Business Intelligence','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('14','Canales Alternativos','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('15','Protección al Usuario','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('16','Préstamos y Depósitos a Plazo Fijo','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('17','Paquetes, TTCC y TTDD','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('18','Seguros','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('19','Marketing, Imagen, Eventos y Web','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('20','Datamart','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('21','Ventas Directas','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('22','Atención de Consultas y Reclamos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('23','Contact Center','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('24','Servicios al Usuario','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('25','Atención al Cliente','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('26','Planeamiento y Control de Gestión','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('27','Planeamiento y Presupuestación','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('28','Finanzas','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('29','Mesa de Operaciones Financieras','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('30','Planificación Financiera','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('31','Balances','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('32','Contable','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('33','Impuestos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('34','Regímenes Informativos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('35','Administración Crediticia','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('36','Análisis de Riesgo Comercial','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('37','Análisis de Riesgo de Consumo','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('38','Auditoría de Créditos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('39','Administración de Recursos Materiales','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('40','Negociación de Bienes y Servicios','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('41','Administración','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('42','Liquidación de Pagos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('43','Infraestructura Edilicia y Logística','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('44','Análisis y Gestión de Costos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('45','Recursos Humanos','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('46','Gestión de Nómina','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('47','Gestión de Recursos Humanos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('48','Servicio de Seguridad y Salud Laboral','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('49','Asuntos Legales','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('50','Consultas y Dictámenes','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('51','Asesoría Banca de Empresas','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('52','Bastanteo','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('53','Asesoría Banca de Consumo','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('54','Oficios','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('55','Gestión Judicial','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('56','Cartera Administrada','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('57','Cartera Propia e Institucionales','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('58','Tecnología y Sistemas','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('59','Tecnología','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('60','Plataformas','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('61','Comunicaciones','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('62','Infraestructura Distribuida','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('63','Diseño de Soluciones Tecnológicas','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('64','Canales Electrónicos','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('65','Sistemas','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('66','Activas y Transferencias','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('67','Pasivas y Prevención del Lavado de Dinero','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('68','Web y Departamentales','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('69','Sucursales y Workflow','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('70','Contabilidad y Relaciones Técnicas','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('71','Testing','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('72','Produccion','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('73','Producción - Turno Diurno','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('74','Producción - Turno Vespertino','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('75','Producción - Turno Nocturno','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('76','Control de Gestión de TI','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('77','Control de Gestión','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('78','Proyectos y Presupuestos','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('79','Organización y Procesos','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('80','Normas','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('81','Reingeniería','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('82','Operaciones','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('83','Administración de Clientes y Productos','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('84','Alta, Baja y Modificación de Productos y Clientes','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('85','Procesamiento de Alta, Baja y Modificación','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('86','Digitalización','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('87','Tarjetas','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('88','Tarjeta de Crédito','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('89','Tarjeta de Débito','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('90','Seguros','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('91','Préstamos y Garantías','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('92','Préstamos','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('93','Garantías','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('94','Leasing','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('95','Servicios Operativos','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('96','Títulos Valores','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('97','Administración de Valores y Canje','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('98','Administración de Valores','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('99','Canje','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('100','Servicios Electrónicos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('101','Transferencias','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('102','Recaudaciones','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('103','Haberes, Jubilaciones y Beneficios','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('104','OPASI','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('105','Administración de Cuentas y Bases','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('106','Operativa de Sucursales','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('107','Parametría','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('108','Control de Canales Alternativos','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('109','Venta Externa','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('110','Santa Fe Servicios','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('111','Site Empresas','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('112','Home Banking – Cajeros Automáticos','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('113','Back Office Contact Center','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('114','Control Operativo','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('115','Control Transaccional','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('116','Control Caja','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('117','Tesorería','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('118','Supervisión Regional','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('119','Monitoreo','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('120','Comercio Exterior','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('121','MPO/ EXPO','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('122','Cambios - RI','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('123','Riesgos','0','B','0','0','29','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('124','Riesgo Operacional','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('125','Riesgo Financiero','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('126','Riesgo de Crédito','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('127','Protección de Activos de la Información','0','B','0','0','30','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('128','Seguridad Bancaria','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('129','Recuperación Crediticia','0','B','0','0','31','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('130','Recupero Comercial','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('131','Recupero Consumo','0','B','0','0','32','1','1',NULL,'3')
+go
+
+insert into ECO(eco,descri,codinter,NODO,ECOSEG,ECONIV,ECOJERAR,ecoUN,ecoSite,ecomap,ESTADO) values ('132','GERENCIA GENERAL','0','B','0','0','0','1','1',NULL,'3')
+go
+set identity_insert ECO   OFF
+GO
+
+
+
+
+truncate table  ECOREL
+GO
+set identity_insert ECOREL  on
+GO
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('1','132','1')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('2','1','2')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('3','1','3')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('4','3','4')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('5','3','5')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('6','5','6')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('7','5','7')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('8','5','8')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('9','3','9')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('10','3','10')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('11','10','11')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('12','132','12')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('13','12','13')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('14','12','14')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('15','12','15')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('16','13','16')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('17','13','17')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('18','13','18')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('19','13','19')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('20','13','20')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('21','14','21')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('22','15','22')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('23','12','23')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('24','15','24')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('25','23','25')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('26','132','26')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('27','26','27')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('28','132','28')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('29','28','29')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('30','29','30')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('31','29','31')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('32','132','32')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('33','32','33')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('34','32','34')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('35','132','35')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('36','35','36')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('37','35','37')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('38','35','38')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('39','132','39')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('40','39','40')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('41','39','41')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('42','39','42')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('43','39','43')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('44','39','44')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('45','132','45')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('46','45','46')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('47','45','47')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('48','47','48')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('49','132','49')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('50','49','50')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('51','50','51')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('52','50','52')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('53','50','53')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('54','50','54')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('55','49','55')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('56','55','56')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('57','55','57')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('58','132','58')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('59','58','59')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('60','59','60')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('61','59','61')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('62','59','62')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('63','59','63')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('64','63','64')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('65','58','65')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('66','65','66')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('67','65','67')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('68','65','68')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('69','65','69')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('70','65','70')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('71','65','71')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('72','58','72')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('73','72','73')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('74','72','74')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('75','72','75')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('76','58','76')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('77','76','77')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('78','76','78')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('79','132','79')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('80','79','80')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('81','79','81')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('82','132','82')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('83','82','83')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('84','83','84')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('85','84','85')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('86','84','86')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('87','83','87')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('88','87','88')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('89','87','89')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('90','83','90')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('91','83','91')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('92','91','92')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('93','91','93')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('94','91','94')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('95','82','95')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('96','83','96')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('97','95','97')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('98','97','98')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('99','97','99')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('100','95','100')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('101','100','101')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('102','100','102')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('103','100','103')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('104','95','104')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('105','104','105')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('106','82','106')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('107','95','107')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('108','106','108')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('109','108','109')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('110','108','110')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('111','108','111')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('112','108','112')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('113','108','113')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('114','106','114')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('115','114','115')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('116','114','116')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('117','106','117')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('118','106','118')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('119','106','119')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('120','82','120')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('121','120','121')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('122','120','122')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('123','132','123')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('124','123','124')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('125','123','125')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('126','123','126')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('127','132','127')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('128','132','128')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('129','132','129')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('130','129','130')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('131','129','131')
+go
+
+insert into ECOREL(CODREL,ECOMASTER,ECODEPEND) values ('132','0','132')
+go
+set identity_insert ECOREL   OFF
+GO
+
+
+
+
+truncate table  ECORELSITE
+GO
+set identity_insert ECORELSITE  on
+GO
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('1','1','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('2','2','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('3','3','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('4','4','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('5','5','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('6','6','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('7','7','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('8','8','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('9','9','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('10','10','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('11','11','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('12','12','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('13','13','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('14','14','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('15','15','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('16','16','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('17','17','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('18','18','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('19','19','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('20','20','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('21','21','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('22','22','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('23','23','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('24','24','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('25','25','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('26','26','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('27','27','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('28','28','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('29','29','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('30','30','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('31','31','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('32','32','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('33','33','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('34','34','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('35','35','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('36','36','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('37','37','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('38','38','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('39','39','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('40','40','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('41','41','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('42','42','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('43','43','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('44','44','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('45','45','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('46','46','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('47','47','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('48','48','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('49','49','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('50','50','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('51','51','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('52','52','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('53','53','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('54','54','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('55','55','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('56','56','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('57','57','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('58','58','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('59','59','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('60','60','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('61','61','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('62','62','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('63','63','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('64','64','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('65','65','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('66','66','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('67','67','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('68','68','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('69','69','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('70','70','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('71','71','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('72','72','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('73','73','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('74','74','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('75','75','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('76','76','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('77','77','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('78','78','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('79','79','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('80','80','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('81','81','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('82','82','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('83','83','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('84','84','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('85','85','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('86','86','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('87','87','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('88','88','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('89','89','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('90','90','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('91','91','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('92','92','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('93','93','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('94','94','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('95','95','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('96','96','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('97','97','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('98','98','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('99','99','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('100','100','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('101','101','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('102','102','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('103','103','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('104','104','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('105','105','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('106','106','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('107','107','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('108','108','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('109','109','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('110','110','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('111','111','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('112','112','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('113','113','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('114','114','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('115','115','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('116','116','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('117','117','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('118','118','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('119','119','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('120','120','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('121','121','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('122','122','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('123','123','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('124','124','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('125','125','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('126','126','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('127','127','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('128','128','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('129','129','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('130','130','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('131','131','9')
+go
+
+insert into ECORELSITE(OBJID,CODREL,SITE) values ('132','132','9')
+go
+set identity_insert ECORELSITE   OFF
+GO
+
+
+
+
+truncate table  ECOSITE
+GO
+set identity_insert ECOSITE  on
+GO
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('1','1','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('2','2','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('3','3','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('4','4','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('5','5','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('6','6','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('7','7','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('8','8','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('9','9','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('10','10','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('11','11','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('12','12','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('13','13','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('14','14','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('15','15','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('16','16','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('17','17','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('18','18','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('19','19','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('20','20','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('21','21','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('22','22','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('23','23','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('24','24','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('25','25','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('26','26','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('27','27','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('28','28','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('29','29','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('30','30','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('31','31','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('32','32','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('33','33','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('34','34','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('35','35','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('36','36','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('37','37','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('38','38','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('39','39','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('40','40','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('41','41','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('42','42','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('43','43','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('44','44','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('45','45','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('46','46','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('47','47','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('48','48','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('49','49','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('50','50','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('51','51','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('52','52','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('53','53','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('54','54','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('55','55','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('56','56','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('57','57','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('58','58','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('59','59','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('60','60','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('61','61','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('62','62','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('63','63','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('64','64','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('65','65','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('66','66','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('67','67','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('68','68','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('69','69','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('70','70','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('71','71','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('72','72','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('73','73','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('74','74','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('75','75','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('76','76','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('77','77','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('78','78','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('79','79','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('80','80','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('81','81','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('82','82','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('83','83','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('84','84','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('85','85','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('86','86','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('87','87','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('88','88','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('89','89','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('90','90','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('91','91','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('92','92','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('93','93','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('94','94','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('95','95','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('96','96','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('97','97','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('98','98','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('99','99','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('100','100','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('101','101','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('102','102','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('103','103','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('104','104','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('105','105','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('106','106','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('107','107','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('108','108','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('109','109','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('110','110','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('111','111','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('112','112','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('113','113','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('114','114','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('115','115','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('116','116','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('117','117','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('118','118','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('119','119','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('120','120','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('121','121','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('122','122','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('123','123','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('124','124','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('125','125','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('126','126','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('127','127','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('128','128','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('129','129','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('130','130','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('131','131','9')
+go
+
+insert into ECOSITE(OBJID,ECO,ECOSITE) values ('132','132','9')
+go
+set identity_insert ECOSITE   OFF
+GO
+
+
+
+
+truncate table  INSTRUMEN
+GO
+set identity_insert INSTRUMEN  on
+GO
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('12','COMUNICADOS "A"','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('13','COMUNICADOS "B"','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('14','COMUNICADOS "C"','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('15','MANUALES DE PROCEDIMIENTOS','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('16','MANUALES DE USUARIOS','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('17','MANUALES DE PRECIOS','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('18','MANUALES DE MISIONES Y FUNCIONES','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('19','MANUALES DE TERCEROS','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('20','ORGANIGRAMAS','3')
+go
+
+insert into INSTRUMEN(objid,Descri,ESTADO) values ('21','MANUALES DE POLÍTICAS','3')
+go
+set identity_insert INSTRUMEN   OFF
+GO
+
+
+
+
+truncate table  JERARQUIA
+GO
+set identity_insert JERARQUIA  on
+GO
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('*','SIN ASOCIAR','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('1','GERENTE DE SUCURSAL','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('10','OFICIAL DE ATENCION AL CLIENTE VIP','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('11','OFICIAL DE ATENCION AL CLIENTE ANEXO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('12','OFICIAL PYME','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('13','RESPONSABLE OPERATIVO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('14','RESPONSABLE OPERATIVO ANEXO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('15','SUPERVISOR DE TESORERIA','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('16','SUPERVISOR DE GESTIONES JUDICIALES','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('17','RESPONSABLE DE CAJA','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('18','RESPONSABLE DE CAJA ANEXO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('19','RESPONSABLE DE CAJA BOCA RECAUDADORA','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('2','GERENTE REGIONAL','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('20','CAJERO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('21','CAJERO BOCA RECAUDADORA','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('22','CAJERO ANEXO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('23','CAJERO BOCA RECAUDADORA','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('24','CAJERO DE OFICINA DE MENOR JERARQUIA (OMJ)','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('25','EJECUTIVO DE ATENCION DE CLIENTES JUDICIALES','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('26','RECEPCIONISTA','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('27','RESPONSABLE DE CUMPLIMIENTO REGULATORIO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('28','OFICIAL DE CUMPLIMIENTO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('29','GERENTE DE AREA','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('3','JEFE OPERATIVO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('30','GERENTE DE DEPARTAMENTO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('31','JEFE DE DE DEPARTAMENTO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('32','JEFE DE DIVISION','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('4','JEFE OPERATIVO REGIONAL','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('5','JEFE DE OFICIALES DE ATENCION AL CLIENTE','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('6','JEFE DE OFICIALES DE ATENCION AL CLIENTE VIP','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('7','JEFE DE OFICIALES DE ATENCION AL CLIENTE ANEXO','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('8','JEFE DE OFICIALES PYME','1','B','3')
+go
+
+insert into JERARQUIA(codjerar,descri,escala,orden,ESTADO) values ('9','OFICIAL DE ATENCION AL CLIENTE','1','B','3')
+go
+set identity_insert JERARQUIA   OFF
+GO
+
+
+
+
+truncate table  NIVELJERAR
+GO
+set identity_insert NIVELJERAR  on
+GO
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('1','DIRECTORIO','S','3')
+go
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('2','COMITÉ DE GESTION','S','3')
+go
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('3','COMITÉ EJECUTIVO','S','3')
+go
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('4','GERENCIA GENERAL','S','3')
+go
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('5','SUBGERENCIA GENERAL','S','3')
+go
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('6','GERENCIAS DE AREA','S','3')
+go
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('7','JEFATURAS DEPARTAMENTALES','S','3')
+go
+
+insert into NIVELJERAR(codnivel,descri,grafica,ESTADO) values ('8','DIVISION','S','3')
+go
+set identity_insert NIVELJERAR   OFF
+GO
+
+
+
+
+truncate table  ORIGEN
+GO
+set identity_insert ORIGEN  on
+GO
+
+insert into ORIGEN(objid,descri) values ('1','AFIP')
+go
+
+insert into ORIGEN(objid,descri) values ('2','ANSES')
+go
+
+insert into ORIGEN(objid,descri) values ('3','BCRA')
+go
+
+insert into ORIGEN(objid,descri) values ('4','DEFENSA DEL CONSUMIDOR')
+go
+
+insert into ORIGEN(objid,descri) values ('5','RESOLUCION DE COMITE')
+go
+
+insert into ORIGEN(objid,descri) values ('6','RESOLUCION DE DIRECTORIO')
+go
+
+insert into ORIGEN(objid,descri) values ('7','SSN')
+go
+
+insert into ORIGEN(objid,descri) values ('8','UIF')
+go
+
+insert into ORIGEN(objid,descri) values ('9','SUPERINTENDENCIA DE ENT.FINANCIERAS')
+go
+
+insert into ORIGEN(objid,descri) values ('10','SOLICITUD INTERNA')
+go
+
+insert into ORIGEN(objid,descri) values ('11','CNV')
+go
+set identity_insert ORIGEN   OFF
+GO
+
+
+
+
+truncate table  TIPOAGRUPA
+GO
+set identity_insert TIPOAGRUPA  on
+GO
+
+insert into TIPOAGRUPA(OBJID,DESCRI,ESTADO) values ('1','ACTIVAS','3')
+go
+
+insert into TIPOAGRUPA(OBJID,DESCRI,ESTADO) values ('2','PASIVAS','3')
+go
+
+insert into TIPOAGRUPA(OBJID,DESCRI,ESTADO) values ('3','SERVICIOS','3')
+go
+
+insert into TIPOAGRUPA(OBJID,DESCRI,ESTADO) values ('4','ADMINISTRATIVOS','3')
+go
+
+insert into TIPOAGRUPA(OBJID,DESCRI,ESTADO) values ('5','INTERNO','3')
+go
+set identity_insert TIPOAGRUPA   OFF
+GO
+
+
+
+
+truncate table  TIPOPRODUCTO
+GO
+set identity_insert TIPOPRODUCTO  on
+GO
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('1','NORMAS GENERALES')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('2','DEPÓSITOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('3','PRÉSTAMOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('4','RECAUDACIONES')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('5','TARJETAS DE DÉBITO')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('6','TARJETAS DE CRÉDITO')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('7','COMERCIO EXTERIOR')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('8','MERCADO DE CAPITALES')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('9','BANCA ELECTRÓNICA')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('10','SEGUROS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('11','PRODUCTOS Y SERVICIOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('12','RECURSOS MATERIALES')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('13','RECURSOS HUMANOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('14','SUCURSALES Y AREAS CENTRALES')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('15','INFORMACIÓN A ENTES REGULADORES Y DE GESTIÓN')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('16','CÓDIGOS Y REGLAMENTOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('17','ACCIONES COMERCIALES Y PROMOCIONES')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('18','LEGALES')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('19','INSTITUCIONAL')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('20','IMPUESTOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('21','TESORERÍA')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('22','ADMINISTRACIÓN Y RECUPERACIÓN CREDITICIA')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('23','SEGURIDAD BANCARIA')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('24','PROTECCIÓN DE ACTIVOS DE LA INFORMACIÓN')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('25','CONTABLE')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('26','RIESGOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('27','GARANTÍAS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('28','PREVENCIÓN DEL LAVADO DE ACTIVOS Y FINANCIAMIENTO DEL TERRORISMO')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('29','AUDITORÍA')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('30','TECNOLOGÍA Y SISTEMAS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('31','PRECIOS')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('32','SISTEMA DE GESTIÓN DE CALIDAD')
+go
+
+insert into TIPOPRODUCTO(OBJID,DESCRI) values ('33',NULL)
+go
+set identity_insert TIPOPRODUCTO   OFF
+GO
+
+
+
+
+truncate table  TIPOSEGMENTO
+GO
+set identity_insert TIPOSEGMENTO  on
+GO
+
+insert into TIPOSEGMENTO(OBJID,DESCRI,ESTADO) values ('1','BANCA EMPRESAS','3')
+go
+
+insert into TIPOSEGMENTO(OBJID,DESCRI,ESTADO) values ('2','BANCA CONSUMO','3')
+go
+
+insert into TIPOSEGMENTO(OBJID,DESCRI,ESTADO) values ('3','BANCA AGROPECUARIA','3')
+go
+
+insert into TIPOSEGMENTO(OBJID,DESCRI,ESTADO) values ('4','BANCA MINERA','3')
+go
+set identity_insert TIPOSEGMENTO   OFF
+GO
+
+

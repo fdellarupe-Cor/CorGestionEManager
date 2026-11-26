@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+
+    </head>
+    <body>
+
+
+
+
+<TABLE><TR><TD>TEXTO<BR>
+<div id=origen name=origen WIDTH=300PX contenteditable="true" >
+Tras más de dos años de cautiverio, los rehenes israelíes que permanecieron en manos del grupo terrorista Hamas fueron liberados este lunes por la madrugada, como parte del acuerdo promovido por Estados Unidos para poner fin al conflicto en la Franja de Gaza.Las Fuerzas de Defensa de Israel (FDI) confirmaron que los 20 rehenes vivos regresaron al país en dos etapas desde tres puntos designados: Ciudad de Gaza, el centro del enclave y Khan Younis, en el sur.Mientras tanto, la ciudad egipcia de Sharm el Sheij se alista para recibir la Cumbre de Paz sobre Gaza, convocada para el mismo día y copresidida por Donald Trump y Abdelfatá al Sisi. Según la Presidencia de Egipto, más de 20 líderes internacionales confirmaron su asistencia al encuentro, cuyo propósito es sellar un acuerdo que ponga fin a la guerra y abra una etapa de estabilidad en Oriente Medio.El plan contempla además la ampliación del ingreso de ayuda humanitaria a Gaza y el intercambio de rehenes israelíes por prisioneros palestinos.
+</div>
+</TD><TD>RESUMEN<BR>
+<div id=destino WIDTH=300PX contenteditable="true">
+</div>
+</TD></TR></TABLE>
+
+
+
+    <script>
+const API_KEY = "AIzaSyA_7paYEoeXBBTdrvSGcRpumNOVwmbrudI";
+
+async function consultarGemini(prompt) {
+    const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${API_KEY}`,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({ contents: [{ parts: [ {text: prompt }] }] })
+        }
+    );
+    const data = await res.json();
+    //console.log(data.candidates?.[0]?.content?.parts?.[0]?.text || "Sin respuesta")
+    resumen=data.candidates?.[0]?.content?.parts?.[0]?.text || "Sin respuesta";
+    document.getElementById('destino').innerText =resumen;
+}
+
+function verresumen()
+{
+
+origent="saca una conclusion en  español en el siguiente texto :" + document.getElementById('origen').innerText  ;
+
+consultarGemini(origent);
+}
+
+
+    </script>
+
+    <button onclick=verresumen()>resumen</buttton>
+    </body>
+    </html>
+
+
+
