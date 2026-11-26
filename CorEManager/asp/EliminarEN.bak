@@ -1,0 +1,293 @@
+<!-- #INCLUDE FILE="../IncFile/CorConect.inc" -->
+<%
+
+response.expires=0
+
+nAccion = request.querystring("Accion")
+nProced = request.querystring("Codproced")
+vuelta = request.querystring("volver")
+nCodigo = request.querystring("Codobjeto")
+sTipo = request.querystring("Tipobjeto")
+sID = request.querystring("ID")
+Tabla = request.querystring("Tabla")
+sEliminar = request.querystring("Eliminar")
+Volver = request.querystring("Volver")
+Volver = ofv.convertircar(Volver,"_","&")
+sUsuario = session("Usuario")
+if sEliminar = "NSNC" then session("volver2") = volver
+sMsg = ""
+ZDHOY = CLNG(DATE()) - clng(cdate("01-01-1900"))
+on error resume next
+
+set cn = ofv.conectar(ofv.strconn2)
+
+strsql = "Select * From " & Tabla & " Where objid = " & sID
+set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+if not rs.eof then
+  if Tabla = "Objeven" then
+    sObjeto = rs(3)
+
+    strsql = "Select * From Objproced Where codeven = " & sID
+    set rsx = ofv.crearconsultaEx(strsql,cn,1,volver)
+    if not rsx.eof then sMsg = "No puede eliminar " & sObjeto & " porque esta siendo utilizado"
+    call ofv.cerrarconsulta(rsx)
+    strsql = "Select * From Objesquema Where codevento = " & sID
+    set rsx = ofv.crearconsultaEx(strsql,cn,1,volver)
+    if not rsx.eof then sMsg = "No puede eliminar " & sObjeto & " porque esta siendo utilizado"
+    call ofv.cerrarconsulta(rsx)
+  elseif Tabla = "Objsector" then
+    strsql = "Select * From eco Where eco = " & rs(4)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(1)
+
+    strsql = "Select codsector From Objsector Where objid = " & sID
+    set rsx = ofv.crearconsultaEx(strsql,cn,1,volver)
+    nCodx = 0
+    if not rsx.eof then nCodx = rsx(0)
+    call ofv.cerrarconsulta(rsx)
+
+
+      strsql = "Select * From Objproced Where codsector = " & sID
+      set rsx = ofv.crearconsultaEx(strsql,cn,1,volver)
+      if not rsx.eof then sMsg = "No puede eliminar " & sObjeto & " porque esta siendo utilizado"
+      call ofv.cerrarconsulta(rsx)
+
+      strsql = "Select * From Objesquema Where (sectororigen = " & nCodx
+      strsql = strsql & " or sectordestino = " & nCodx & ") and codobjeto = " & nCodigo
+      set rsx = ofv.crearconsultaEx(strsql,cn,1,volver)
+      if not rsx.eof then sMsg = "No puede eliminar " & sObjeto & " porque esta siendo utilizado"
+      call ofv.cerrarconsulta(rsx)
+
+      strsql = "Select * From Objcontrol Where codsector = " & nCodx & " and codobjeto = " & nCodigo
+      set rsx = ofv.crearconsultaEx(strsql,cn,1,volver)
+      if not rsx.eof then sMsg = "No puede eliminar " & sObjeto & " porque esta siendo utilizado"
+      call ofv.cerrarconsulta(rsx)
+
+  elseif Tabla = "Objproced" or Tabla = "Objesquema" then
+    strsql = "Select descri From Objeven Where objid = " & rs(3)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "Objaccion" then
+    strsql = "Select descri From Tipoaccalt Where tipoaccionalt = " & rs(4)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "Objesquema2" then
+    strsql = "Select descri From Objcuenta Where objid = " & rs(4)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "Objcontrol" then
+    strsql = "Select Eco.descri From Eco Inner Join Objcontrol On "
+    strsql = strsql & "Eco.eco = Objcontrol.codsector "
+    strsql = strsql & "Where Objcontrol.objid = " & rs(0)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "Objcontrol2" then
+    strsql = "Select descri From Objcontrol2 Where Objcontrol2.objid = " & rs(0)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+    sObjeto = "este control?"
+  elseif Tabla = "Objaccioncontrol" then
+    strsql = "Select descri From Tipoaccalt Where tipoaccionalt = " & rs(2)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "Objtabdef" then
+    strsql = "Select tabtitulo From Objtabdef Where objid = " & rs(0)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "Objhtm" then
+    strsql = "Select descri From Objhtm Where objid = " & rs(0)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "Objestr" then
+    strsql = "Select contitulo From Objestr Where objid = " & rs(0)
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = rs(0)
+  elseif Tabla = "ORPARAMCUANTI" then
+    strsql = "SELECT P.PERIODO, O.DESCRI ,PC.NOMBRE_ARCHIVO FROM ORPARAMCUANTI PC LEFT JOIN ORPERIODOS P ON P.OBJID = PC.PERIODO_SELECCIONADO LEFT JOIN OBJETOS O ON O.CODOBJETO = PC.PROCESO WHERE ID = " & sID
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = " el registro del Periodo " & rs(0) & " - Proceso " + rs(1) & " - de la selección de parametros "
+  elseif Tabla = "ORPARAMEVENTOS" then
+    strsql = "SELECT * FROM ORPARAMEVENTOS WHERE ID = " & sID
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = " el registro " & rs(0) & " de la selección de parametros "
+  elseif Tabla = "ORPARAMPLANESTAREAS" then
+    strsql = "SELECT P.PERIODO, O.DESCRI ,PC.NOMBRE_ARCHIVO FROM ORPARAMPLANESTAREAS PC LEFT JOIN ORPERIODOS P ON P.OBJID = PC.PERIODO_SELECCIONADO LEFT JOIN OBJETOS O ON O.CODOBJETO = PC.PROCESO WHERE ID = " & sID
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = " el registro del Periodo " & rs(0) & " - Proceso " + rs(1) & " - de la selección de parametros "
+  elseif Tabla = "ORPARAMINDIVAR" then
+    strsql = "SELECT ORP.ID , ORP.NUM_INDICADOR ,ORI.DESCRIPCION FROM ORPARAMINDIVAR ORP LEFT JOIN ORINDICADORES ORI ON.ORI.OBJID = ORP.NUM_INDICADOR WHERE ORP.ID = " & sID
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = " el registro " & rs(0) & " de la selección de parametros "
+  elseif Tabla = "ORPARAMINDICADORES" then
+    strsql = "SELECT ORP.ID , ORP.PEDIDO FROM ORPARAMINDICADORES ORP WHERE ORP.ID = " & sID
+    call ofv.cerrarconsulta(rs)
+    set rs = ofv.crearconsultaEx(strsql,cn,1,volver)
+    sObjeto = " el registro " & rs(0) & " de la selección de parametros "
+  end if
+end if
+call ofv.cerrarconsulta(rs)
+
+if sEliminar <> "NO" then
+  if sMsg = "" then
+    if sEliminar = "NSNC" then
+      sMensaje = "Esta seguro que desea eliminar " & sObjeto
+      dato = "../Mensajes3.asp?msg=" & ofv.convertircar(sMensaje," ","_") & "&volver="
+      dato = dato & "asp/EliminarEN.asp?ID=" & sID & "&Tipobjeto=" & sTipo & "&Codobjeto="
+      dato = dato & nCodigo & "&Accion=" & nAccion & "&Codproced=" & nProced & "&vuelta="
+      dato = dato & vuelta & "&Botones=2" & "&Tabla=" & Tabla & chr(13)
+      response.redirect dato
+    elseif sEliminar = "SI" then
+           select case Ucase(tabla)
+                  case "OBJACCION"
+                       strsql = "Select * From " & Tabla & " Where objid = " & sID
+                       set rsb = ofv.crearconsultaEx(strsql,cn,1,volver)
+                       idb = 0
+                       idL = 0
+                       if not rsb.eof then
+                          idb = rsb(18)
+                          idL = rsb(19)
+                       end if
+                       call ofv.cerrarconsulta(rsb)
+
+                       if idL > 0 then
+                          strsql = "delete objlnk Where objid = " & idL
+                          call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                       end if
+
+                       strsql = "Delete From Objaccioncontrol Where idaccion = " & idb
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+                  case "OBJPROCED"
+                       strsql = "Select * From " & Tabla & " Where objid = " & sID
+                       set rsb = ofv.crearconsultaEx(strsql,cn,1,volver)
+                       idb = 0
+                       if not rsb.eof then idb = rsb(7)
+                       call ofv.cerrarconsulta(rsb)
+                       strsql = "Delete From Objaccioncontrol Where codproced = " & idb
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                       strsql = "Delete From Objaccion Where codproced = " & idb
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                  case "OBJCONTROL"
+                       strsql = "Delete From Objcontrol2 Where control = " & sID
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                  case "OBJESQUEMA"
+                       strsql = "Delete From Objesquema2 Where codesquema = " & sID
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                  case "OBJTABDEF"
+                       strsql = "Select * From objtabblk Where tabdef = " & sID
+                       set rsb = ofv.crearconsultaEx(strsql,cn,1,volver)
+                       idb = 0
+                       do until rsb.eof
+                          idb = rsb(0)
+                          strsql = "Delete From Objtabcon Where tabblk = " & idb
+                          call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                          rsb.movenext
+                       loop
+                       call ofv.cerrarconsulta(rsb)
+                       strsql = "Delete From Objtabblk Where tabdef = " & sID
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                  case "OBJTABBLK"
+                       strsql = "Delete From Objtabcon Where tabblk = " & sID
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                  case "OBJESTR"
+
+                       strsql = "Delete From Objestdet Where detcon = " & sID
+                   '    RESPONSE.WRITE STRSQL & chr(13)
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+                       strsql = "Delete From Objestprty Where detcon = " & sID
+                    '    RESPONSE.WRITE STRSQL & chr(13)
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+
+
+                  case "OBJESTDET"
+				       strsql = "Delete From Objlnk Where ltipo='KL' AND IDEN1 = '" & sID &"' AND CODOBJETO=" & nCodigo
+				      '  strsql = "Delete From Objlnk Where  IDEN1 = '" & sID &"' AND CODOBJETO=" & nCodigo
+				   '    response.write strsql
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+				  case "ORPARAMCUANTI"
+				       'strsql = "Delete From Objlnk Where ltipo='KL' AND IDEN1 = '" & sID &"' AND CODOBJETO=" & nCodigo
+				        strsql = "UPDATE ORPARAMCUANTI SET FLG_BORRADO = 'S', FECHA_BORRADO = (SELECT CONVERT(INT, GETDATE() - 1)), USUARIO_BORRADO = '" & session("usuario") & "' WHERE ID = " & sID
+				       'response.write strsql
+                       call ofv.crearconsultaEx(StrSql,cn,1,volver)
+           end select
+
+      strsql= "Delete From " & Tabla & " Where objid = " & sID
+     ' RESPONSE.WRITE STRSQL
+      call ofv.crearconsultaEx(StrSql,cn,1,volver)
+      if cn.errors.count = 0 then
+         if Ucase(tabla) <> "OBJWFLDET" then
+            strsql = "Update Objprty Set aprobo = '" & sUsuario & "' Where codobjeto = " & nCodigo
+            call ofv.crearconsultaEx(StrSql,cn,1,volver)
+         end if
+
+      end if
+
+
+      Volver = session("volver2")
+      if tabla = "Objaccioncontrol" then
+         Volver = Volver & "?Codproced=" & nProced & "&Codobjeto=" & nCodigo & "&Accion="
+         Volver = Volver & nAccion & "&Tipobjeto=" & sTipo & "&vuelta=" & vuelta
+      else
+         if right(volver,3) = "asp" then
+            volver = volver & "?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+         else
+            volver = volver & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+         end if
+      end if
+    ' RESPONSE.WRITE REQUEST.QUERYSTRING
+     set errores = cn.errors
+     if errores.count = 0 then
+        response.redirect volver
+     else
+        response.write ofv.ErrorDB(cn,volver)
+     end if
+
+    end if
+  else
+    dato = "../Mensajes3.asp?msg=" & ofv.convertircar(sMsg," ","_") & "&volver="
+    dato = dato & "asp/EliminarEN.asp?ID=" & sID & "&Tipobjeto=" & sTipo & "&Codobjeto="
+    dato = dato & nCodigo & "&Accion=" & nAccion & "&Codproced=" & nProced & "&vuelta="
+    dato = dato & vuelta & "&Botones=1" & "&Tabla=" & Tabla & chr(13)
+    response.redirect dato
+  end if
+
+else
+
+
+      Volver = session("volver2")
+      if tabla = "Objaccioncontrol" then
+         Volver = Volver & "?Codproced=" & nProced & "&Codobjeto=" & nCodigo & "&Accion="
+         Volver = Volver & nAccion & "&Tipobjeto=" & sTipo & "&vuelta=" & vuelta
+      else
+         if right(volver,3) = "asp" then
+            volver = volver & "?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+         else
+            volver = volver & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+         end if
+      end if
+        ' RESPONSE.WRITE REQUEST.QUERYSTRING
+        response.redirect volver
+
+end if
+
+
+
+call ofv.cerrarconsulta(rs)
+call ofv.cerrarconn(cn)
+
+%>

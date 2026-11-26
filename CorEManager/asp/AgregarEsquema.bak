@@ -1,0 +1,326 @@
+<!-- #INCLUDE FILE="../IncFile/CorConect.inc" -->
+<%
+
+response.expires=0
+
+sTipo = request.querystring("Tipo")
+sNombre = request.querystring("Nombre")
+sUsuario = session("Usuario")
+sElemento = request.querystring("Elemento")
+n = InStr(sElemento,"-")
+If n > 0 Then
+	nCodMaster = Left(sElemento,n-1)
+	sTipoMaster = Mid(sElemento,n+1)
+	n = InStr(sTipoMaster,"-")
+	sTipoMaster = Left(sTipoMaster,n-2)
+End If
+
+SPTIPO = request.querystring("SPTIPO")
+
+'response.write " elemento " & selemento & " tipomaster " & stipomaster
+
+On Error Resume Next
+
+Set cn = ofv.conectar(ofv.strconn2)
+nFecini = 0
+
+
+
+If nFecini < CLng(CDate("01-01-1900")) Then
+	nFecini = CLng(CDate("01-01-1900"))
+Else
+	nFecini = 0
+End If
+
+strsql = "select * from Objetos"
+Set rs = ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+strsql = "Insert into Objetos (Tipobjeto"
+
+For Each x In Request.form
+	strsql = strsql & "," & x
+Next
+
+
+strsql = strsql & ") Values ('" & sTipo & "'"
+
+For Each yy In Request.form
+	x = LCase(yy)
+	If x = "aplic" Then WKFAPLIC = Request.Form(x)
+	TipoValido = ofv.ValidarTipo(rs(x),Request.Form(x))
+	If TipoValido = False And LCase(rs(x).name) <> "codiden" Then Exit For
+	ValorNulo = ofv.EsNulo(rs(x),Request.Form(x))
+	If ValorNulo = True And rs(x).name <> "codiden" Then Exit For
+	s = ofv.queesx(rs(x).type)
+	If rs(x).type = 200 Then s = "'"
+	If LCase(rs(x).name) = "codiden" Then
+		strsql = strsql & ",'" & CStr(session.sessionid) & "'"
+		TipoValido = True
+		ValorNulo = False
+	Else
+		strsql = strsql & "," & s & UCase(Request.Form(x)) & s
+	End If
+Next
+
+
+volver = "../vuelve.asp"
+If TipoValido = False Or ValorNulo = True Then
+	On Error Resume Next
+	response.write ofv.ErrorTipo(volver,Request.Form(x),rs(nx).name)
+	If Err.number <> 0 Then response.write ofv.ErrorTipo(volver,"","")
+Else
+	strsql = strsql & ")"
+	' response.write "primer insert " & strsql & "<br>"
+	Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+	
+	If cn.errors.count = 0 Then
+		Call ofv.cerrarconsulta(rs)
+		
+		strsql = "Select codobjeto From Objetos Where codiden = '" & CStr(session.sessionid) & "'"
+		
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,volver)
+		If Not rs.eof Then nCodAsoc = rs(0)
+		
+		Call ofv.cerrarconsulta(rs)
+		
+		If request.form("codiden") = "" Then
+			ncodiden = "SD"
+		Else
+			ncodiden =  request.form("codiden")
+		End If
+		
+		strsql = "Update Objetos set codiden = '" & ncodiden & "', indobj = 10 "
+		strsql = strsql & " where codiden = '" & CStr(session.sessionid) & "'"
+		Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+		
+		Strsql = "SELECT * FROM OBJdistPrty  "
+		Strsql = Strsql & " Where codobjeto=0"
+		Strsql = Strsql & " And tipobjeto = 'DEFDST' "
+		
+		Set OBJdistPrty = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+		
+		If OBJdistPrty.eof Then
+			Strsql = "insert into OBJdistPrty  (codobjeto,tipobjeto,emisor,asunto,texto,importancia,aviso,dias) values ("
+			Strsql = Strsql & nCodAsoc & ",'" & stipo & "','" & session("usuario") & "','Activacion de <ESQNOR>',"
+			Strsql = Strsql & "'<ESQNOR> esta vigente a partir de la fecha',1,'NO','7')"
+		Else
+			Strsql = "insert into OBJdistPrty  (codobjeto,tipobjeto,emisor,asunto,texto,importancia,aviso,dias) values ("
+			Strsql = Strsql & nCodAsoc & ",'" & stipo & "','COREMANAGER','"& OBJdistPrty("asunto")& "',"
+			
+			Strsql = Strsql & "'" & OBJdistPrty("texto")&"',"& OBJdistPrty("importancia") &",'"& OBJdistPrty("aviso")&"','"& OBJdistPrty("dias")&"')"
+		End If
+		Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+		' response.write "2do insert " & strsql & "<br>"
+		Call ofv.cerrarconsulta(OBJdistPrty)
+		sNIVE = "D"
+		
+		StrSql = "Select TIPOCPT From Tipobjeto "
+		StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & stipo & "'"
+		Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+		If  Not rsIcono.EOF Then
+			sNIVE  = rsIcono(0)
+		End If
+		Call OFV.cerrarconsulta(rsIcono)
+		
+		
+		If SESSION("EMPMUN") = "S" Then
+			
+			Strsql = "insert into OBJdist  (codobjeto,tipobjeto,GRPUSR,SECTOR) values ("
+			Strsql = Strsql & nCodAsoc & ",'" & stipo & "','TODOS','" & session("UN") & "')"
+			Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+			'    response.write "3 insert " & strsql & "<br>"
+		End If
+		
+		strsql = "Insert into Relaobj (Codobjmaster,Tipobjmaster,Codojasoc,Tipobjasoc) "
+		strsql = strsql & "Values (" & nCodMaster & ",'" & sTipomaster & "',"
+		strsql = strsql & nCodAsoc & ",'" & sTipo & "')"
+		'    response.write "4 insert " & strsql & "<br>"
+		Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+		nEstado = 1
+		If cn.errors.count = 0 Then
+			
+			If sNIVE = "D" Then
+				strsql = "Select objid From Estados Where estado = '" & UCase(session("menu")) & "'"
+				
+				' response.write "estado " & strsql & "<br>"
+				Set rs = ofv.crearconsultaEx(StrSql,cn,1,volver)
+				If Not rs.eof Then nEstado = rs(0)
+			Else
+				nEstado = 3
+			End If
+			
+			If WKFAPLIC = "RG" Then nEstado = 3
+			If WKFAPLIC = "PL" Then nEstado = 1
+			
+			'      dFechaNula = "1/1/1900"
+			dFechaNula = CLng(CDate("01-01-1900")) - nFecini
+			dHoy = CLng(Date) - nFecini
+			strsql = "Insert into Objprty (codobjeto, tipobjeto, estado, fecemis, fecvigen, "
+			strsql = strsql & "fecbaja, fecvto, fecacta,fecpublic, autor) Values (" & nCodAsoc & ",'" & sTipo & "',"
+			strsql = strsql & nEstado & ",'" & DHoy & "','" & DFechaNula & "','"
+			strsql = strsql & DFechaNula & "','" & DFechaNula & "','" & dFechaNula & "','" & dFechaNula & "','" & sUsuario & "')"
+			
+			'  response.write "5 insert " & strsql & "<br>"
+			
+			Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+			If cn.errors.count = 0 Then
+				strsql = "Insert into OBJSDK (codobjeto, tipobjeto, segct,segmo,segco,segce,segown "
+				strsql = strsql & ") Values (" & nCodAsoc & ",'" & sTipo & "',0,0,0,0,'"
+				strsql = strsql & Session("Usuario") & "')"
+				'     response.write "6 insert " & strsql & "<br>"
+				Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+				
+				' SE AGREGA ALCANCE 22/9
+				
+				If session("APLMDCLI")="GP" Then
+					strsql = "Insert into OBJMEMPALC (codobjeto, tipobjeto, codempre"
+					strsql = strsql & ") Values (" & nCodAsoc & ",'" & sTipo & "','" & SESSION("CLIEMP") & "')"
+					Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+				End If
+				
+				If cn.errors.count = 0 Then
+					strsql = "Insert into OBJWFL (codobjeto, tipobjeto)"
+					strsql = strsql & " Values (" & nCodAsoc & ",'" & sTipo & "')"
+					'      response.write "7 insert " & strsql & "<br>"
+					Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+					If cn.errors.count = 0 Then
+						
+						'''''''''''' SOLO PARA SUBPROCESOS CON VINCULACION EXPLICITA (ACTIVIDADES ADMINISTRADAS EN FORMA MANUAL)
+						If SPTIPO = "CR" Or SPTIPO = "AI" Then
+							
+							
+							GETFECH()
+							
+							WKFECHA = XLFECDAT - CLng(CDate("01-01-1900"))
+							WKHORA  = XLHORDAT
+							WKSECTOR = 0
+							
+							strsql = "insert into OBJSECTOR  ("
+							strsql = strsql & "codobjeto,tipobjeto,codSECTOR,MODI,"
+							strsql = strsql & "TIPMODI,MODAUTOR,MODFECHA,MODHORA"
+							strsql = strsql & ") values ("
+							strsql = strsql & nCodAsoc & ",'" & sTipo & "','0','1',"
+							strsql = strsql & "'A','" & SESSION("USUARIO") & "','" & WKFECHA & "','" & WKHORA & "'"
+							strsql = strsql & ")"
+							'        response.write "8 insert " & strsql & "<br>"
+							Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+							
+							strsql = "SELECT OBJID FROM OBJSECTOR "
+							strsql = strsql & " WHERE CODOBJETO = " & nCodAsoc & " "
+							Set rsN = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+							If Not rsN.eof Then
+								WKSECTOR = rsN(0)
+							End If
+							
+							
+							sevento = 0
+							sukey = GTkey(nCodAsoc)
+							
+							strsql = "insert into objproced  ("
+							strsql = strsql & "codobjeto,tipobjeto,codproced,codeven,"
+							strsql = strsql & "frecuencia,tipproced,CODSECTOR,MODI,"
+							strsql = strsql & "TIPMODI,MODAUTOR,MODFECHA,MODHORA"
+							strsql = strsql & ") values ("
+							strsql = strsql & nCodAsoc & ",'" & sTipo & "','" & sukey & "','" & sevento & "',"
+							strsql = strsql & "'DIARIA','" & wkaplic & "','" & WKSECTOR & "','1',"
+							strsql = strsql & "'A','" & SESSION("USUARIO") & "','" & WKFECHA & "','" & WKHORA & "'"
+							strsql = strsql & ")"
+							'          response.write "9 insert " & strsql & "<br>"
+							Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+							
+							
+							
+							
+							strsql = "Insert into OBJLNK (codobjeto, tipobjeto, iden1, iden2, codobjetoL, tipobjetoL, Lurl, LurlDesc, LTipo "
+							strsql = strsql & ",IDEN3L,IDEN4,IDEN4L) Values ('" & nCodMaster & "','" & sTipomaster & "',"
+							strsql = strsql & "'" & nCodMaster & "','" & nCodMaster & "',"
+							strsql = strsql & "'" & nCodAsoc & "','" & sTipo & "','','','LRGCR','5','" & sukey & "','0'"
+							strsql = strsql & ")"
+							'    response.write "10 insert " & strsql & "<br>"
+							Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+							
+							Strsql = "SELECT * From OBJLNK where iden1 = '" & nCodMaster & "' and iden2 = '" & nCodMaster & "' and LTIPO = 'LRGCR' "
+							Set rsN = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+							If Not rsN.eof Then
+								wlnkid = rsN(0)
+							Else
+								wlnkid = 0
+								wlink = 0
+							End If
+							Call ofv.cerrarconsulta(rsN)
+							
+							If CLng(wlnkid) > 0 Then
+								strsql = "update OBJETOS set rellink = " & wlnkid
+								strsql = strsql & " where  codobjeto = 0" & nCodMaster
+								Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+							End If
+							
+							
+							
+						End If
+						
+						'''''''''''' SOLO PARA OBJETOS SOPORTE DEL PLAN DE CONTINGENCIAS
+						If SPTIPO = "PL" Then
+							
+							
+							GETFECH()
+							
+							WKFECHA = XLFECDAT - CLng(CDate("01-01-1900"))
+							WKHORA  = XLHORDAT
+							WKSECTOR = 0
+							
+							
+							strsql = "Insert into OBJLNK (codobjeto, tipobjeto, iden1, iden2, iden3, codobjetoL, tipobjetoL, Lurl, LurlDesc, LTipo "
+							strsql = strsql & ",IDEN3L,IDEN4,IDEN4L) Values ('" & nCodMaster & "','" & sTipomaster & "',"
+							strsql = strsql & "'" & nCodMaster & "','" & nCodMaster & "','" & SESSION("ORPERIODO") & "',"
+							strsql = strsql & "'" & nCodAsoc & "','" & sTipo & "','','','LRGPL','0','0','0'"
+							strsql = strsql & ")"
+							'          response.write "11 insert " & strsql & "<br>"
+							Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+							
+							Strsql = "SELECT * From OBJLNK where iden1 = '" & nCodMaster & "' and "
+							strsql = strsql & " iden2 = '" & nCodMaster & "' and "
+							strsql = strsql & " iden3 = '" & SESSION("ORPERIODO") & "' and "
+							strsql = strsql & "LTIPO = 'LRGPL' "
+							Set rsN = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+							If Not rsN.eof Then
+								wlnkid = rsN(0)
+							Else
+								wlnkid = 0
+								wlink = 0
+							End If
+							Call ofv.cerrarconsulta(rsN)
+							
+							If CLng(wlnkid) > 0 Then
+								strsql = "update OBJETOS set rellink = " & wlnkid
+								strsql = strsql & " where  codobjeto = 0" & nCodMaster
+								Call ofv.crearconsultaEx(StrSql,cn,1,volver)
+							End If
+							
+							
+							
+						End If
+						
+						
+						response.redirect volver
+					Else
+						response.write ofv.ErrorDB(cn,volver)
+					End If
+				Else
+					response.write ofv.ErrorDB(cn,volver)
+				End If
+			Else
+				response.write ofv.ErrorDB(cn,volver)
+			End If
+		Else
+			response.write ofv.ErrorDB(cn,volver)
+		End If
+	Else
+		response.write ofv.ErrorDB(cn,volver)
+	End If
+End If
+
+Call ofv.cerrarconsulta(rs)
+Call ofv.cerrarconn(cn)
+
+%>

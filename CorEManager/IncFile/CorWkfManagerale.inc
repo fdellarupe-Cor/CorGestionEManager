@@ -1,0 +1,2159 @@
+<%
+
+nFecini = 0
+xstyle=" style='font-size: 10pt; font-family: Verdana;' "
+if nFecini < clng(cdate("01-01-1900")) then
+   nFecini = clng(cdate("01-01-1900"))
+else
+   nFecini = 0
+end if
+
+function ORRECALCEVENTO(XORCODIGO,XORMODAL)
+
+  DIM XORTABCARACTER(100,2)
+  XORTABIND = 0
+  XORTOPIND = 0
+
+  XORSENENCA = "NO"
+
+  XORIMPOM = 0
+  XORIMPRE = 0
+  XORIMPPO = 0
+  XORIMPDE = 0
+  XORIMPNC = 0
+
+  XORCODCARACTER = 0
+  XOROPCNETO     = "S"
+  XORESHIJO      = "N"
+  simpcont="X"
+        Strsql = "select TRCCODTRACERP,TRCCARACTER FROM ORTRACER  WHERE CODTRACER = '" & XORCODIGO & "'    "
+''  response.write strsql & "<br>"
+        set Xrs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+        IF NOT XRS2.EOF THEN
+
+           XORCODCARACTER = XRS2(1) & ""
+
+           IF (XRS2(0) & "") <> "" THEN
+
+               XORSENENCA    = "SI"
+               XORCODIGORAIZ = XRS2(0)
+               XORESHIJO     = "S"
+               sFECREGIS     = CLNG(DATE()) - clng(cdate("01-01-1900"))
+
+               Strsql = "UPDATE ORTRACER SET  "
+               strsql = Strsql & " TRCMARCAACTH = 'A', TRCFECACTH = '" & sFECREGIS & "' "
+               Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+
+
+        ''  RESPONSE.WRITE Strsql & "<BR>"
+          ''''     call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+           ''    XORESHIJOxx     = 0
+            ''   sFECREGIS     = sFECREGIS  / XORESHIJOxx
+
+           END IF
+
+
+
+
+           Strsql = "Select * From ORTIPOCARACTER WHERE OBJID = 0" & XORCODCARACTER
+           ''response.write strsql & chr(13)
+           set Xrs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+           if NOT Xrs.eof then
+           	       simpcont=xrs("IMPCONT") ' ME FIJO SI TIENE IMPACTO CONTABLE
+      '''''        'response.write "PASO2<BR>"
+              IF (XRS(2) & "") = "NCN" THEN XOROPCNETO = "N"
+           END IF
+
+
+        END IF
+
+   IF XORMODAL = "SI" THEN
+
+      XORSENENCA = "SI"
+      XORCODIGORAIZ = XORCODIGO
+
+   END IF
+
+
+   IF  XORSENENCA = "SI" THEN
+
+
+       Strsql = "Select * From ORTIPOCARACTER ORDER BY OBJID"
+       set Xrs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+       if NOT Xrs.eof then
+
+          DO WHILE NOT XRS.EOF
+              XORTABIND = XORTABIND + 1
+
+              XORTABCARACTER(XORTABIND,0) = XRS(0) 'CODIGO
+              XORTABCARACTER(XORTABIND,1) = XRS(2) 'ACUMULA
+
+
+              XORTOPIND = XORTABIND
+
+           XRS.MOVENEXT
+          LOOP
+
+
+       END IF
+
+''' CARACTER   --- 24
+
+
+''' MON.BRUTO  --- 12
+
+''' OTR.MONTOS --- 14
+''' RECUPEROS  --- 15
+''' PERDIDAS   --- 13
+''' DESAFECTA  --- 36
+''' NO CONTABLES -- 42 - TRCIMPNOCTBLE - NCN
+
+
+        Strsql = "select trcimpbruto,trccaracter FROM ORTRACER  WHERE TRCCODTRACERP = '" & XORCODIGORAIZ & "' AND TRCESTADO <> 'CAN'  "
+''  'response.write strsql & "<br>"
+        set Xrs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+        IF NOT XRS2.EOF THEN
+
+           DO WHILE NOT XRS2.EOF
+
+
+              XORWKCARACTER = CLNG("0" & XRS2(1))
+              XORWKimpbruto = CDBL(XRS2(0))
+
+              XORWKCARACMON = "OM"
+
+
+              FOR XORTABIND=1 TO XORTOPIND
+
+                  IF XORTABCARACTER(XORTABIND,0) = XORWKCARACTER THEN
+                     XORWKCARACMON = XORTABCARACTER(XORTABIND,1)
+                     EXIT FOR
+                  END IF
+
+              NEXT
+
+''  XORIMPOM = 0
+''  XORIMPRE = 0
+''  XORIMPPO = 0
+''  XORIMPDE = 0
+''  XORIMPNC = 0
+
+
+              SELECT CASE  XORWKCARACMON
+                     CASE "OM"
+
+                          XORIMPOM = XORIMPOM + XORWKimpbruto
+
+                     CASE "REC"
+
+                          XORIMPRE = XORIMPRE + XORWKimpbruto
+
+                     CASE "DES"
+
+                          XORIMPDE = XORIMPDE + XORWKimpbruto
+
+                     CASE "PER"
+
+                          XORIMPPO = XORIMPPO + XORWKimpbruto
+
+                     CASE "NCN"
+
+                          XORIMPNC = XORIMPNC + XORWKimpbruto
+
+                     CASE ELSE
+
+                          XORIMPOM = XORIMPOM + XORWKimpbruto
+
+              END SELECT
+
+            XRS2.MOVENEXT
+
+           LOOP
+
+        END IF
+
+
+
+        Strsql = "UPDATE ORTRACER SET "
+        Strsql = Strsql & " TRCIMPOTROS = '" & REPLACE(XORIMPOM & "",",",".") & "' , "
+        Strsql = Strsql & " trcimpacrecen = '" & REPLACE(XORIMPPO & "",",",".") & "' , "
+        Strsql = Strsql & " TRCIMPDESAFECTA = '" & REPLACE(XORIMPDE & "",",",".") & "' , "
+        Strsql = Strsql & " TRCIMPRECUPERA = '" & REPLACE(XORIMPRE & "",",",".") & "', "
+        Strsql = Strsql & " TRCIMPNOCTBLE = '" & REPLACE(XORIMPNC & "",",",".") & "' "
+        Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+        'response.write "11 " & strsql & chr(13)
+        call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+     IF XOROPCNETO = "N" THEN
+    '    if Simpcont="N"   then
+    '     Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+	'	 Strsql = Strsql & " (  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+    '     Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+    '    else
+    '    Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+    '    Strsql = Strsql & " ( TRCIMPBRUTO +  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+    '    Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+    '    end if
+    '    response.write "1 " & strsql & chr(13) & Simpcont & chr(13)
+    '    call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+
+        IF XORESHIJO     = "S" then
+
+           Strsql = "UPDATE ORTRACER SET  "
+           Strsql = Strsql & " TRCIMPNOCTBLE = (  TRCIMPNOCTBLE  + " & REPLACE(XORIMPNC & "",",",".") & " ) "
+           Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+
+    '    RESPONSE.WRITE Strsql & "<BR>"
+       ''    call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+
+
+      '     response.write "2 " & strsql & chr(13)
+
+
+        ELSE
+
+          ' if Simpcont="N" then
+          ' Strsql = "UPDATE ORTRACER SET  "
+		  ' Strsql = Strsql & " TRCIMPNOCTBLE = (  TRCIMPNOCTBLE   ) "
+          ' Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+          ' else
+        '   Strsql = "UPDATE ORTRACER SET  "
+       '    Strsql = Strsql & " TRCIMPNOCTBLE = (  TRCIMPNOCTBLE  + TRCIMPBRUTO ) "
+       '    Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+          ' end if
+      ''    RESPONSE.WRITE Strsql & "<BR>"
+         ' call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+           'response.write "3 " & strsql & chr(13)
+      '     STRSQL = "select B.IMPCONT from ortracer A "
+	'	   STRSQL=STRSQL & " INNER JOIN ortipocaracter B ON(A.TRCCARACTER=B.OBJID)"
+	'	   Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+	'	            response.write "12" & strsql & chr(13)
+	'	   set Xrs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	'	   IF NOT Xrs2.eof then
+	'		Simpcont=Xrs2(0)
+	'	   else
+	'		Simpcont="S"
+      '     end if
+
+        END IF
+
+        STRSQL = "select B.IMPCONT from ortracer A "
+		   STRSQL=STRSQL & " INNER JOIN ortipocaracter B ON(A.TRCCARACTER=B.OBJID)"
+		   Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+					'response.write "12" & strsql & chr(13)
+		   set Xrs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+		   IF NOT Xrs2.eof then
+			Simpcont=Xrs2(0)
+		   else
+			Simpcont="S"
+         end if
+
+        if Simpcont="N"   then
+		         Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+				 Strsql = Strsql & " (  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+		         Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+		 else
+		        Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+		        Strsql = Strsql & " ( TRCIMPBRUTO +  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+		        Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+		end if
+         call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+        'response.write "1 " & strsql & chr(13) & Simpcont & chr(13)
+
+
+
+
+     ELSE 'XORSENENCA = "NO"
+
+
+        STRSQL = "select B.IMPCONT from ortracer A "
+	    STRSQL=STRSQL & " INNER JOIN ortipocaracter B ON(A.TRCCARACTER=B.OBJID)"
+        Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+         'response.write "12" & strsql & chr(13)
+        set Xrs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+        IF NOT Xrs2.eof then
+         Simpcont=Xrs2(0)
+        else
+         Simpcont="S"
+        end if
+
+
+        if Simpcont="N" then
+        Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+		Strsql = Strsql & " (  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+        Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+        else
+        Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+        Strsql = Strsql & " ( TRCIMPBRUTO + TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+        Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGORAIZ & "' "
+        end if
+
+
+        'response.write "4 " & strsql & chr(13)
+        call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+
+     END IF
+
+  else
+
+     IF XOROPCNETO = "N" THEN
+
+        if Simpcont="N" then
+         Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+         Strsql = Strsql & " (  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+         Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGO & "' "
+        else
+         Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+		 Strsql = Strsql & " (  TRCIMPBRUTO + TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+         Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGO & "' "
+        end if
+        'response.write "5 " & strsql & chr(13)
+        call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+     else
+        if Simpcont="N" then
+        Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+		Strsql = Strsql & " (  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+        Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGO & "' "
+        else
+        Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+        Strsql = Strsql & " ( TRCIMPBRUTO +  TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+        Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGO & "' "
+        end if
+        'response.write "6 " & strsql & chr(13)
+        call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+     end if
+
+
+
+  END IF
+
+   IF XORMODAL = "NO" THEN
+
+       IF XOROPCNETO = "S" THEN
+   '''''       RESPONSE.WRITE "PASO4<BR>"
+
+          Strsql = "UPDATE ORTRACER SET TRCIMPNETO = "
+          Strsql = Strsql & " ( TRCIMPBRUTO + TRCIMPOTROS - TRCIMPRECUPERA + trcimpacrecen - TRCIMPDESAFECTA) "
+          Strsql = Strsql & " WHERE  CODTRACER = '" & XORCODIGO & "' "
+
+          'response.write "9 " & strsql & chr(13)
+          call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+       END IF
+
+   END IF
+
+'response.write "XOROPCNETO="&XOROPCNETO &"       Simpcont= " & Simpcont & "    XORSENENCA=" & XORSENENCA & "      XORESHIJO=" & XORESHIJO & "           XORMODAL=" & XORMODAL & "   XORCODIGO=" & XORCODIGO
+END FUNCTION
+
+
+
+
+function getobjurl(getnCodigo,getstipo)
+
+
+  WKURLCONS = getnCodigo & "-" & getstipo
+
+  set getcn = ofv.conectar(ofv.strconn2)
+
+
+  xStrsql = "SELECT * FROM TIPOBJETO  "
+  xStrsql = xStrsql & " Where  tipobjeto = '" & getstipo & "' "
+
+  set getrs = ofv.crearconsultaEx(xStrSql,getcn,1,parametros)
+  if not getrs.eof then
+
+    wkhosturl = request.servervariables("HTTP_REFERER")
+
+    wkhosturlX = ucase(wkhosturl & "NO")
+
+    wkhosturln = instr(wkhosturlX,"/COREMANAGER/")
+
+    if wkhosturln > 0 then
+
+       wkhosturl = left(wkhosturl,wkhosturln)
+
+
+    else
+
+       wkhosturln = instr(UCASE(request.servervariables("SCRIPT_NAME") & "NO"),"/COREMANAGER/")
+
+       wkhosturl = left(request.servervariables("SCRIPT_NAME") & "NO",wkhosturln)
+
+       wkhosturl = "http://" & request.servervariables("SERVER_NAME") & ":" & request.servervariables("SERVER_PORT") & wkhosturl
+
+
+    end if
+
+    WKURLCONS = wkhosturl
+
+
+    WKURLCONS = WKURLCONS & "coress20/corexpress.asp?opt=CC-" & getnCodigo & "-" & getstipo
+
+   end if
+
+   getobjurl = WKURLCONS
+
+
+end function
+
+
+function EsqnomP(xtipo,xcodigo,ofv)
+
+ set xcn=ofv.conectar(ofv.strconn2)
+
+
+ IF xtipo = "RSK" THEN
+
+    strsql = "SELECT * FROM  ORRSKCIRCUITO "
+    strsql = strsql & " Where OBJID = 0" & xcodigo
+    set xrs = ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+    if not xrs.eof then
+       IF XRS("APLIC") = "OR" THEN
+          xdescri = "CIRCUITO AUTOEVALUACION"
+       ELSE
+          xdescri = "PLAN DE CONTINGENCIAS"
+       END IF
+
+       Strsql = "Select * From objetos where codobjeto = 0" & XRS("CODOBJETO")
+       set xrs = ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+       if not xrs.eof then
+          xiden = xrs(1)
+          xobjdes = xrs(3)
+       end if
+
+
+    END IF
+    call ofv.cerrarconsulta(xrs)
+
+ ELSE
+
+
+
+
+    Strsql="Select descri From tipobjeto where tipobjeto ='" & xtipo & "' "
+    set xrs=ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+    if not xrs.eof then xdescri = xrs(0)
+    call ofv.cerrarconsulta(xrs)
+
+    Strsql="Select * From objetos where codobjeto =" & xcodigo
+    set xrs=ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+    if not xrs.eof then
+       xiden = xrs(1)
+       xobjdes = xrs(3)
+    end if
+    call ofv.cerrarconsulta(xrs)
+
+ END IF
+
+
+
+
+
+ call ofv.cerrarconn(xcn)
+
+ esqnomP = xdescri & ": "  & xobjdes
+
+end function
+
+
+function msgsend(xusr,xmsgusr,ofv,xnCodigo,xsTipo,xsnovcodi)
+
+
+xmsgusrn = replace(xmsgusr,">>>","<br>")
+xmsgusr = replace(xmsgusr,">>>"," ")
+
+set xcn=ofv.conectar(ofv.strconn0)
+
+Strsql="Select ID, descripcion From usuarios where ID ='" & xusr & "' "
+set xrs=ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+
+If xrs.Eof then
+  call ofv.cerrarconsulta(xrs)
+Else
+
+  Xdestinodesc = xrs(1)
+  call ofv.cerrarconsulta(xrs)
+end if
+
+call ofv.cerrarconn(xcn)
+
+set xcn=ofv.conectar(ofv.strconn3)
+
+YC = 1
+YD = 0
+Xmarca = 0
+
+Strsql= " select * from CsMsgSearch where Msgusrid ='" & xusr & "'  order by msgid DESC"
+set xrs=ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+Do until xrs.Eof
+
+if YC > 14 then
+  Redim Preserve Xmsgid(YD)
+  Xmsgid(YD) = xrs(0)
+  YD = YD + 1
+  Xmarca = 1
+end if
+
+  xrs.Movenext
+  YC = YC + 1
+
+Loop
+call ofv.cerrarconsulta(xrs)
+
+if Xmarca = 1 then
+   for YC = 0 to Ubound(Xmsgid)
+       Strsql= " delete  from MsgChat where Msgid =" & Xmsgid(YC)
+       call ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+   next
+end if
+
+Strsql="insert into MsgChat (Msgusrid,Msgusrdesc,Msgtstamp,Msgdata,Msgusrorigid,Msgusroridesc) Values('"
+Strsql= Strsql & xusr & "','" & Xdestinodesc & "','" & now  & "','" & xmsgusr & "','" & Session("usuario") & "','" & Session("segusuario") & "') "
+'response.write strsql
+call ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+
+call ofv.cerrarconn(xcn)
+
+set xcn = ofv.conectar(ofv.strconn0)
+
+                         strsql = "Select email From Usuarios  where ID = 'COREMANAGER' "
+                         set rsx1 = ofv.crearconsultaEx(StrSql,xcn,1,volver)
+                         if not rsx1.eof then
+                            if len(rsx1(0)) > 0 then
+                               xfromusr = "COREMANAGER"
+                               xfrommail = trim(rsx1(0))
+                            end if
+
+                         end if
+                         call ofv.cerrarconsulta(rsx1)
+
+
+
+strsql = "Select email,DESCRIPCION From Usuarios  where ID = '" & xusr & "' "
+
+set rsx11 = ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+        if not rsx11.eof then
+                if len(rsx11(0)) > 0 then
+                    xfromusr = "COREMANAGER"
+                    xfrom = trim(rsx11(0))
+                    xPARA2 = "DESTINATARIO " & rsx11(1)
+                end if
+        end if
+call ofv.cerrarconsulta(rsx11)
+call ofv.cerrarconn(xcn)
+
+'''  XXXMAIL
+
+if (xfrom <> "" or len(xfrom) > 0) then
+
+  ' message = "<u><font size=1 color=#000080 >" & XPARA2 & "</font></u><BR><BR><b><font size=1  >" & xmsgusrn & "</font><b>"
+    message = "<P "& xstyle &" >" & XPARA2 & "<BR><BR><b>" & xmsgusrn & "<b></P>"
+   CALL SendMail(message, xfrom, xfrommail,"CIRCUITO DE AUTORIZACION", session("MailComponent"),"SI",1, "NO")
+
+end if
+
+set xcn = ofv.conectar(ofv.strconn2)
+
+        xnovcod = xsnovcodi
+        dFechai = clng(date()) - nFecini
+        dFechae = clng(date()) - nFecini + 300
+        xhora = time()
+
+        strsql = "Insert into novedades (codobjeto,tipobjeto,codigo,tipo,fecinicio,fecexp,mensaje,importancia,relacion,workflowid,contacto,hora) "
+        strsql = strsql & " values (" & xnCodigo & ",'" & xsTipo & "','" & xnovcod & "',4," & dFechai & "," & dFechae & ",'" & xmsgusrn & "',0,0,0,'" & xfromusr & "','" & xhora & "')"
+        response. write  "<br> 1 " & strsql & "<br>"
+        call ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+
+        strsql = "Insert into novedadesdist (codigo,usugrp,sector,fecexp,hora) "
+        strsql = strsql & " values ('" & xnovcod & "','" & xusr & "',0," & dFechae & ",'" & xhora & "')"
+        response. write  "<br> 2 " & strsql & "<br>"
+        call ofv.crearconsultaEx(StrSql,xcn,1,parametros)
+
+call ofv.cerrarconn(xcn)
+
+end function
+
+
+
+function GETWKFMANAGER(XNCODIGO,XSTIPO,XSESTADO1,XTABLA,XCKT)
+
+
+          set CNXM = ofv.conectar(ofv.strconn2)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''' circuitos de autoevaluacion - riesgo operacional
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = DESARROLLO
+''''
+         if Ucase(XTABLA) = "ORRSKCIRCUITO" and XSESTADO1 = 1 then
+               response.write "entro aca "
+
+            IF XCKT = "WKF" THEN
+                      strsql = "Update ORRSKCIRCUITO Set "
+                      strsql = strsql & " estado = 1 Where OBJID = 0" & XNCODIGO
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            END IF
+
+            IF XCKT = "SMP" THEN
+                         dFechai = clng(date()) - nFecini
+                         Strsql = "SELECT codigo FROM novedades "
+                         Strsql = Strsql & " Where fecexp > " & dFechai
+                         Strsql = Strsql & " And tipo = 4"
+                         Strsql = Strsql & " And codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+               response. write  "<br> 3 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rsx.eof then
+                         do until rsx.eof
+
+                            strsql = "update novedades set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+              response. write  "<br> 4 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+                            strsql = "update novedadesdist set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+              response. write  "<br> 5 " & strsql & "<br>"
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         rsx.movenext
+                         loop
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+
+            END IF
+
+
+
+'           elimina los autorizantes por default cuando pasa a desarrollo nuevamente
+
+                      strsql = "delete from objwfldet where orden > 8999 and "
+                      strsql = strsql & " codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+                      response. write  "<br> 6 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+
+         end if
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = DESARROLLO
+''''
+
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = OBSERVADO
+''''
+         if Ucase(XTABLA) = "ORRSKCIRCUITO" and XSESTADO1 = 6 then
+ '              response.write "entro aca "
+
+            IF XCKT = "WKF" THEN
+
+                      strsql = "Update ORRSKCIRCUITO Set "
+                      strsql = strsql & " estado = 6 Where OBJID = 0" & XNCODIGO
+                      response. write  "<br> 7 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+            END IF
+
+
+            IF XCKT = "SMP" THEN
+                         dFechai = clng(date()) - nFecini
+                         Strsql = "SELECT codigo FROM novedades "
+                         Strsql = Strsql & " Where fecexp > " & dFechai
+                         Strsql = Strsql & " And tipo = 4"
+                         Strsql = Strsql & " And codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+        response. write  "<br> 8 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rsx.eof then
+                         do until rsx.eof
+
+                            strsql = "update novedades set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+           response. write  "<br> 9 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+                            strsql = "update novedadesdist set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+response. write  "<br> 10 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         rsx.movenext
+                         loop
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+
+            END IF
+
+'           elimina los autorizantes por default cuando pasa a desarrollo nuevamente
+
+                      strsql = "delete from objwfldet where orden > 8999 and "
+                      strsql = strsql & " codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+                      response. write  "<br> 11 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+
+         end if
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = OBSERVADO
+''''
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = PARA OBSERVACION
+''''
+
+
+         if Ucase(XTABLA) = "ORRSKCIRCUITO" and XSESTADO1 = 5 then
+
+
+
+            IF XCKT = "WKF" THEN
+                      strsql = "Update ORRSKCIRCUITO Set "
+                      strsql = strsql & "  estado = 5 Where OBJID = 0" & XNCODIGO
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            END IF
+
+
+'           incorpora a los autorizantes por default
+
+            xactiva = 0
+
+           IF XCKT = "SMP" THEN
+
+
+            strsql = "select * from Defwfl "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               xactiva = rx(1)
+
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if xactiva then
+               strsql = "select * from objwfldet Where codobjeto = 0"
+               strsql = strsql & " and tipobjeto ='ALL'  order by orden, objid"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+
+
+                     strsql = "insert into Objwfldet (codobjeto, tipobjeto, orden,usr,conf, enviado) "
+                     strsql = strsql & " values(" & XNCODIGO & ",'" & XSTIPO & "'," & clng(rx(3)) + 9000 & ",'"
+                     strsql = strsql & rx(4) & "','SC','NO')"
+                    response. write  "<br> 13 " & strsql & "<br>"
+                     call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                  rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+
+
+            end if
+
+
+
+            strsql = "select * from objwfldet Where codobjeto = "
+            strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "' order by orden, objid"
+            response. write  "<br> 14 " & strsql & "<br>"
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               do until rx.eof
+
+                  xnovcodi = "ENA" & rx(4) & cstr(XNCODIGO) & cstr(clng(date())) & cstr(time())
+
+                  strsql = "Update Objwfldet Set conf = 'SC', enviado='NO',codigo='" & xnovcodi & "' Where objid = " & rx(0)
+                  response. write  "<br> 15 " & strsql & "<br>"
+                  call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                rx.movenext
+                loop
+             end if
+            call ofv.cerrarconsulta(rx)
+
+            smsgchat = esqnomP(XSTIPO,XNCODIGO,ofv) & ">>>"
+
+            strsql = "select * from objwfl Where codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+            response. write  "<br> 16 " & strsql & "<br>"
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               sesqauto = rx(3)
+               sordenest = rx(4)
+               schat = rx(5)
+               smsgchat = smsgchat &  rx(7)
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if sesqauto and schat then
+
+               strsql = "select usr,codigo,objid from objwfldet Where codobjeto = "
+               strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "'  order by orden"
+               response. write  "<br> 17 " & strsql & "<br>"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+                     call msgsend(rx(0),smsgchat,ofv,XNCODIGO,XSTIPO,rx(1))
+                          strsql = "Update Objwfldet Set enviado='SI' Where objid = " & rx(2)
+                          response. write  "<br> 18 " & strsql & "<br>"
+                          call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+                     if sordenest then exit do
+                     rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+           end if
+
+          END IF
+
+        end if
+
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = PARA observacion
+''''
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = PARA APROBACION
+''''
+
+
+         if Ucase(XTABLA) = "ORRSKCIRCUITO" and XSESTADO1 = 2 then
+
+            IF XCKT = "WKF" THEN
+                      strsql = "Update ORRSKCIRCUITO Set "
+                      strsql = strsql & " estado = 2 Where OBJID = 0" & XNCODIGO
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            END IF
+
+
+'           incorpora a los autorizantes por default
+
+            xactiva = 0
+
+           IF XCKT = "SMP" THEN
+
+
+            strsql = "select * from Defwfl "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               xactiva = rx(1)
+
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if xactiva then
+               strsql = "select * from objwfldet Where codobjeto = 0"
+               strsql = strsql & " and tipobjeto ='ALL'  order by orden, objid"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+
+
+                     strsql = "insert into Objwfldet (codobjeto, tipobjeto, orden,usr,conf, enviado) "
+                     strsql = strsql & " values(" & XNCODIGO & ",'" & XSTIPO & "'," & clng(rx(3)) + 9000 & ",'"
+                     response. write  "<br> 19 " & strsql & "<br>"
+                     strsql = strsql & rx(4) & "','SC','NO')"
+
+                     call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                  rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+
+
+            end if
+
+
+
+            strsql = "select * from objwfldet Where codobjeto = "
+            strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "' order by orden, objid"
+            response. write  "<br> 20 " & strsql & "<br>"
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               do until rx.eof
+
+                  xnovcodi = "ENA" & rx(4) & cstr(XNCODIGO) & cstr(clng(date())) & cstr(time())
+
+                  strsql = "Update Objwfldet Set conf = 'SC', enviado='NO',codigo='" & xnovcodi & "' Where objid = " & rx(0)
+                  response. write  "<br> 21 " & strsql & "<br>"
+                  call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                rx.movenext
+                loop
+             end if
+            call ofv.cerrarconsulta(rx)
+
+            smsgchat = esqnomP(XSTIPO,XNCODIGO,ofv) & ">>>"
+
+            strsql = "select * from objwfl Where codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               sesqauto = rx(3)
+               sordenest = rx(4)
+               schat = rx(5)
+               smsgchat = smsgchat &  rx(7)
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if sesqauto and schat then
+
+               strsql = "select usr,codigo,objid from objwfldet Where codobjeto = "
+               strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "' order by orden"
+               response. write  "<br> 22 " & strsql & "<br>"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+                     call msgsend(rx(0),smsgchat,ofv,XNCODIGO,XSTIPO,rx(1))
+                          strsql = "Update Objwfldet Set enviado='SI' Where objid = " & rx(2)
+                          response. write  "<br> 23 " & strsql & "<br>"
+                          call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+                     if sordenest then exit do
+                     rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+           end if
+
+          END IF
+
+        end if
+
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = PARA APROBACION
+''''
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = VIGENTE
+''''
+
+
+         if Ucase(XTABLA) = "ORRSKCIRCUITO" and XSESTADO1 = 3 then
+
+                         vFECHAvig = 0
+                         Strsql = "SELECT * FROM ORRSKCIRCUITO  "
+                         Strsql = Strsql & " Where OBJID = 0" & XNCODIGO
+                         set rx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rx.eof then
+                            vFECHAvig    = rx("fecvigen")
+                            if vFECHAvig = "" then vFECHAvig = 0
+                         end if
+                         call ofv.cerrarconsulta(rx)
+
+                         vFECHAHOY = clng(DATE) - clng(cdate("01-01-1900"))
+
+                         strsql = "Update ORRSKCIRCUITO Set estado = 3 "
+
+                         if vFECHAvig = 0 then
+                            vFECHAvig = vFECHAHOY
+                         end if
+
+                         strsql = strsql & " , fecvigen = '" & vFECHAvig & "' "
+                         strsql = strsql & " Where OBJID = 0" & XNCODIGO
+                         call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+         END IF
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = VIGENTE
+''''
+
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = NO VIGENTE
+''''
+
+
+         if Ucase(XTABLA) = "ORRSKCIRCUITO" and XSESTADO1 = 4 then
+
+
+                         vFECHAHOY = clng(DATE) - clng(cdate("01-01-1900"))
+
+                         strsql = "Update ORRSKCIRCUITO Set estado = 4 "
+                         strsql = strsql & " , FECBAJA = '" & vFECHAHOY & "' "
+                         strsql = strsql & " Where OBJID = 0" & XNCODIGO
+                         call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+         END IF
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = NO VIGENTE
+''''
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''' esquemas normativos - emanager
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = DESARROLLO
+''''
+         if Ucase(XTABLA) = "OBJPRTY" and XSESTADO1 = 1 then
+ '              response.write "entro aca "
+
+            IF XCKT = "WKF" THEN
+                      strsql = "Update Objprty Set aprobo = '"
+
+                      strsql = strsql & "' , estado = 1 Where codobjeto = " & XNCODIGO
+                      response. write  "<br> 24 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            END IF
+
+
+            IF XCKT = "SMP" THEN
+                         dFechai = clng(date()) - nFecini
+                         Strsql = "SELECT codigo FROM novedades "
+                         Strsql = Strsql & " Where fecexp > " & dFechai
+                         Strsql = Strsql & " And tipo = 4"
+                         Strsql = Strsql & " And codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+        response. write  "<br> 25 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rsx.eof then
+                         do until rsx.eof
+
+                            strsql = "update novedades set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+               response. write  "<br> 26 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+                            strsql = "update novedadesdist set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+response. write  "<br> 28 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         rsx.movenext
+                         loop
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+
+            END IF
+
+'           elimina los autorizantes por default cuando pasa a desarrollo nuevamente
+
+                      strsql = "delete from objwfldet where orden > 8999 and "
+                      strsql = strsql & " codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+                      response. write  "<br> 29 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+
+         end if
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = DESARROLLO
+''''
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = OBSERVADO
+''''
+         if Ucase(XTABLA) = "OBJPRTY" and XSESTADO1 = 6 then
+ '              response.write "entro aca "
+
+            IF XCKT = "WKF" THEN
+                      strsql = "Update Objprty Set aprobo = '"
+                      strsql = strsql & "' , estado = 6 Where codobjeto = " & XNCODIGO
+                      response. write  "<br> 30 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            END IF
+
+
+            IF XCKT = "SMP" THEN
+                         dFechai = clng(date()) - nFecini
+                         Strsql = "SELECT codigo FROM novedades "
+                         Strsql = Strsql & " Where fecexp > " & dFechai
+                         Strsql = Strsql & " And tipo = 4"
+                         Strsql = Strsql & " And codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+        response. write  "<br> 31 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rsx.eof then
+                         do until rsx.eof
+
+                            strsql = "update novedades set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+response. write  "<br> 31 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+                            strsql = "update novedadesdist set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+response. write  "<br> 33 " & strsql & "<br>"
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         rsx.movenext
+                         loop
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+
+            END IF
+
+'           elimina los autorizantes por default cuando pasa a desarrollo nuevamente
+
+                      strsql = "delete from objwfldet where orden > 8999 and "
+                      strsql = strsql & " codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+                      response. write  "<br> 34 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+
+         end if
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = OBSERVADO
+''''
+
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = PARA OBSERVACION
+''''
+
+
+         if Ucase(XTABLA) = "OBJPRTY" and XSESTADO1 = 5 then
+
+
+
+            IF XCKT = "WKF" THEN
+                      strsql = "Update Objprty Set aprobo = '"
+                      strsql = strsql & "' , estado = 5 Where codobjeto = " & XNCODIGO
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            END IF
+
+
+'           incorpora a los autorizantes por default
+
+            xactiva = 0
+
+           IF XCKT = "SMP" THEN
+
+
+            strsql = "select * from Defwfl "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               xactiva = rx(1)
+
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if xactiva then
+               strsql = "select * from objwfldet Where codobjeto = 0"
+               strsql = strsql & " and tipobjeto ='ALL'  order by orden, objid"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+
+
+                     strsql = "insert into Objwfldet (codobjeto, tipobjeto, orden,usr,conf, enviado) "
+                     strsql = strsql & " values(" & XNCODIGO & ",'" & XSTIPO & "'," & clng(rx(3)) + 9000 & ",'"
+                     strsql = strsql & rx(4) & "','SC','NO')"
+
+                     call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                  rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+
+
+            end if
+
+
+
+            strsql = "select * from objwfldet Where codobjeto = "
+            strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "' order by orden, objid"
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               do until rx.eof
+
+                  xnovcodi = "ENA" & rx(4) & cstr(XNCODIGO) & cstr(clng(date())) & cstr(time())
+
+                  strsql = "Update Objwfldet Set conf = 'SC', enviado='NO',codigo='" & xnovcodi & "' Where objid = " & rx(0)
+                  call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                rx.movenext
+                loop
+             end if
+            call ofv.cerrarconsulta(rx)
+
+            smsgchat = esqnomP(XSTIPO,XNCODIGO,ofv) & ">>>"
+
+            strsql = "select * from objwfl Where codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               sesqauto = rx(3)
+               sordenest = rx(4)
+               schat = rx(5)
+               smsgchat = smsgchat &  rx(7)
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if sesqauto and schat then
+
+               strsql = "select usr,codigo,objid from objwfldet Where codobjeto = "
+               strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "' order by orden"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+                     call msgsend(rx(0),smsgchat,ofv,XNCODIGO,XSTIPO,rx(1))
+                          strsql = "Update Objwfldet Set enviado='SI' Where objid = " & rx(2)
+                          call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+                     if sordenest then exit do
+                     rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+           end if
+
+          END IF
+
+        end if
+
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = PARA observacion
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = PARA APROBACION
+''''
+
+
+         if Ucase(XTABLA) = "OBJPRTY" and XSESTADO1 = 2 then
+
+            IF XCKT = "WKF" THEN
+                      strsql = "Update Objprty Set aprobo = '"
+                      strsql = strsql & "' , estado = 2 Where codobjeto = " & XNCODIGO
+                      response. write  "<br> 36 " & strsql & "<br>"
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            END IF
+
+
+'           incorpora a los autorizantes por default
+
+            xactiva = 0
+
+           IF XCKT = "SMP" THEN
+
+
+            strsql = "select * from Defwfl "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               xactiva = rx(1)
+
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if xactiva then
+               strsql = "select * from objwfldet Where codobjeto = 0"
+               strsql = strsql & " and tipobjeto ='ALL'  order by orden, objid"
+               response. write  "<br> 37 " & strsql & "<br>"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+
+
+                     strsql = "insert into Objwfldet (codobjeto, tipobjeto, orden,usr,conf, enviado) "
+                     strsql = strsql & " values(" & XNCODIGO & ",'" & XSTIPO & "'," & clng(rx(3)) + 9000 & ",'"
+                     strsql = strsql & rx(4) & "','SC','NO')"
+response. write  "<br> 38 " & strsql & "<br>"
+                     call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                  rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+
+
+            end if
+
+
+
+            strsql = "select * from objwfldet Where codobjeto = "
+            strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "' order by orden, objid"
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               do until rx.eof
+
+                  xnovcodi = "ENA" & rx(4) & cstr(XNCODIGO) & cstr(clng(date())) & cstr(time())
+
+                  strsql = "Update Objwfldet Set conf = 'SC', enviado='NO',codigo='" & xnovcodi & "' Where objid = " & rx(0)
+                  call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+                rx.movenext
+                loop
+             end if
+            call ofv.cerrarconsulta(rx)
+
+            smsgchat = esqnomP(XSTIPO,XNCODIGO,ofv) & ">>>"
+
+            strsql = "select * from objwfl Where codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               sesqauto = rx(3)
+               sordenest = rx(4)
+               schat = rx(5)
+               smsgchat = smsgchat &  rx(7)
+            end if
+            call ofv.cerrarconsulta(rx)
+
+            if sesqauto and schat then
+
+               strsql = "select usr,codigo,objid from objwfldet Where codobjeto = "
+               strsql = strsql & XNCODIGO  & " AND TIPOBJETO = '" & XSTIPO & "' order by orden"
+               set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+                     call msgsend(rx(0),smsgchat,ofv,XNCODIGO,XSTIPO,rx(1))
+                          strsql = "Update Objwfldet Set enviado='SI' Where objid = " & rx(2)
+                          call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+                     if sordenest then exit do
+                     rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+           end if
+
+          END IF
+
+        end if
+
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = PARA APROBACION
+''''
+
+''''
+'''' WKFLOW --------------- POR CAMBIO ESTADO = VIGENTE
+''''
+
+
+         if Ucase(XTABLA) = "OBJPRTY" and XSESTADO1 = 3 then
+
+                         vFECHAvig = 0
+                         Strsql = "SELECT * FROM OBJprty  "
+                         Strsql = Strsql & " Where codobjeto=" & XNCODIGO
+                         Strsql = Strsql & " And tipobjeto = '" & XSTIPO & "'"
+                         set rx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         response. write  "<br>39 " & strsql & "<br>"
+                         if not rx.eof then
+                            vFECHAvig    = rx("fecvigen")
+                            if vFECHAvig = "" then vFECHAvig = 0
+                         end if
+                         call ofv.cerrarconsulta(rx)
+
+                         vFECHAHOY = clng(DATE) - clng(cdate("01-01-1900"))
+
+                         strsql = "Update Objprty Set aprobo = '" & session("usuario")
+                         strsql = strsql & "' , estado = 3 "
+                         response. write  "<br> 40 " & strsql & "<br>"
+                         if vFECHAvig = 0 then
+                            vFECHAvig = vFECHAHOY
+                         end if
+
+                         strsql = strsql & " , fecvigen = '" & vFECHAvig & "' , fecpublic = '" & vFECHAHOY & "' "
+                         strsql = strsql & " Where codobjeto = " & XNCODIGO
+                         response. write  "<br> 41 " & strsql & "<br>"
+                         call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+
+
+
+      sql = "Select objrem,Tipobjeto From Objetos Where codobjeto = " & XNCODIGO
+      set rsCodigo = ofv.crearconsultaEx(Sql,CNXM,1,volver)
+      if not rsCodigo.eof then
+        if clng(rsCodigo(0)) <> 0 then
+          sql = "Select Tipobjeto From Objetos Where codobjeto = " & rsCodigo(0)
+          set rsCodigox = ofv.crearconsultaEx(Sql,CNXM,1,volver)
+          if not rsCodigox.eof then xntipobj = rsCodigox(0)
+'-----------------
+          Segct = "S"
+
+          Sql = "Select * From OBJSDK Where tipobjeto='"
+          sql = sql & xntipobj & "' and codobjeto = " & rsCodigo(0)
+          set rsx = ofv.crearconsultaEx(Sql,CNXM,1,parametros)
+          if not rsx.eof then
+
+
+             if Session("Usuario") <> rsx(7) then
+                if rsx(3) then Segct = "N"
+                call ofv.cerrarconsulta(rsx)
+                sql = "Select * From OBJSDKDET Where tipobjeto='" & xntipobj
+                sql = sql & "' and codobjeto = "  & rsCodigo(0)
+                sql = sql & " and ((grpusr = 'USR-" & Session("Usuario") & "') "
+                sql = sql & " or (grpusr = 'GRP-" & Session("Seggrp") & "')) "
+                set rsx = ofv.crearconsultaEx(Sql,CNXM,1,parametros)
+                do until rsx.eof
+
+                      select case rsx(3)
+                          case "1"
+                               Segct = "S"
+                      end select
+                rsx.movenext
+                 loop
+            end if
+          end if
+          call ofv.cerrarconsulta(rsx)
+
+'-----------
+          if Segct = "S" then
+             vFECHAHOY = clng(DATE) - clng(cdate("01-01-1900"))
+             sql = "Update Objprty Set estado = 4,fecbaja = '" & vFECHAHOY & "', "
+             sql = sql & "elimino = '" & sUsuario & "' "
+             sql = sql & "Where estado = 3 And codobjeto = " & rsCodigo(0)
+             call ofv.crearconsultaEx(Sql,CNXM,1,volver)
+             sql = "Update Objetos Set objrdo = " & XNCODIGO
+             sql = sql & " Where codobjeto = " & rsCodigo(0)
+             call ofv.crearconsultaEx(Sql,CNXM,1,volver)
+             if cn.errors.count = 0 then
+        ' actualiza esquemas asociados (arbol)
+                sql = "Update Relaobj Set codobjmaster = " & XNCODIGO & " , tipobjmaster = '"
+                sql = sql & rsCodigo(1) & "' Where codobjmaster = " & rsCodigo(0)
+                sql = sql & " and tipobjmaster = '" & xntipobj & "' "
+                call ofv.crearconsultaEx(Sql,CNXM,1,volver)
+
+ ''       ' actualiza esquema linkeados
+ ''               sql = "Update objlnk Set codobjetoL = " & XNCODIGO & " , tipobjetoL = '"
+ ''               sql = sql & rsCodigo(1) & "' Where codobjetoL = " & rsCodigo(0)
+ ''               sql = sql & " and tipobjetoL = '" & xntipobj & "' "
+ ''               call ofv.crearconsultaEx(Sql,CNXM,1,volver)
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        ' actualiza esquema linkeados
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+                Sql = "Select * From objlnk Where tipobjetoL ='"
+                sql = sql & xntipobj & "' and codobjetoL = " & rsCodigo(0)
+                sql = sql & " and LTIPO = 'L'"
+                set rsx2 = ofv.crearconsultaEx(Sql,CNXM,1,parametros)
+
+           '''     response.write "-lee link ---" & Strsql & "<br>"
+
+                DO WHILE not rsx2.eof
+
+                   WIDEN3L = 0
+                   WIDEN4  = 0
+                   WIDEN4L = 0
+
+
+'''''''''''''''''''''' fija la solapa '''''''''''''''''
+                   WIDEN3L = RSX2(11)
+
+'''''''''''''''''''''' fija el 1er nivel '''''''''''''''''
+
+     SELECT CASE WIDEN3L
+
+            CASE "2"   'CONSIDERACIONES
+
+                     Strsql = "SELECT objid FROM OBJNWEDT WHERE relant = '" & RSX2(12) & "' and codobjeto = " & XNCODIGO
+                     set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                     if not Xrs.eof then
+                        WIDEN4 = Xrs(0)
+                     END IF
+                     call ofv.cerrarconsulta(Xrs)
+
+
+            CASE "5"   'PROCEDIMIENTOS
+
+                     Strsql = "SELECT CODPROCED FROM objproced WHERE relant = '" & RSX2(12) & "' and codobjeto = " & XNCODIGO
+                     set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                     if not Xrs.eof then
+                        WIDEN4 = Xrs(0)
+                     END IF
+                     call ofv.cerrarconsulta(Xrs)
+
+            CASE "7"   'CONTROLES
+
+
+                     Strsql = "SELECT objid FROM objcontrol WHERE relant = '" & RSX2(12) & "' and codobjeto = " & XNCODIGO
+                     set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                     if not Xrs.eof then
+                        WIDEN4 = Xrs(0)
+                     END IF
+                     call ofv.cerrarconsulta(Xrs)
+
+
+            CASE "8"   'ESQUEMAS
+
+                     Strsql = "SELECT objid FROM objesquema WHERE relant = '" & RSX2(12) & "' and codobjeto = " & XNCODIGO
+                     set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                     if not Xrs.eof then
+                        WIDEN4 = Xrs(0)
+                     END IF
+                     call ofv.cerrarconsulta(Xrs)
+
+
+            CASE "9"   'TABLAS
+
+
+                     Strsql = "SELECT objid FROM ObjTabDef WHERE relant = '" & RSX2(12) & "' and codobjeto = " & XNCODIGO
+                     set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                     if not Xrs.eof then
+                        WIDEN4 = Xrs(0)
+                     END IF
+                     call ofv.cerrarconsulta(Xrs)
+
+
+            CASE "11"   'CONTENIDO
+
+                     Strsql = "SELECT objid FROM OBJESTR WHERE relant = '" & RSX2(12) & "' and codobjeto = " & XNCODIGO
+                     set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                     if not Xrs.eof then
+                        WIDEN4 = Xrs(0)
+                     END IF
+                     call ofv.cerrarconsulta(Xrs)
+
+
+
+     END SELECT
+
+          '''      response.write "---- lee anterior ----" & Strsql & "<br>"
+
+'''''''''''''''''''''' fija el 2er nivel '''''''''''''''''
+
+        IF  WIDEN3L = "9" THEN
+
+            Strsql = "SELECT objid FROM ObjTabblk WHERE relant = '" & RSX2(13) & "' and codobjeto = " & XNCODIGO
+            set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+            if not Xrs.eof then
+               WIDEN4L = Xrs(0)
+            END IF
+            call ofv.cerrarconsulta(Xrs)
+
+        END IF
+
+
+        IF  WIDEN3L = "11" THEN
+
+            Strsql = "SELECT objid FROM OBJESTDET WHERE relant = '" & RSX2(13) & "' and codobjeto = " & XNCODIGO
+            set Xrs = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+            if not Xrs.eof then
+               WIDEN4L = Xrs(0)
+            END IF
+            call ofv.cerrarconsulta(Xrs)
+
+        END IF
+
+           ''''     response.write "---- lee anterior - 2do ---" & Strsql & "<br>"
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+
+                   sql = "Update objlnk Set codobjetoL = " & XNCODIGO
+                   sql = sql & ", tipobjetoL = '" & rsCodigo(1) & "' "
+                   sql = sql & ", IDEN3L     = '" & WIDEN3L & "' "
+                   sql = sql & ", IDEN4      = '" & WIDEN4 & "' "
+                   sql = sql & ", IDEN4L     = '" & WIDEN4L & "' "
+                   sql = sql & " Where OBJID = " & RSX2(0)
+                   call ofv.crearconsultaEx(Sql,CNXM,1,volver)
+
+             ''''   response.write "-------------- actualiza --" & sql & "<br>"
+
+
+
+                RSX2.MOVENEXT
+                LOOP
+
+
+                sql = "Update objlnk Set codobjetoL = " & XNCODIGO & " , tipobjetoL = '"
+                sql = sql & rsCodigo(1) & "' Where codobjetoL = " & rsCodigo(0)
+                sql = sql & " and tipobjetoL = '" & xntipobj & "' "
+                sql = sql & " and LTIPO <> 'L' and LTIPO <> 'LRGVN' "
+                call ofv.crearconsultaEx(Sql,CNXM,1,volver)
+
+
+             else
+                response.write ofv.ErrorDB(CNXM,volver)
+             end if
+          end if
+        end if
+
+      end if
+      call ofv.cerrarconsulta(rsCodigo)
+
+      ' envio de mensajes segun lista de distribucion
+
+
+
+          set cnx = ofv.conectar(ofv.strconn0)
+
+
+                         xlista    = ""
+                         xsepar    = ""
+                         xfromusr  = "NO"
+                         xfromusrD = "NO"
+                         xfrom     = "CorESolutionSuite@hotmail.com"
+                         xAviso    = "NO"
+                         ximport   = 1
+                         xmensaje1 = esqnomP(XSTIPO,XNCODIGO,ofv)  & ">>>"
+                         xsubject  = "(Cor E-Manager) Activacion de " & xmensaje1
+                         xmensaje  = xmensaje1 & " esta activo a partir de la fecha "
+
+
+                         XUSRPRV    = session("USRPRV")
+                         session("USRPRV")  = "I"
+
+                         xxxx = getInfoUserw("COREMANAGER")
+                         if session("SGU_mail") <> "" then
+                            xfrom     = session("SGU_mail")
+                            xfromusr  = session("SGU_nombre")
+                            xfromusrD = "COREMANAGER"
+                         end if
+
+                         session("USRPRV")  = XUSRPRV
+
+
+
+                         xAviso   = "NO"
+                         ximport  = 1
+                         xdiasvig = 7
+
+                         Strsql = "SELECT * FROM OBJdistPrty "
+                         Strsql = Strsql & " Where codobjeto=" & XNCODIGO
+                         Strsql = Strsql & " And tipobjeto = '" & XSTIPO & "'"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if  not rsx.eof then
+                             xAviso    = rsx(7)
+                             ximport   = rsx(6)
+                             xmensaje  = rsx(5)
+                             xmensajen = replace(xmensaje,"<ESQNOR>",xmensaje1)
+
+                             if Session("CORUNQ") = "S" then
+                                xmensurl  = getobjurl(XNCODIGO,XSTIPO)
+                                xmensaje  = replace(xmensaje,"<ESQNOR>"," <a href='" & xmensurl & "' >" & xmensaje1  & "</a>")
+                             else
+                                xmensaje  = replace(xmensaje,"<ESQNOR>",xmensaje1)
+                             end if
+
+                             xmensaje  = replace(xmensaje,">>>"," ")
+
+                             xmensajen = replace(xmensajen,">>>","<br>")
+                             xsubject  = rsx(4)
+                             xsubject  = replace(xsubject,"<ESQNOR>",xmensaje1)
+                             xsubject  = replace(xsubject,">>>"," ")
+                            ' xfromusr  = rsx(3)
+                             xfromusrD = rsx(3)
+                             xdiasvig  = rsx(8)
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+
+        xnovcod = "ENV" & cstr(XNCODIGO)
+              dFechai = clng(date()) - clng(cdate("01-01-1900"))
+              dFechae = clng(date()) - clng(cdate("01-01-1900")) + clng(xdiasvig)
+
+        select case clng(ximport)
+               case 0
+                     ximportn = 2
+               case 1
+                     ximportn = 1
+               case 2
+                     ximportn = 0
+
+        end select
+
+
+        xhora = time()
+
+
+
+
+''''''''''''''''''''''''' BUSCA MAIL Y NOMBRE DEL EMISOR EN CASO DE NO SER EL DEFAULT '''''''''''''''''''''''''
+
+
+       IF SESSION("WKFETPU") = "D" THEN               ' EMISOR DEFAULT (EL RESPONSABLE DEL PASO)
+
+
+
+          if xfromusrD <> "NO" then
+             if xfromusrD <> "COREMANAGER" then
+
+                xxxx = getInfoUserw(xfromusrD)
+                if session("SGU_mail") <> "" then
+                   xfrom     = session("SGU_mail")
+                   xfromusr  = session("SGU_nombre")
+                  ''' xfromusrD = "COREMANAGER"
+                end if
+
+             end if
+          end if
+
+
+
+       ELSEIF SESSION("WKFETPU") = "U" THEN           ' EMISOR PREDETERMINADO (PARAMETRIZADO EL LA BASE DE USUARIOS)
+
+          WKFEUSR = SESSION("WKFEUSR")
+
+          if WKFEUSR = "" then   WKFEUSR = "COREMANAGER"
+
+          if WKFEUSR <> "COREMANAGER" then
+
+
+             XUSRPRV    = session("USRPRV")
+             session("USRPRV")  = "I"
+
+             xxxx = getInfoUserw(WKFEUSR)
+             if session("SGU_mail") <> "" then
+                xfrom     = session("SGU_mail")
+                xfromusr  = session("SGU_nombre")
+                xfromusrD = session(WKFEUSR)
+             end if
+
+             session("USRPRV")  = XUSRPRV
+
+
+          ELSE
+             xfromusrD = "COREMANAGER"
+
+          END IF
+
+
+       ELSE                                           ' EMISOR FIJO (USUARIO Y MAIL FIJOS EN CORCONECT)
+
+          WKFEUSR = SESSION("WKFEUSR")
+
+          if WKFEUSR = "" then   WKFEUSR = "COREMANAGER"
+
+          xfrom     = SESSION("WKFEMAI")
+          xfromusr  = WKFEUSR
+          xfromusrD = WKFEUSR
+       END IF
+
+
+''''''''''''''''''''''''' ENVIA EL MENSAJE A LA BANDEJA DE NOVEDADES DE ACTIVACION/PUBLICACION DE DOCUMENTOS '''''''''
+
+
+        strsql = "Insert into novedades (codobjeto,tipobjeto,codigo,tipo,fecinicio,fecexp,mensaje,importancia,relacion,workflowid,contacto,hora) "
+        strsql = strsql & " values (" & XNCODIGO & ",'" & XSTIPO & "','" & xnovcod & "',3," & dFechai & "," & dFechae & ",'" & xmensajen & "'," & ximportn & ",0,0,'" & xfromusrD & "','" & xhora & "')"
+       response. write  "<br> 43 " & strsql & "<br>"
+        fffff
+
+        call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+                         Strsql = "SELECT * FROM OBJdist "
+                         Strsql = Strsql & " Where codobjeto=" & XNCODIGO
+                         Strsql = Strsql & " And tipobjeto = '" & XSTIPO & "'"
+                         response. write  "<br> 44 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if rsx.eof then
+
+                              strsql = "Insert into novedadesdist (codigo,usugrp,sector,fecexp,hora) "
+                              strsql = strsql & " values ('" & xnovcod & "','TODOS',999," & dFechae & ",'" & xhora & "')"
+                         response. write  "<br> 45 " & strsql & "<br>"
+                              call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         else
+                           do until rsx.eof
+
+                            if Ucase(rsx(4)) = "SECT-" then
+
+                              strsql = "Insert into novedadesdist (codigo,usugrp,sector,fecexp,xhora) "
+                              strsql = strsql & " values ('" & xnovcod & "','SECTOR',0" & rsx(5) & "," & dFechae & ",'" & xhora & "')"
+                              response. write  "<br>46 " & strsql & "<br>"
+
+                              call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+                               strsql = "Select email From Usuarios  where sector = 0" & rsx(5)
+                               response. write  "<br> 47 " & strsql & "<br>"
+                               set rsx1 = ofv.crearconsultaEx(StrSql,cnx,1,volver)
+                               do until rsx1.eof
+
+                                     xmail = rsx1("email")
+                                     if len(xmail) > 0 then
+                                        xmail = trim(xmail)
+                                        xlista = xlista & xsepar & xmail
+                                        xsepar = " ; "
+                                     end if
+
+
+                               rsx1.movenext
+                               loop
+                               call ofv.cerrarconsulta(rsx1)
+
+
+
+
+
+
+                            else
+
+                              IF rsx(4) = "TODOS" THEN
+                                 XSECVAL = RSX(5)
+                              ELSE
+                                 XSECVAL = 0
+                              END IF
+
+                              strsql = "Insert into novedadesdist (codigo,usugrp,sector,fecexp,hora) "
+                              strsql = strsql & " values ('" & xnovcod & "','" & rsx(4) & "',0" & XSECVAL & "," & dFechae & ",'" & xhora & "')"
+                             response. write  "<br> 48 " & strsql & "<br>"
+                              call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+
+                               xxxx = getInfoUserw(rsx(4))
+                               if session("SGU_mail")<> "" then
+                                  xlista = xlista & xsepar & session("SGU_mail")
+                                  xsepar = " ; "
+                               end if
+
+                            end if
+
+
+
+                         rsx.movenext
+                         loop
+                        end if
+                        call ofv.cerrarconsulta(rsx)
+                        call ofv.cerrarconn(cnx)
+
+''''''''''''''''''''''' envia el mail a la lista XXXMAIL
+
+                        if len(xlista) > 0 then
+
+
+                      '''' "Circuito de autorización"
+                        xPARA2 = "DESTINATARIO LISTA DE DISTRIBUCION"
+                        'message = "<u><font size=1 color=#000080 >" & XPARA2 & "</font></u><BR><BR><b><font size=1  >" & xmensaje & "</font><b>"
+                        message = "<P "& xstyle & ">" & XPARA2 & "<BR><BR><b>" & xmensaje & "<b></P>"
+
+                        CALL SendMail(message, xlista, xfrom,xsubject, session("MailComponent"),"SI",ximport, xAviso)
+
+                        end if
+
+
+                   end if
+
+
+
+
+
+       ''  END IF
+
+''''
+'''' WKFLOW --------------- FIN ---- POR CAMBIO ESTADO = VIGENTE
+''''
+
+
+''''
+'''' WKFLOW --------------- POR CAMBIO CIRCUITO SIMPLE DE APROBACION
+''''
+
+
+        if Ucase(XTABLA) = "OBJWFLDET"  then
+
+            smsgchat = esqnomP(XSTIPO,XNCODIGO,ofv)  & ">>>"
+            strsql = "select * from objwfl Where codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+            set rx =  ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+            if not rx.eof then
+               sesqauto = rx(3)
+               sordenest = rx(4)
+               schat = rx(5)
+               smsgchat = smsgchat & " " & rx(7)
+            end if
+            call ofv.cerrarconsulta(rx)
+            sant = ""
+            sdat = ""
+            sdatSC = ""
+            sdatNC = ""
+            sdatNCID = 0
+            susr = ""
+            Strsql = "SELECT * FROM OBJwfldet  "
+            Strsql = Strsql & " Where codobjeto=" & XNCODIGO
+            Strsql = Strsql & " And tipobjeto = '" & XSTIPO & "' order by orden,objid"
+            response. write  "<br> 49 " & strsql & "<br>"
+           set rx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+           do until rx.eof
+
+              if rx(8) = "SC" then
+                 susr = rx(4)
+                 sdat = rx(8)
+                 sdatSC = rx(8)
+                 sdatNCID = rx(0)
+                 sdatNC = rx(10)
+                 if sesqauto and sordenest then exit do
+              elseif rx(8) = "NO" then
+                 susr = rx(4)
+                 sdat = rx(8)
+                 exit do
+              elseif rx(8) = "NC" then
+                 susr = rx(4)
+                 sdat = rx(8)
+                 sdatNC = rx(8)
+                 sdatNCID = rx(0)
+                 if sesqauto and sordenest then
+                         dFechai = clng(date()) - clng(cdate("01-01-1900"))
+                         Strsql = "SELECT codigo FROM novedades "
+                         Strsql = Strsql & " Where fecexp > " & dFechai
+                         Strsql = Strsql & " And tipo = 4"
+                         Strsql = Strsql & " And codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+                         Strsql = Strsql & " And codigo = '" & rx(10) & "' "
+                         response. write  "<br> 50 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rsx.eof then
+
+
+                            strsql = "update novedades set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+                            response. write  "<br> 51 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+                            strsql = "update novedadesdist set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+                           response. write  "<br> 52 " & strsql & "<br>"
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+
+                         smsgchatx = "Su asignacion para autorizacion ha sido expirada "
+                         call msgsend(susr,smsgchatx,ofv,XNCODIGO,XSTIPO,rx(10) & "ANL")
+                 end if
+
+
+                 strsql = "update OBJwfldet set conf = 'NP', enviado='SP', fecconf = '" & now() & "',comen1 = '"
+                 strsql = strsql & "Su asignacion para autorizacion ha sido expirada ' where objid = " & rx(0)
+                 response. write  "<br> 53 " & strsql & "<br>"
+                 call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+              elseif rx(8) = "NP" then
+                 sant = rx(8)
+                 sdat = rx(8)
+              else
+                 sant = rx(8)
+                 sdat = rx(8)
+                 if sesqauto and sordenest and schat then
+                    if rx(11) = "SI" then
+                       strsql = "Update Objwfldet Set enviado='SP' Where objid = " & rx(0)
+                       response. write  "<br> 54 " & strsql & "<br>"
+                       call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+                         dFechai = clng(date()) - clng(cdate("01-01-1900"))
+                         Strsql = "SELECT codigo FROM novedades "
+                         Strsql = Strsql & " Where fecexp > " & dFechai
+                         Strsql = Strsql & " And tipo = 4"
+                         Strsql = Strsql & " And codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+                         Strsql = Strsql & " And codigo = '" & rx(10) & "' "
+                         response. write  "<br> 55 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rsx.eof then
+
+
+                            strsql = "update novedades set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+                            response. write  "<br> 56 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+                            strsql = "update novedadesdist set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+                            response. write  "<br> 57 " & strsql & "<br>"
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+                    end if
+                 end if
+              end if
+             rx.movenext
+          loop
+          call ofv.cerrarconsulta(rx)
+
+          select case sdat
+                 case "SC"
+                      if sesqauto and sordenest and schat then
+                         call msgsend(susr,smsgchat,ofv,XNCODIGO,XSTIPO,sdatNC)
+                         strsql = "Update Objwfldet Set enviado='SI' Where objid = " & sdatNCID
+                         call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+                      end if
+
+                 case "NO"
+
+
+                      strsql = "Update Objprty Set aprobo = '"
+                      strsql = strsql & "' , estado = 1 Where codobjeto = " & XNCODIGO
+                      call ofv.crearconsultaEx(StrSql,CNXM,1,volver)
+
+
+
+
+                         XXXX = GETWKFMANAGER(XNCODIGO,XSTIPO,1,"OBJPRTY",XCKT)
+
+
+                 case else
+' entra por todos ok o por si alguno fue anulado por expiracion --- --- --- ---
+
+                      if sdatSC <> "SC" then
+
+
+                         dFechai = clng(date()) - clng(cdate("01-01-1900"))
+                         Strsql = "SELECT codigo FROM novedades "
+                         Strsql = Strsql & " Where fecexp > " & dFechai
+                         Strsql = Strsql & " And tipo = 4"
+                         Strsql = Strsql & " And codobjeto = " & XNCODIGO & " AND TIPOBJETO = '" & XSTIPO & "' "
+response. write  "<br> 58 " & strsql & "<br>"
+                         set rsx = ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         if not rsx.eof then
+                         do until rsx.eof
+
+                            strsql = "update novedades set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+response. write  "<br> 59 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+
+
+
+                            strsql = "update novedadesdist set fecexp = " & dFechai & " where codigo = '" & rsx(0) & "' "
+response. write  "<br> 60 " & strsql & "<br>"
+
+                            call ofv.crearconsultaEx(StrSql,CNXM,1,parametros)
+                         rsx.movenext
+                         loop
+                         end if
+                         call ofv.cerrarconsulta(rsx)
+
+                         XXXX = GETWKFMANAGER(XNCODIGO,XSTIPO,3,"OBJPRTY",XCKT)
+
+                      END IF
+          end select
+        end if
+
+''''
+'''' WKFLOW --------------- FIN -------- POR CAMBIO CIRCUITO SIMPLE DE APROBACION
+''''
+
+ ''  end if
+
+   call ofv.cerrarconn(CNXM)
+
+END FUNCTION
+
+
+Function getobjurl(getnCodigo, getstipo)
+
+
+    WKURLCONS = getnCodigo & "-" & getstipo
+
+    Set getcn = ofv.conectar(ofv.strconn2)
+
+
+    xStrSql = "SELECT * FROM TIPOBJETO  "
+    xStrSql = xStrSql & " Where  tipobjeto = '" & getstipo & "' "
+
+    Set getrs = ofv.crearconsultaEx(xStrSql, getcn, 1, parametros)
+    If Not getrs.EOF Then
+
+        wkhosturl = request.servervariables("HTTP_REFERER")
+
+        wkhosturlX = UCase(wkhosturl & "NO")
+
+        wkhosturln = InStr(wkhosturlX, "/COREMANAGER/")
+
+        If wkhosturln > 0 Then
+
+            wkhosturl = Left(wkhosturl, wkhosturln)
+
+
+        Else
+
+            wkhosturln = InStr(UCase(request.servervariables("SCRIPT_NAME") & "NO"), "/COREMANAGER/")
+
+            wkhosturl = Left(request.servervariables("SCRIPT_NAME") & "NO", wkhosturln)
+
+            wkhosturl = "http://" & request.servervariables("SERVER_NAME") & ":" & request.servervariables("SERVER_PORT") & wkhosturl
+
+
+        End If
+
+        WKURLCONS = wkhosturl
+
+
+        WKURLCONS = WKURLCONS & "coress20/corexpress.asp?opt=CC-" & getnCodigo & "-" & getstipo
+
+    End If
+
+    getobjurl = WKURLCONS
+
+
+End Function
+
+
+Function getobjurlWK(getnCodigo, getstipo, getpaso)
+
+
+    WKURLCONS = getnCodigo & "-" & getstipo
+
+    Set getcn = ofv.conectar(ofv.strconn2)
+
+
+    xStrSql = "SELECT * FROM TIPOBJETO  "
+    xStrSql = xStrSql & " Where  tipobjeto = '" & getstipo & "' "
+
+    Set getrs = ofv.crearconsultaEx(xStrSql, getcn, 1, parametros)
+    If Not getrs.EOF Then
+
+        wkhosturl = request.servervariables("HTTP_REFERER")
+
+        wkhosturlX = UCase(wkhosturl & "NO")
+
+        wkhosturln = InStr(wkhosturlX, "/COREMANAGER/")
+
+        If wkhosturln > 0 Then
+
+            wkhosturl = Left(wkhosturl, wkhosturln)
+
+
+        Else
+
+            wkhosturln = InStr(UCase(request.servervariables("SCRIPT_NAME") & "NO"), "/COREMANAGER/")
+
+            wkhosturl = Left(request.servervariables("SCRIPT_NAME") & "NO", wkhosturln)
+
+            wkhosturl = "http://" & request.servervariables("SERVER_NAME") & ":" & request.servervariables("SERVER_PORT") & wkhosturl
+
+
+        End If
+
+        WKURLCONS = wkhosturl
+
+
+        WKURLCONS = WKURLCONS & "coress20/corexpress.asp?opt=WK-" & getnCodigo & "-" & getstipo & "&SEGCKTPSC=" & getpaso
+
+    End If
+
+    getobjurlWK = WKURLCONS
+
+
+End Function
+
+%>

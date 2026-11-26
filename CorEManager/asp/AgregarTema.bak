@@ -1,0 +1,106 @@
+<!-- #INCLUDE FILE="../IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  vuelta = request.querystring("Volver")
+  bAgregar = request.querystring("Agregar")
+
+  on error resume next
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+  nErrores = 0
+
+  if bAgregar = "True" then
+    strsql = "Select * From Tema"
+
+ '' response.write strsql & " strsql -0- " & "<br>"
+
+    set rs = ofv.crearconsulta2(strsql,cn)
+
+    strsql = "Insert Into Tema ("
+    n = 0
+    For Each x In Request.form
+      if n = 0 then
+        strsql = strsql & x
+      else
+        strsql = strsql & "," & x
+      end if
+
+      n = n + 1
+
+    Next
+    strsql = strsql & ") Values ("
+
+ '' response.write strsql & " strsql -1- " & "<br>"
+
+    n = 0
+    For Each x In Request.form
+      TipoValido = ofv.ValidarTipo(rs(x),Request.Form(x))
+      if TipoValido = False then exit for
+      ValorNulo = ofv.EsNulo(rs(x),Request.Form(x))
+      if ValorNulo = True then exit for
+
+''''      s = ofv.queesx(rs(x).type)
+''''      if rs(x).type = 200 then s = "'"
+
+       s = "'"
+
+
+  xdescri = rs(1)
+  response.write xdescri & " xdescri " & "<br>" & chr(13)
+
+      if n = 0 then
+         if xdescri <> "" then
+           strsql = strsql & s & Request.Form(x) & s
+         else
+           strsql = strsql & s & UCase(Request.Form(x)) & s
+         end if
+      else
+         if xdescri <> "" then
+           strsql = strsql & "," & s & Request.Form(x) & s
+         else
+           strsql = strsql & "," & s & UCase(Request.Form(x)) & s
+         end if
+     end if
+
+     n = n + 1
+
+    Next
+
+    if not TipoValido or ValorNulo then
+      response.write ofv.ErrorTipo(vuelta,Request.Form(x),rs(nx).name)
+      if err.number <> 0 then response.write ofv.ErrorTipo(vuelta,"","")
+    else
+      strsql = strsql & ")"
+ ''   response.write strsql & " strsql -2- " & "<br>"
+      call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+      nErrores = cn.errors.count
+
+      if nErrores = 0 then
+         response.redirect vuelta
+      else
+         response.write ofv.ErrorDB(cn,vuelta)
+      end if
+    end if
+    call ofv.cerrarconsulta(rs)
+  else
+
+  end if
+
+  sHTML = sHTML & "</body></html>"
+
+  call ofv.cerrarconn(cn)
+end if
+
+if nErrores = 0 then response.write sHTML
+
+%>

@@ -1,0 +1,1032 @@
+
+<%
+
+
+Function GENFMTPROCEDIMIENTOS(FNCODOBJ,FNTIPOBJ)
+
+
+	FNSHTML = ""
+
+	' dim wstipo(6)
+   '   for i =0 to 6
+   '   wstipo(i)=false
+   '   next
+	Fila = ""
+
+
+
+	bColor = "False"
+	If nID <> "no" Then
+
+		''  Response.write nid & " 0000 "
+        dim wsmodo
+        dim wsmodoB
+		ReDim wsmodo(0)
+		ReDim wsmodoB(0)
+        DIM TM
+		ym = 1
+'response.write tm & "<br>"
+		strsql = "select * from modo "
+		strsql = strsql & " Order By tipomodo"
+		Set rs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+		'response.write strsql & " linea 30 " & "<br>"
+
+		If Not rs2.eof Then
+			Do until rs2.eof
+				tm = ym
+				ReDim preserve wsmodo(ym)
+				ReDim preserve wsmodoB(ym)
+				wsmodo(ym) = rs2(0)
+				wstipo(0) = rs2(2)
+				For ymm = 1 To 6
+					wstipo(ymm) = rs2(ymm + 3)
+				Next
+				wsmodoB(ym) = wstipo
+				ym = ym + 1
+				rs2.movenext
+			Loop
+		Else
+			tm = ym
+			ReDim preserve wsmodo(ym)
+			ReDim preserve wsmodoB(ym)
+			wsmodo(ym) = "NO"
+		End If
+      '   for ym =1 to TM
+      '     response.write  wsmodo(ym) & "----" & wsmodoB(YM)(3)  & "<BR>"
+      '   next
+		strsql = "select * from OBJACCION "
+		strsql = strsql & "WHERE codproced = '" &  nID & "'"
+		If  sCambios = "NO" Then
+			strsql = strsql & " and (modi = 0 or (modi <> 0 and tipmodi <> 'E')) "
+		Else
+			strsql = strsql & " and modi <> 0  "
+		End If
+		strsql = strsql & " Order By secuen"
+
+		'Response.Write strsql & " 0001 "
+		'response.write strsql & " linea 63 " & "<br>"
+
+
+		' response.write StrSql
+
+		Set rs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+		posicion = 0
+
+		Do While Not rs2.eof
+			nAccion   = rs2(0)
+			nAccionID = rs2(18)
+			xfclas    = "dt"
+			sImage    = "&nbsp;"
+
+			RCHEK = "N"
+			Celdakk = ""
+			''   muemodi = rs2(15)
+
+			'   response.write muemodi & "vvvv"
+
+			If bVersion = "SI" And rs2(14) And SESSION("SHWMOD") <> "N" Then
+				If rs2(15) = "M" Then
+					xftitl = "Modificado."
+					xfclas = "btbs"
+					sglmod = "<div class='" & xfclas & "'  ><i class='las la-angle-right' ></i></div>"
+					sImage = ofv.GenLink("",xfclas,"","","","",sglmod,"si")
+
+					''''''para mostrar el item modificado
+
+					Strsql = "Select * from OBJACCION where objid = 0" & rs2("relant")
+					Set rs3 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					'response.write strsql & " linea 95 " & "<br>"
+					If Not rs3.eof Then
+						RCHEK = "S"
+					End If
+
+
+
+					''''''Fin mostrar item modificado
+
+					''response.write strsql
+
+
+				ElseIf rs2(15) = "A" Then
+					xftitl = "Agregado."
+					xfclas = "btba"
+					sglmod = "<div class='" & xfclas & "' ><font class=btic >6</font></div>"
+					sImage = ofv.GenLink("",xfclas,"","","","",sglmod,"si")
+				ElseIf rs2(15) = "E" Then
+					xftitl = "Eliminado."
+					xfclas = "btbn"
+					sglmod = "<div class='" & xfclas & "' ><font class=btic >5</font></div>"
+					sImage = ofv.GenLink("",xfclas,"","","","",sglmod,"si")
+				End If
+			End If
+
+			sPoint = "T" & nAccion
+
+			'Acciones
+			If rs2(4) <> "" Then
+				Strsql = "Select descri,MODO From Tipoaccalt Where tipoaccionalt = " & rs2(4)
+				Set rsAcciones = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				'response.write strsql & " linea 126 " & "<br>"
+				If  Not rsAcciones.eof Then
+					sAccionM = rsAcciones(0)
+					sModo   = rsAcciones(1)
+				End If
+				Call ofv.cerrarconsulta(rsAcciones)
+			End If
+			''''onclick='alert(document.getElementById(" & chr(34) & rs2(0) & "M" & chr(34) & "));'
+
+			Celda  = ofv.GenCelda(sPoint,"uts title='" & xftitl & "' onclick='document.getElementById(" & chr(34) & rs2(0) & "M" & chr(34) & ").style.display=""block"";' ","","1%","","","","<b>" & sImage & "</b>","si")
+
+			''  response.write sCambios & " 0001"
+
+			''  response.write celdakk
+
+			' estado observacion
+
+			Celdaobs  = ""
+
+
+			If Nestado=5 And origen <> "ED" Then
+
+				sAccion = "genObsdoc.asp?wasotxt=N&vuelve=" & vuelta  & "&Codobjeto=" & nCodigo
+				sAccion = sAccion & "&Tipobjeto=" & sTipo & "&ID=" & nAccion  & "&ID2=" & nID
+
+				xsffun  = " onclick=""document.getElementById('DX4').style.display='';"" "
+				sHref   = sAccion
+				sInput  = "<div style='border-style:solid;border-color:#993333;border-width:1;' >" & "OBS" & "</div>"
+				''     Celdaobs  = ofv.GenCelda("","ut" & xsffun & "  title='Agregar/consultar observaciones para el elemento.' ","","","1","","",sInput,"si")
+				''    Celdaobs  = ofv.GenLink("","ut" & "  ",sHref,"WK4","","",Celdaobs,"si")
+
+				Celdaobs= ofv.GenLink("","ut" & "  ",sHref,"WK4","","",sInput,"si")
+				Celdaobs =  ofv.GenCelda("","ut" & xsffun & "  title='Agregar/consultar observaciones para el elemento.' ","","","1","","",Celdaobs,"si")
+
+
+
+			End If
+
+			''  response.write sInput
+
+			''  Celda = Celda & Celdaobs
+
+			'' Nuevo 16012014
+
+			Celda  = Celdaobs & ofv.GenCelda("","uts title='" & xftitl & "' ","","1%","","","","<b>" & sImage & "</b>","si")
+
+			If Marca  = "CA" Then
+				If   RCHEK = "S" Then
+					Celdakk = Celdakk & ofv.GenCelda("","","","","","","","&nbsp; bbb ","si")
+				End If
+			End If
+
+			'' Nuevo 16012014 FIN
+
+			tenc   = "NO"
+			For ym=1 To tm
+		'	response. write rs2(0) & "----" & smodo & "-----" & Ucase(wsmodo(ym)) & "--" & "<br>"
+				If ucase(sModo) = Ucase(wsmodo(ym)) Then
+					tenc = "SI"
+                            'response.write  ym & " --" & sModo &"--- "  & tm & "<br>"
+					For ymm=0 To 6
+
+						wstipo(ymm) = wsmodoB(ym)(ymm)
+					'	response.write sModo & "  "& ymm & " "   & wstipo(ymm)  & "<br>"
+
+					Next
+
+					Exit For
+				ElseIf UCASE(sModo) < UCASE(wsmodo(ym)) Then
+					tenc = "NO"
+					Exit For
+				End If
+			Next
+
+			If ym > tm Then  tenc = "NO"
+
+			If   tenc = "NO" Then
+				For ymm=0 To 6
+					wstipo(ymm) = 0
+				Next
+			End If
+
+			sLink = "&nbsp;"
+
+			If wstipo(1) Then
+				'Acciones alternativas
+
+				strsql12 = "SELECT * from modo "
+				strsql12 = strsql12 & "Where tipomodo = '" & sModo & "' "
+				Set rs12 = ofv.crearconsultaEx(StrSql12,cn,1,volver)
+
+				''''    response.write strsql12
+				''response.write strsql12 & " linea 209 " & "<br>"
+				If Not rs12.eof Then
+					sArch   = rs12(2)
+
+				End If
+				Call ofv.cerrarconsulta(rs12)
+
+				nCantRegAMover = "A"
+				vueltaC = ofv.vueltaaspExC("../",CantRegAMover,CantRegAMover2)
+				sID = "Accion=" & nAccionID & "&Codproced=" & nID & "&Codobjeto=" & nCodigo
+				sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+				sID = sID & "_Tipobjeto=" & sTipo & "_proced=" & nID & "_Menu=" & sMenux & "_Sector="
+				sID = sID & ofv.convertircar(sSectorx,"_","@") & "_origen=" & origen
+
+				sImage   = ofv.GenImage("","","","","Iconos/" & sArch,"0","")
+				sLink    = sImage
+
+				slinkalt = acciones(nAccionID,nCodigo,nID,sTipo)
+
+
+			End If
+			Celda = Celda & ofv.GenCelda("","dt","","1%","","","",sLink,"si")
+
+
+			''    response.write sLink
+
+			'Secuencia
+			''''' Celda = Celda & ofv.GenCelda("","dt","","4%","","","",rs2(10),"si")
+
+			sVerbo   = sAccionM
+			sAcciont = sAccionM
+			i        = instr(sVerbo," ")
+
+			If i > 0 Then
+				sVerbo   = left(sAccionM,i-1)
+				sAcciont = mid(sAccionM,i+1)
+			Else
+				sAcciont=""
+			End If
+
+			sInput = rs2(10) & ".&nbsp;<i>" & sVerbo & "</i>" & "&nbsp;&nbsp;&nbsp;"
+			sInput = sInput & sAcciont
+			if rs2(4)=301 then
+			 Celda  = Celda & ofv.GenCelda("","dt colspan=5  ","","","","","","<b>" & rs2(10) &  ".&nbsp;" & rs2("descriacc") & "</b>","si")
+			else
+			 Celda  = Celda & ofv.GenCelda("","dt colspan=5  ","","","","","","<b>" & sInput & "</b>","si")
+			end if
+			Fila   = Fila & ofv.GenRow("","","","","30","","",Celda,"si")
+
+			''    response.write sInput
+
+
+			sImagen  = "NO"
+			wasotxt  = "N"
+
+
+			'link
+		'	response.write "<br> " & RS2(0) & "--" & wstipo(3)
+			If wstipo(3)   Then
+				wlnkptr = "0" & rs2(19)
+				If Not isnull(wlnkptr) Then
+					If clng(wlnkptr) > 0 Then
+
+						Strsql = "SELECT * From objlnk where objid = " & rs2(19)
+						Set rsx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+						''      response.write strsql
+
+						If Not rsx.eof Then
+
+
+							wasotxt     = rsx(14) & ""
+							wasotxtstr  = CLNG("0" & rsx(15))
+							wasotxtcan  = CLNG("0" & rsx(16))
+							wasotxtdat  = rsx(17) & ""
+
+							If wasotxt = "" Then
+								wasotxt = "N"
+							End If
+
+							wtipoL   = rsx(6)
+							wtipoLc  = rsx(7) & ""
+							wUrl     = rsx(8) & ""
+							wUrlDesc = rsx(9) & ""
+							wtipoLNK = rsx(10) & ""
+
+							wNV1    = rsX(11) & ""
+							wNV2    = rsX(12) & ""
+							wNV3    = rsX(13) & ""
+
+							If  WNV1 = "" Then WNV1 = "0"
+							If  WNV2 = "" Then WNV2 = "0"
+							If  WNV3 = "" Then WNV3 = "0"
+
+
+						Else
+							wtipoL   = 0
+							wtipoLc  = "NO"
+							wUrl     = "NO"
+							wUrlDesc = ""
+							wtipoLNK = "NO"
+
+							WNV1 = "0"
+							WNV2 = "0"
+							WNV3 = "0"
+
+						End If
+						Call ofv.cerrarconsulta(rsx)
+
+						If wtipoLNK = "I" Then
+
+							wNomLt    = wUrlDesc
+							wNomL     = wUrlDesc
+							If wNomL <> "" Then
+								wNomL = UCASE(wNomLt)
+							Else
+								wNomL = "S/D"
+							End If
+
+							If Not isnull(wUrl) Then
+								sHref = instr(wUrl,"://")
+								If sHref > 0 Then
+									sHref = wUrl
+								Else
+									sHref = "HTTP://" & wUrl
+								End If
+							Else
+								sHref = "javascript:void(0);"
+							End If
+							sFuncion = " target=_blank "
+
+
+						Else
+
+							wNomLt    = wUrlDesc
+							wNomL     = wUrlDesc
+							If wNomL <> "" Then
+								wNomL = UCASE(wNomLt)
+							Else
+								wNomL = "S/D"
+
+
+								Strsql = "Select * From csGenObjetos where codobjeto = " & wtipoL
+
+
+								Set rsx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+								If Not rsx.eof Then
+									wNomL = rsx(1)
+								Else
+									wNomL = "S/D"
+								End If
+								Call ofv.cerrarconsulta(rsx)
+
+							End If
+
+							sActcon = "Consultar.asp?Codigo=" & wtipoL & "&Tipo=" & wtipoLc
+							sActcon = sActcon & "&Datos=*smenu=PORESTADO*lista=3"
+							sActcon = sActcon & "&NIV1=" & WNV1 & "&NIV2=" & WNV2 & "&NIV3=" & WNV3
+
+							sHref = "&nbsp;"
+
+							sFuncion = " onclick=" & Chr(34) & " AbrirCons('" & sActcon & "','" & wtipoL & "'); return false;" & Chr(34)
+
+						End If
+
+
+						slnktit = wNomLt
+
+						SArma = wNomL
+
+						Slnkdata = wNomL
+
+						sImagen  = "SI"
+
+						sLink       = ofv.GenLink("","btbn title='" & slnktit & "' ",GenKeyLnks(sHref),"","",GenKeyLnks(sFuncion),sgllnk,"si")
+						sLink2       = ofv.GenLink("","nt title='" & slnktit & "' ",GenKeyLnks(sHref),"","",GenKeyLnks(sFuncion),"NNNNNN","si")
+
+
+
+					End If
+				End If
+			End If
+
+
+
+
+			''''''''''''''''''''''''''''''''''''''
+
+			'Texto de Referencia
+			sArma = rs2(11)
+			If len(sArma) > 0 Then
+
+
+				If wasotxt = "S" Then
+					If  wasotxtstr > 0  And wasotxtcan > 0 Then
+
+						sfontstyl = " style='font-family:" & Session("CMFPNGNFTFC") & ";color:" & Session("APLFT") & ";font-size:" & Session("CMFPNGNFTSZ") + 2 & "pt;font-weight:800;' "
+
+						sArma = left(sArma,wasotxtstr - 1) & "" & replace(sLink2,"NNNNNN","&nbsp;<u><font " & sfontstyl & "  >" & mid(sArma,wasotxtstr,wasotxtcan) & "</font></u>&nbsp;") & "" & right(sArma,len(sArma) - (wasotxtstr + wasotxtcan - 1))
+					End If
+				End If
+
+				''     response.write wasotxt & " 001"
+
+				sArma = replace(sArma,chr(13),"<br>")
+
+				Celda = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp;","si")
+				Celda = Celda & ofv.GenCelda("","utg colspan=4 style='text-align:justify;' ","","","","","",SArma,"si")
+				Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+				''      response.write sArma & " Texto Ref.--- "
+
+			End If
+
+			''    response.write wasotxt & " texto"
+
+			sArma = rs2(16)
+
+			If len(sArma) > 0 Then
+				sArma = replace(sArma,chr(13),"<br>")
+				Celda = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp;","si")
+				Celda = Celda & ofv.GenCelda("","utg colspan=4 style='text-align:justify;' ","","","","","",SArma,"si")
+				Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+			End If
+
+			sArma = rs2(17)
+
+			If len(sArma) > 0 Then
+				sArma = replace(sArma,chr(13),"<br>")
+				Celda = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp;","si")
+				Celda = Celda & ofv.GenCelda("","utg colspan=4 style='text-align:justify;' ","","","","","",SArma,"si")
+				Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+			End If
+
+			'link
+			If wstipo(3) Then
+
+				If  wasotxt  = "N" Then
+					If  simagen <> "NO" Then
+
+						sLink2 = replace(sLink2,"NNNNNN",slnkdata)
+
+						Celdak = ""
+						Celdak = Celdak & ofv.GenCelda("","btbn title='ver documento.' ","","2","","","",sLink,"si")
+						Celdak = Celdak & ofv.GenCelda("","uti","","","","","",sLink2,"si")
+
+						Filak = ofv.GenRow("","","","","","","",Celdak,"si")
+						SArma = ofv.GenTabla("","TWINE","","98%","","0","0","0","-1","","",Filak,"si")
+
+
+						Celda = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp;","si")
+						Celda = Celda & ofv.GenCelda("","dt ","","","","","","&nbsp;&nbsp;","si")
+						Celda = Celda & ofv.GenCelda("","dt2 colspan=3","","","","","",SArma,"si")
+						Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+
+					End If
+
+				End If
+
+			End If
+
+
+			If rs2(6) <> "" And rs2(6) > "0"  Then
+				Celda = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp;","si")
+
+				nCopias = "&nbsp;"
+
+				If wstipo(2) Then
+					'Copias
+					If Not isnull(rs2(13)) Then
+						If rs2(13) > "0" Then
+							If rs2(13) > "1" Then
+								nCopias = "&nbsp;En&nbsp;" & rs2(13) & "&nbsp;Copias"
+							Else
+								nCopias = "&nbsp;En&nbsp;" & rs2(13) & "&nbsp;Copia"
+							End If
+						End If
+					End If
+				End If
+
+				'Componentes
+				sComponente = "&nbsp;"
+				sLink       = sglcmp
+				sLink2      = "&nbsp;"
+
+
+					strsql = "SELECT *  From objlnk where ltipo in('KL','KF')  AND objid = " & rs2(6)
+					'  response.write strsql
+					Set rsx = ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+                    STIPOL=""
+                    If Not rsx.eof Then STIPOL=RSX("LTIPO")
+
+                    SELECT CASE STIPOL
+
+                    CASE "KF"
+
+
+					'If Not rsx.eof Then
+
+						wasotxt     = rsx(14) & ""
+						wasotxtstr  = CLNG("0" & rsx(15))
+						wasotxtcan  = CLNG("0" & rsx(16))
+						wasotxtdat  = rsx(17) & ""
+
+						If wasotxt = "" Then wasotxt = "N"
+
+
+
+						wNV1    = rsx(11) & ""
+						wNV2    = rsx(12) & ""
+						wNV3    = rsx(13) & ""
+
+						If  WNV1 = "" Then WNV1 = "0"
+						If  WNV2 = "" Then WNV2 = "0"
+						If  WNV3 = "" Then WNV3 = "0"
+
+						codobjetoL = clng(rsx("codobjetoL"))
+						wtipoLc    = rsx(7)
+						If trim(rsx("Ltipo")) = "KF" Then
+
+							wUrlDesc = rsx(9) & ""
+
+
+							wNomL    = wUrlDesc
+							If wNomL = "" Then
+								wNomL = "S/D"
+
+
+								Strsql = "Select * From csGenObjetos where estado <> 4 and codobjeto = " & codobjetoL
+								'      RESPONSE.WRITE STRSQL
+								Set rst2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+								If Not rst2.eof Then
+									wNomL = rst2(1)
+								Else
+									wNomL =""' "S/D"
+								End If
+								Call ofv.cerrarconsulta(rst2)
+
+							End If
+
+							sActcon = "Consultar.asp?Codigo=" & codobjetoL & "&Tipo=" & wtipoLc
+							sActcon = sActcon & "&Datos=*smenu=PORESTADO*lista=3"
+							sActcon = sActcon & "&NIV1=" & WNV1 & "&NIV2=" & WNV2 & "&NIV3=" & WNV3
+
+
+
+							sHref    = "&nbsp;"
+							' response.write sActcon
+							sFuncion = " onclick=" & Chr(34) & " AbrirCons('" & sActcon & "','" & wtipoLc & "'); return false;" & Chr(34)
+
+
+							slnktit  = wNomL
+							wNomL    = pStyle & "&nbsp;<u><i>" & wNomL & "</i></u>&nbsp;" & pStyleF
+							sImagen  = wNomL
+
+						End If
+					'End If
+
+					sLink       = ofv.GenLink("","btba",GenKeyLnks(sActcon),"_new","","",sglcmp,"si")
+					sLink2      = ofv.GenLink("","nt",GenKeyLnks(sActcon),"_new","","",wNomL,"si")
+
+					'sLink    = OFV.GenLink("", "nt title='" & slnktit & "' ",GenKeyLnks(sHref), "", "", sFuncion,sImage & wNomL, "si")
+					 Call ofv.cerrarconsulta(rsx)
+				CASE "KL"
+				'Else
+				'	Strsql = "Select * From objlnk Where ltipo = 'KL' and objid = 0" & rs2(6)
+				'	Set rsx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				'	If Not rsx.eof Then
+
+						wtipoL   = rsx(6)
+						wtipoLc  = rsx(7) & ""
+
+						wNV1    = rsX(11) & ""
+						wNV2    = rsX(12) & ""
+						wNV3    = rsX(13) & ""
+
+						If  WNV1 = "" Then WNV1 = "0"
+						If  WNV2 = "" Then WNV2 = "0"
+						If  WNV3 = "" Then WNV3 = "0"
+
+
+						Strsql = "Select nombre From csacomple Where codcomp = " & wtipoL
+						'  response.write strsql
+						Set rsComponentes = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+						If  Not rsComponentes.eof Then
+							sComponente = rsComponentes(0)
+							SArma       = replace(sComponente," ","&nbsp;")  & nCopias & ""
+							sHref       = "EditarImagen2.asp?ID=" & wtipoL
+							sHref       = sHref & "&NIV1=" & WNV1 & "&NIV2=" & WNV2 & "&NIV3=" & WNV3
+
+							sLink       = ofv.GenLink("","btba",GenKeyLnks(sHref),"_new","","",sglcmp,"si")
+							sLink2      = ofv.GenLink("","nt",GenKeyLnks(sHref),"_new","","",SArma,"si")
+
+						End If
+						Call ofv.cerrarconsulta(rsComponentes)
+
+					'End If
+					Call ofv.cerrarconsulta(rsx)
+				'End If
+				END SELECT
+
+				Celdak = ""
+				Celdak = Celdak & ofv.GenCelda("","btba title='ver complemento.' ","","2","","","",sLink,"si")
+				Celdak = Celdak & ofv.GenCelda("","uti","","","","","",sLink2,"si")
+
+				Filak = ofv.GenRow("","","","","","","",Celdak,"si")
+				SArma = ofv.GenTabla("","TWINE","","98%","","0","0","0","-1","","",Filak,"si")
+
+
+				Celda = Celda & ofv.GenCelda("","dt ","","","","","","&nbsp;&nbsp;","si")
+				Celda = Celda & ofv.GenCelda("","dt2 colspan=3","","","","","",SArma,"si")
+				Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+
+			End If
+
+
+			If rs2(8) > "0" Or rs2(9) > "0" Then
+				Celda = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp;","si")
+				'Sector Continuador
+				sContinuador = "&nbsp;"
+				If rs2(8) > "0" Then
+					Strsql = "Select descri From Eco Where eco = " & rs2(8)
+					Set rsContinuadores = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					If Not rsContinuadores.eof Then sContinuador = rsContinuadores(0) & "&nbsp;"
+					Call ofv.cerrarconsulta(rsContinuadores)
+				End If
+
+
+				'Perfil Continuador
+				sPerfil = "&nbsp;"
+				If rs2(9) > "0" Then
+					Strsql = "Select descri From Tipoperfil Where tipoperfil = '" & rs2(9) & "'"
+					Set rsPerfiles = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					If Not rsPerfiles.eof Then sPerfil = rsPerfiles(0) & "&nbsp;"
+					Call ofv.cerrarconsulta(rsPerfiles)
+				End If
+
+
+				Celdak = ""
+				Celdak = Celdak & ofv.GenCelda("","ut title='sector continuador.' ","","2","","","",sglcnt,"si")
+				Celdak = Celdak & ofv.GenCelda("","uti","","","","","",sContinuador & "&nbsp;&nbsp;","si")
+				Celdak = Celdak & ofv.GenCelda("","ut title='perfil continuador.'  ","","2","","","",sglprf,"si")
+				Celdak = Celdak & ofv.GenCelda("","uti","","","","","",sPerfil,"si")
+
+				Filak = ofv.GenRow("","","","","","","",Celdak,"si")
+				SArma = ofv.GenTabla("","TWINE","","98%","","0","0","0","-1","","",Filak,"si")
+
+				Celda = Celda & ofv.GenCelda("","dt ","","","","","","&nbsp;&nbsp;","si")
+				Celda = Celda & ofv.GenCelda("","dt colspan=3","","","","","",SArma,"si")
+
+				Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+			End If
+
+			If  wstipo(1) Then
+				Celda =  ofv.GenCelda("","dt colspan=3","","1%","","","","&nbsp;","si")
+				Celda =  celda & ofv.GenCelda("","dt colspan=4","","","","","",sLinkalt,"si")
+				Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+				If sLinkalt <> "" And   sLinkalt <> "&nbsp;"  And session("APLMDCLI") = "BGAL" Then
+
+					Celda =  ofv.GenCelda("","vt colspan=2","","1%","","","","SI","si")
+					Celda =  celda & ofv.GenCelda("","dt colspan=5","","","","","","&nbsp;","si")
+					Fila = Fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+				End If
+				sLinkalt = ""
+			End If
+
+			''       response.write Celda & "00001"
+
+			Celda    = ""
+
+			Celda = Celda & ofv.GenCelda("","dt","","1%","","","","&nbsp;","si")
+			Celda = Celda & ofv.GenCelda("","dt","","1%","","","","&nbsp;","si")
+			Celda = Celda & ofv.GenCelda("","dt","","3%","","","","&nbsp;","si")
+			Celda = Celda & ofv.GenCelda("","dt","","50%","","","","&nbsp;","si")
+			Celda = Celda & ofv.GenCelda("","dt","","","","","","&nbsp;","si")
+			Celda = Celda & ofv.GenCelda("","dt","","","","","","&nbsp;","si")
+			Celda = Celda & ofv.GenCelda("","dt","","","","","","&nbsp;","si")
+
+			Fila = Fila & ofv.GenRow("","","","","5","","",Celda,"si")
+
+			'' response.write rs3.eof & " aaaa " & rs3.fields.count
+
+			''  24012014 - Inicio Modificacion
+			If RCHEK ="S" And sCambios <> "NO" Then
+
+				Filatt = ""
+				Celdakk = ""
+				Celdakk = Celdakk & ofv.GenCelda("","utg colspan=6 style='text-align:justify;color:#0054a9;' ","","25%","","","","<u>Version Anterior:</u>","si")
+				Filatt = Filatt & ofv.GenRow("","ut","","","","","",Celdakk,"si")
+				'Acciones
+				If rs3(4) <> "" Then
+					Strsql = "Select descri,MODO From Tipoaccalt Where tipoaccionalt = " & rs3(4)
+					Set rsAcciones = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					If  Not rsAcciones.eof Then
+						sAccionM = rsAcciones(0)
+						sModo   = rsAcciones(1)
+					End If
+					Call ofv.cerrarconsulta(rsAcciones)
+				End If
+				sVerbo   = sAccionM
+				sAcciont = sAccionM
+				i        = instr(sVerbo," ")
+
+				If i > 0 Then
+					sVerbo   = left(sAccionM,i-1)
+					sAcciont = mid(sAccionM,i+1)
+				Else
+					sAcciont=""
+				End If
+
+				sInput = rs3(10) & ".&nbsp;<i>" & sVerbo & "</i>" & "&nbsp;&nbsp;&nbsp;"
+				sInput = sInput & sAcciont
+				Celdakk = ""
+				Celdakk  = Celdakk & ofv.GenCelda("","qt colspan=5 style='text-align:justify;color:#0054a9;' ","","","","","","<b>" & sInput & "</b>","si")
+				Filatt = Filatt & ofv.GenRow("","","","","30","","",Celdakk,"si")
+
+
+
+				sArmakk = rs3(11)
+				If len(sArmakk) > 0 Then
+					'' sArmakk = "-Texto Anterior- <br>" & replace(rs3(11) & "",chr(13)," <br>")
+					'' Celdakk = ""
+					Celdakk = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp; ","si")
+					CeldaKK = CeldaKK & ofv.GenCelda("","utg"," valign=top style='text-align:justify;color:#0054a9;' ","","",Pbgcol,"", PnumS  & sArmakk & "","si")
+					Filatt = Filatt & ofv.GenRow(rs3(0) & "M","utg style='text-align:justify;' ","","","","","",Celdakk,"si")
+				End If
+
+
+				If  rs3(8) & "" > "0" Or rs3(9) & "" > "0" Then
+					Celdakk = ofv.GenCelda("","dt colspan=3","","20","","","","&nbsp;","si")
+					'Sector Continuador Anterior
+					sContinuador = "&nbsp;"
+					If rs3(8) > "0" Then
+						Strsql = "Select descri From Eco Where eco = " & rs3(8)
+						Set rsContinuadores = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+						If Not rsContinuadores.eof Then sContinuador = rsContinuadores(0) & "&nbsp;"
+						Call ofv.cerrarconsulta(rsContinuadores)
+					End If
+
+					'Perfil Continuador Anterior
+					sPerfil = "&nbsp;"
+					If rs3(9) > "0" Then
+						Strsql = "Select descri From Tipoperfil Where tipoperfil = '" & rs3(9) & "'"
+						Set rsPerfiles = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+						If Not rsPerfiles.eof Then sPerfil = rsPerfiles(0) & "&nbsp;"
+						Call ofv.cerrarconsulta(rsPerfiles)
+					End If
+
+
+					''  response.write sContinuador & " Sector "
+					''  Muestra la Estructura Anterior
+
+					Celdakk = ""
+					Celdakk = Celdakk & ofv.GenCelda("","utg colspan=4","","","","","","&nbsp;&nbsp;","si")
+					Celdakk = Celdakk & ofv.GenCelda("","utg colspan=1 style='text-align:justify;title='sector continuador.' ","","","","","",sglcnt,"si")
+					Celdakk = Celdakk & ofv.GenCelda("","utg colspan=1 style='color:#0054a9' ","","","","","",sContinuador,"si")
+					Celdakk = Celdakk & ofv.GenCelda("","utg colpsan=1 style='text-align:justify;title='perfil continuador.'  ","","","","","",sglprf,"si")
+					Celdakk = Celdakk & ofv.GenCelda("","utg colspan=1 style='color:#0054a9' ","","","","","",sPerfil,"si")
+					''  Fila = Fila & ofv.GenRow("","","","","","","",Celdakk,"si")
+
+					Celdak = ""
+
+					Celdak = Celdak & ofv.GenCelda("","ut title='sector continuador.' ","","2","","","",sglcnt,"si")
+					Celdak = Celdak & ofv.GenCelda("","uti","","","","","",sContinuador & "&nbsp;&nbsp;","si")
+					Celdak = Celdak & ofv.GenCelda("","ut title='perfil continuador.'  ","","2","","","",sglprf,"si")
+					Celdak = Celdak & ofv.GenCelda("","uti","","","","","",sPerfil,"si")
+
+					Filak = ofv.GenRow("","","","","","","",Celdak,"si")
+					SArma = ofv.GenTabla("","TWINE","","98%","","0","0","0","-1","","",Filak,"si")
+					Celdakk = ""
+					Celdakk = Celdakk & ofv.GenCelda("","utg colspan=4","","","","","","&nbsp;&nbsp;","si")
+					'' Celdakk = Celdakk & ofv.GenCelda("","dt ","","","","","","&nbsp;&nbsp;","si")
+					Celdakk = Celdakk & ofv.GenCelda("","dt colspan=3","","","","","",SArma,"si")
+
+					Filatt = Filatt & ofv.GenRow("","","","","","","",Celdakk,"si")
+
+
+
+				End If
+
+
+				SArmatt = ofv.GenTabla("","AAA style='BACKGROUND-COLOR:#f9f9f9;border-style:solid;border-width:1;border-color:#0054a9;'  ","","80%","","0","0","2","2","","",Filatt,"si")
+
+				Celdakk = ""
+				Celdakk = Celdakk & ofv.GenCelda("","ut colspan=7 align=CENTER ","","","","","",SArmatt,"si")
+
+				Fila = Fila & ofv.GenRow("","","","","","","",Celdakk,"si")
+
+				Celdakk = ""
+				Celdakk = Celdakk & ofv.GenCelda("","ut colspan=7 align=CENTER ","","","","","","&nbsp;&nbsp;","si")
+
+				Fila = Fila & ofv.GenRow("","","","","","","",Celdakk,"si")
+
+
+				''  24012014 - Fin Modificacion
+
+			End If
+			rs2.movenext
+			posicion = posicion + 1
+		Loop
+	End If
+
+
+
+	FNSHTML = FNSHTML & ofv.GenTabla("","","","95%","","0","0","0","0","","",Fila,"si")
+
+	GENFMTPROCEDIMIENTOS = "<div id=zglos class='norma-card' style='border-radius: 0px 0px 10px 10px;'>" & FNSHTML & "</div>"
+
+End Function
+
+
+Function acciones(nAccion,nCodigo,nProced,sTipo)
+	Dim FNSHTML2
+	Dim rs,rs2
+	Set cn = ofv.conectar(ofv.strconn2)
+
+	strsqlx = "Select Version From Objprty Where Objprty.codobjeto = " & nCodigo
+	Set rs = ofv.crearconsultaEx(StrSqlx,cn,1,parametros)
+	bVersion = "NO"
+	If Not rs.eof Then
+		If rs(0) = "V" Then bVersion = "SI"
+	End If
+	Call ofv.cerrarconsulta(rs)
+
+
+	strsql = "SELECT TIPOACCALT.tipoaccionalt, TIPOACCALT.descri, Objaccion.secuen "
+	strsql = strsql & "FROM OBJACCION, TIPOACCALT where "
+	strsql = strsql & "OBJACCION.tipoaccion = TIPOACCALT.tipoaccionalt "
+	strsql = strsql & "and OBJACCION.codaccion = '" & nAccion & "'"
+	strsql = strsql & " Order By secuen"
+	' response.write strsql
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,volver)
+	If Not rs.eof Then
+		VTACC = rs(0)
+		VDACC = rs(1)
+		VSACC = rs(2)
+	End If
+	Call ofv.cerrarconsulta(rs)
+
+	strsql = "SELECT * from csaccaltsel "
+	strsql = strsql & "Where idaccion = '" & nAccion & "' "
+	strsql = strsql & " and (modi = 0 or "
+	strsql = strsql & " (modi <> 0 and tipmodi <> 'E')) "
+	strsql = strsql & " order by secuencia"
+	'response.write strsql
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+	strsql = "SELECT * FROM TIPOACCALT WHERE TIPOACCALT.modo='OP' Or TIPOACCALT.modo='RF' "
+	strsql = strsql & "ORDER BY descri"
+
+	FNSHTML2 = ""
+
+	FNSHTML2 = FNSHTML2 & ofv.GenTabla("panel","","","80% ","","0","0","-1","2","","","","no")
+
+	t2    = ofv.GenCelda("","utis colspan=3 style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#eeeeee;' ","","","","","",sfidkC & "&nbsp;NO.","si")
+
+	FNSHTML2 = FNSHTML2 & ofv.GenRow("","","","","","","",t2,"si")
+
+
+	Vcont = 1
+	Valor = ""
+	VCTACC = ""
+	VCDACC = ""
+	VCSACC = ""
+
+	If Not rs.eof Then
+		Do until rs.eof
+			Valor = rs(0)
+			If Not isnull(rs(8)) Then
+				Continuador = rs(8)
+
+
+				strsql = "SELECT TIPOACCALT.tipoaccionalt, TIPOACCALT.descri, Objaccion.secuen "
+				strsql = strsql & "FROM OBJACCION, TIPOACCALT where "
+				strsql = strsql & "OBJACCION.tipoaccion = TIPOACCALT.tipoaccionalt "
+				strsql = strsql & "and OBJACCION.codaccion = '" & Continuador & "'"
+				strsql = strsql & " Order By secuen"
+				'response.write strsql
+				Set rs2 = ofv.crearconsultaEx(StrSql,cn,1,volver)
+				If Not rs2.eof Then
+					VCTACC = rs2(0)
+					VCDACC = rs2(1)
+					VCSACC = rs2(2)
+				End If
+				Call ofv.cerrarconsulta(rs2)
+
+			End If
+			ID = rs(2)
+			sImage = "&nbsp;"
+			If bVersion = "SI" And rs(9) And SESSION("SHWMOD") <> "N" Then
+				If rs(10) = "M" Then
+					sImage = ofv.GenImage("","","","","Imagenes/Botmodx.jpg","0","")
+				ElseIf rs(10) = "A" Then
+					sImage = ofv.GenImage("","","","","Imagenes/Botagrx.jpg","0","")
+				End If
+			End If
+
+			t1 = ofv.GenCelda("","dt","","5%","","","",sImage,"si")
+
+			t1 = t1 & ofv.GenCelda("","dt","","5%","","","","&nbsp;" & VSACC & "." & rs(6) & "&nbsp;","si")
+
+			Vcont = Vcont + 1
+
+			'Texto Accion Alt
+			If rs(4) <> "" Then
+				Strsql = "Select descri From Tipoaccalt Where tipoaccionalt = " & rs(4)
+				'response.write strsql
+				Set rsAcciones = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				If Not rsAcciones.eof Then
+					sAccion = rsAcciones(0)
+				End If
+				Call ofv.cerrarconsulta(rsAcciones)
+			End If
+
+			sVerbo = sAccion
+			sAcciont = sAccion
+			i = instr(sVerbo," ")
+			If i > 0 Then
+				sVerbo = left(sAccion,i-1)
+				sAcciont = mid(sAccion,i+1)
+			Else
+				sAcciont=""
+			End If
+			sInput = "<B><i>" & sVerbo  & "</i>" & "&nbsp;&nbsp;&nbsp;"
+			sInput = sInput & sAcciont & "</b>"
+
+			t2 = ofv.GenCelda("","qt ","","90%","","","",sInput,"si")
+
+			FNSHTML2 = FNSHTML2 & ofv.GenRow("","","","","","","",t1 & t2,"si")
+
+			'Texto de Referencia
+			If ofv.explorador = "MSIE" Then
+				nCol = 60
+			Else
+				nCol = 60
+			End If
+
+			t3 = ofv.GenCelda("","","","","","","","&nbsp;","si")
+			t3 = t3 & ofv.GenCelda("","","","","","","","&nbsp;","si")
+			sArma = rs(7)
+			If len(sArma) > 0 Then
+				sArma = replace(sArma,chr(13),"<br>")
+			End If
+			'''    SArma = "<font color=#225588 face=arial-narrow size=1>" & sArma & "</font>"
+			t3 = t3 & ofv.GenCelda("","et ","","","","","",SArma,"si")
+			FNSHTML2 = FNSHTML2 & ofv.GenRow("","","","","","","",t3,"si")
+			rs.movenext
+		Loop
+
+
+		'Encabezado Continuador
+
+
+
+		t4 = ofv.GenCelda("","","","2%","","","","&nbsp;","si")
+		t4 = t4 & ofv.GenCelda("","","","","","","","&nbsp;","si")
+		'Texto Continuador
+		If VCDACC <> "" Then
+			sVerbo = VCDACC
+			sAcciont = VCDACC
+			i = instr(sVerbo," ")
+			If i > 0 Then
+				sVerbo = left(VCDACC,i-1)
+				sAcciont = mid(VCDACC,i+1)
+			Else
+				sAcciont=""
+
+			End If
+			sInput = "<i>" & sVerbo & "</i>" & "&nbsp;&nbsp;&nbsp;"
+			sInput = sInput & sAcciont
+			sContinuador = "<b>" & VCSACC & " - " & sInput & "</b>"
+		End If
+		t4 = t4 & ofv.GenCelda("","et","","","","","","Continua en: " & sContinuador,"si")
+		If VCDACC <> "" Then
+			FNSHTML2 = FNSHTML2 & ofv.GenRow("","","","","","","",t4,"si")
+		End If
+
+	Else
+
+		t6 = ofv.GenCelda("","","","","","","","&nbsp;","si")
+		t6 = t6 & ofv.GenCelda("","","","","","","","&nbsp;","si")
+		''   SArma = "<h5><B>Sin&nbsp;datos&nbsp;disponibles</B></h5>"
+		SArma = "&nbsp;"
+		t6 = t6 & ofv.GenCelda("","dt","","","","","",SArma,"si")
+		FNSHTML2 = FNSHTML2 & ofv.GenRow("","","","","","","",t6,"si")
+
+
+	End If
+
+	t5 = ofv.GenCelda("","","","","","","","&nbsp;","si")
+	t5 = t5 & ofv.GenCelda("","","","","","","","&nbsp;","si")
+	t5 = t5 & ofv.GenCelda("","","","","","","","&nbsp;","si")
+	FNSHTML2 = FNSHTML2 & ofv.GenRow("","","","","","","",t5,"si")
+
+
+	FNSHTML2 = FNSHTML2 & ofv.GenFTabla()
+
+	Call ofv.cerrarconsulta(rs)
+
+
+
+	acciones=FNSHTML2
+End Function
+
+%>
