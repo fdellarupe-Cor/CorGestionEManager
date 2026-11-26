@@ -1,0 +1,76 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+	
+	CantRegMostrarx = 3
+	CantRegMoverx = CDbl(request.querystring("CantRegMover"))
+	vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx)
+	response.write "<table  marginwidth=0  cellspacing=0 cellpadding=0>"
+	response.write "<tr>"
+	response.write "<td width=100% >"
+	response.write ofv.Repbody(request.querystring("mnn")) & ofv.RepHeader2(ofv.convertircar(request.querystring("mnn"),"_"," "),"600")
+	response.write "<table id=margen1 width=600 marginwidth=0  cellspacing=1 cellpadding=2>"
+	response.write "<tr>"
+	response.write "<td width=1% >&nbsp;</td><td width=10% >&nbsp;</td>"
+	response.write "<td width=40% >&nbsp;</td><td width=49% >&nbsp;</td>"
+	response.write "</tr></table>"
+	
+	'Encabezados
+	If SESSION("base") = "K" Then
+		Formulario=Chr(13)&" <TR ><TD  class=tt width=2% >Descripcion</TD></tr>" & Chr(13)
+	Else
+		
+		Formulario=Chr(13)&" <TR ><TD  class=tt width=2% >Perfil</TD><TD  class=tt width=2% >Descripcion</TD></tr>" & Chr(13)
+	End If
+	
+	Set cn = ofv.conectar(ofv.strconn2)
+	
+	If SESSION("BASE")="K" Then
+		Strsql = "Select * From Objperfil WHERE  TIPOPERFIL LIKE 'FRMPF%' Order By descri"
+	Else
+		Strsql = "Select * From Objperfil  WHERE  TIPOPERFIL not LIKE 'FRMPF%' Order By descri"
+	End If
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	
+	Do While (Not rs.EOF) 
+		Celda = "" 
+		If SESSION("base") = "K" Then
+			'Perfil
+			
+			'sInput = rs(0)
+			'Celda = Celda & ofv.gencelda("","vt","","50","","","",sInput,"si")
+		Else
+			
+			'Perfil
+			
+			sInput = rs(0)
+			Celda = Celda & ofv.gencelda("","vt","","50","","","",sInput,"si")
+		End If
+		
+		
+		'Descripcion
+		sInput =rs(1) 
+		Celda = Celda & ofv.gencelda("","ut ","","90%","","","",sInput,"si")
+		Fila = ofv.genrow("","","","","","","",Celda,"si")
+		Formulario = Formulario & fila
+		rs.Movenext
+	Loop
+	sHTML = sHTML & ofv.GenTabla("","","","80% ","","0","","0","0","","",Formulario,"si")
+	
+	
+	Call ofv.cerrarconsulta(rs)
+	Call ofv.cerrarconn(cn)
+	
+	sHTML = sHTML & "</body></html>"
+End If
+
+Response.Write sHTML
+
+%>

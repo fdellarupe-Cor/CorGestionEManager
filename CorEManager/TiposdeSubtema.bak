@@ -1,0 +1,147 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+	
+	sImagenCampo = "ARCHIVO"
+	CantRegMostrarx = 8
+	CantRegMoverx = CDbl(request.querystring("CantRegMover"))
+	vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx)
+	
+	If Session("CorApli") = "COREM20" Then
+		wkaplic = "EM"
+	ElseIf Session("CorApli") = "COREP20" Then
+		wkaplic = "PL"
+	Else
+		wkaplic = "OR"
+	End If
+	
+	
+	sHTML = ofv.FormHeader("TIPOS DE SUBTEMA")
+	
+	'Encabezados
+	Formulario = ofv.Encabezados("Tipo","Descripcion","Nivel","Alcance","Propiedades")
+	
+	If request.querystring("seg") <> "" Then
+		Session("Form") = ofv.convertircar(request.querystring("seg"),"_"," ")
+	End If
+	ofv.ObtenerAtributos Session("Form"),""
+	bAgregar = ofv.AAgregar
+	bModificar = ofv.AModificar
+	bSuprimir = ofv.AEliminar
+	bConsultar = ofv.AConsultar
+	
+	Set cn = ofv.conectar(ofv.strconn2)
+	
+	Strsql = "Select * From Subtema WHERE aplic = '" & wkaplic & "' or aplic = 'GLB' Order By descri"
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	If Not rs.eof Then rs.move(CantRegMoverx)
+	posi = 0
+	Do While (Not rs.EOF) And (posi < CantRegMostrarx)
+		sForm = "form" & posi
+		
+		'Eliminar
+		If bSuprimir Then
+			sHref = "asp/EliminarRegistro.asp?ID=" & ofv.convertircar(rs(0)," ","_")
+			sHref = sHref & "&Tabla=Subtema&volver=" & vuelta & "&Eliminar=NSNC"
+			Celda = ofv.BotonEliminar(rs(1),sHref)
+		Else
+			Celda = ofv.GenCelda("","","","","","","","&nbsp;","si")
+		End If
+		
+		'Tipo
+		sInput = rs(0)
+		Celda = Celda & ofv.gencelda("","cc","","30","","","",sInput,"si")
+		
+		'Descripcion
+		sInput = ofv.GenerarInput(rs(1).name,rs(1),"text",sForm,"90","dt","")
+		Celda = Celda & ofv.gencelda("","","","","","","",sInput,"si")
+		
+		'Nivel
+		sInput = "B"
+		Celda = Celda & ofv.gencelda("","cc","center","","","","",sInput,"si")
+		
+		'APLICACION
+		scomK = wkaplic & Chr(9) & "GLB"
+		scomD = "Aplicacion" & Chr(9) & "GLOBAL"
+		
+		
+		If bModificar Then
+			sInput = ofv.gencomboFX(sForm,rs(16).name,rs(16),scomK,scomD," ")
+		Else
+			sInput = ofv.GenerarInput("",rs(16),"readonly","","10","dt","")
+		End If
+		
+		Celda = Celda & ofv.GenCelda("","" ,"","","","","",sInput,"si")
+		
+		
+		
+		sImagenP = "&#0232;"
+		sFuncAnc = " onmouseover=""this.className='ft1o';"" onmouseout=""this.className='ft1n';"" "
+		sinput = "<a class='ft1n' " & sFuncAnc & " href='TiposdeSubtemaProp.asp?wperfil=" & rs(0) & "&CantRegMover=" & CantRegMoverx
+		sinput = sinput  & "&CantRegMostrar=" & CantRegMostrarx
+		sinput = sinput  & "' title='Propiedades de " & rs(1) & "' >" & sImagenP & "</a>"
+		Celda = Celda & ofv.gencelda("","ft","center","","15%","","",sInput,"si")
+		
+		
+		Fila = ofv.genrow("","","","","","","",Celda,"si")
+		
+		
+		
+		sAccion = ""
+		If bModificar Then
+			sAccion = "asp/actualizar.asp?fname=" & ofv.convertircar(rs(0)," ","*")
+			sAccion = sAccion & "&tabla=Subtema&volver=" & vuelta
+		End If
+		Formulario = Formulario & ofv.genform(sForm,"",sAccion,"","post","",Fila,"si")
+		
+		posi = posi + 1
+		rs.Movenext
+	Loop
+	
+	ftab = ofv.GenTabla("","","","50% ","","0","","0","0","","",Formulario,"si")
+	
+	Celda = ofv.GenCelda("","","center","","","","",ftab,"si")
+	FilaS = filas & ofv.GenRow("","","","","","","",Celda,"si")
+	
+	sHTML = sHTML & ofv.GenTabla("","aaa  ","","90%","","0","","0","0","","",filas,"si")
+	
+	'  sHTML = sHTML & ofv.GenTabla("","","","80%","","0","","0","1","","",Formulario,"si")
+	
+	'Botonera
+	Agregar = ""
+	If bAgregar Then
+		sAccion = "AgregarTiposdeSubtema.asp?Regisvuelta=" & CantRegMoverx
+		sAccion = sAccion & "&Opcion=si&tabla=Subtema"
+		Agregar = ofv.BotonAgregar(sAccion)
+	End If
+	
+	str1 = "Select descri From Subtema Order By descri "    ' orden pagina
+	str2 = "Select descri From Subtema Order By descri "    ' orden alfabetico
+	Buscar = ofv.Combobuscar(str1,str2,cn,cantregmostrarx,CantRegMoverx,ofv.vueltaasp2(""))
+	
+	sinput = "<a class=tt href=TiposdeSubtemaCons.asp?"&request.querystring & " target=_new ><b>consulta</b></a>"
+	Celda = ofv.gencelda("","tt style='border-style:outset;border-width:2;' ","center","","15%","","",sInput,"si")
+	
+	sAccion = "TiposdeSubtemaCons.asp?" & request.querystring
+	Celda = ofv.BotonConsultar(sAccion)
+	
+	sHTML = sHTML & Replace(ofv.botoneraESSX("2",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","","no",Agregar,Buscar,Celda),"xr1.cells","XFKR.cells")
+	
+	''  sHTML = sHTML & ofv.botoneraESSX("2",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","","no",Agregar,Buscar,Celda)
+	
+	Call ofv.cerrarconsulta(rs)
+	Call ofv.cerrarconn(cn)
+	
+	sHTML = sHTML & "</body></html>"
+End If
+
+Response.Write sHTML
+
+%>

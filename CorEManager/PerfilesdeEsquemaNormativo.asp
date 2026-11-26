@@ -1,0 +1,169 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+
+	CantRegMostrarx = 8
+	CantRegMoverx = CDbl(request.querystring("CantRegMover"))
+	vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx)
+	base=request.querystring("BASE")
+
+
+
+
+	Set cn = ofv.conectar(ofv.strconn2)
+	If base <>"" Then
+		SESSION("BASE")=base
+	End If
+
+	sHTML = ofv.FormHeader(session("FormN"))  & Chr(13)
+	perfilF=""
+	perfilF=request.querystring("perfil")
+	'Encabezados
+	' IF SESSION("BASE")="K" THEN
+	'Formulario = ofv.Encabezados("Descripcion","Propiedades")
+	'ELSE
+	Formulario = ofv.Encabezados("Perfil","Descripcion","Propiedades")
+	' end if
+
+
+
+	If perfilF <> "" Then
+		Strsql = "Select * From Objperfil where tipoperfil = '" & perfilF & "' "
+		'response.write strsql
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+		If Not rs.eof Then
+
+			If CLng(rs(32)) = 9999 Then
+
+				Strsql = "UPDATE OBJPERFIL SET objdsc01 = 'PROPIEDADES',objdsc02 = 'CONSIDERACIONES GENERALES',objdsc03 = 'SECTORES',"
+				Strsql = strsql & "objdsc04 = 'EVENTOS',objdsc05 = 'PROCEDIMIENTOS',objdsc06 = 'DESCRIPCION',objdsc07 = 'CONTROLES',"
+				Strsql = strsql & "objdsc08 = 'ESQUEMAS',objdsc09 = 'TABLAS',objdsc10 = 'DOCUMENTOS',objdsc11 = 'CONTENIDO',objdsc12 = 'CURSOGRAMAS',"
+				Strsql = strsql & "objdsc13 = 'CONTRATOS',objdsc14 = 'PREGUNTAS FRECUENTES',objdsc15 = 'GENERAL',objord01 = 2,objord02 = 5,objord03 = 4,objord04 = 6,"
+				Strsql = strsql & "objord05 = 7,objord06 = 3,objord07 = 8,objord08 = 9,objord09 = 12,objord10 = 11,objord11 = 10,"
+				Strsql = strsql & "objord12 = 13,objord13 = 14,objord14 = 15,objord15 = 1"
+				Strsql = strsql & " where tipoperfil = '" & perfilF & "' "
+				'  response.write strsql
+				Call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+			End If
+
+		End If
+
+		Call ofv.cerrarconsulta(rs)
+
+	End If
+	ofv.ObtenerAtributos Session("Form"),""
+	bAgregar = ofv.AAgregar
+	bModificar = ofv.AModificar
+	bSuprimir = ofv.AEliminar
+	bConsultar = ofv.AConsultar
+
+
+
+	If SESSION("BASE")="K" Then
+		Strsql = "Select * From Objperfil WHERE  TIPOPERFIL LIKE 'FRMPF%' Order By descri"
+	Else
+		Strsql = "Select * From Objperfil WHERE  TIPOPERFIL not LIKE 'FRMPF%'  Order By descri"
+	End If
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	If Not rs.eof Then rs.move(CantRegMoverx)
+	posI = 0
+	Do While (Not rs.EOF) And (posi < CantRegMostrarx)
+		sForm = "form" & posi
+
+		'Eliminar
+		If bSuprimir Then
+			sHref = "asp/EliminarRegistro.asp?ID=" & ofv.convertircar(rs(0)," ","_")
+			sHref = sHref & "&Tabla=Objperfil&volver=" & vuelta & "&Eliminar=NSNC"
+			Celda = ofv.BotonEliminar(rs(1),sHref)
+			celda = Replace(celda,"<IMG  width=15  height=15  src=" & Chr(34) & "imagenes/botdel.jpg" & Chr(34) & "  border=0 >","<font face=corflaticon size=2 color=#aa0000>4</font>")
+		Else
+			Celda = ofv.GenCelda("","","","","","","","&nbsp;","si")
+		End If
+
+		'Perfil
+
+		sInput = rs(0)
+		Celda = Celda & ofv.gencelda("","cc","","50","","","",sInput,"si")
+
+
+		'Descripcion
+		sInput = ofv.GenerarInput(rs(1).name,rs(1),"text",sForm,"115","dt","")
+		Celda = Celda & ofv.gencelda("","vt ","","90%","","","",sInput,"si")
+
+
+		'sImagenP = "&#0232;"
+		'sFuncAnc = " onmouseover=""this.className='ft1o';"" onmouseout=""this.className='ft1n';"" "
+		sinput = "<a href='PerfilesdeEsquemaNormativoProp.asp?wperfil=" & rs(0) & "&CantRegMover=" & CantRegMoverx
+		sinput = sinput  & "&CantRegMostrar=" & CantRegMostrarx
+		sinput = sinput  & "' title='Propiedades de " & rs(1) & "' ><i class='las la-arrow-right'></i></a>"
+		Celda = Celda & ofv.gencelda("","ft","center","","15%","","",sInput,"si")
+
+
+
+		Fila = ofv.genrow("","","","","","","",Celda,"si")
+
+
+		sAccion = ""
+		If bModificar Then
+			sAccion = "asp/actualizar.asp?fname=" & ofv.convertircar(rs(0)," ","*")
+			sAccion = sAccion & "&tabla=Objperfil&volver=" & vuelta
+		End If
+		Formulario = Formulario & ofv.genform(sForm,"",sAccion,"","post","",Fila,"si")
+
+		posi = posi + 1
+		rs.Movenext
+	Loop
+
+
+
+
+
+	ftab = ofv.GenTabla("","","","50% ","","0","","0","0","","",Formulario,"si")
+
+	Celda = ofv.GenCelda("","","center","","","","",ftab,"si")
+	FilaS = filas & ofv.GenRow("","","","","","","",Celda,"si")
+
+	sHTML = sHTML & ofv.GenTabla("","aaa  ","","","","0","","0","0","","",filas,"si")
+
+
+	'Botonera
+	Agregar = ""
+	If bAgregar Then
+		sAccion = "AgregarPerfilesdeEsquemaNorm.asp?Regisvuelta=" & CantRegMoverx
+		sAccion = sAccion & "&Opcion=si&tabla=Objperfil"
+		Agregar = ofv.BotonAgregar(sAccion)
+	End If
+
+	If SESSION("BASE")="K" Then
+		'Strsql = "Select * From Objperfil WHERE  TIPOPERFIL LIKE 'FRMPF%' Order By descri"
+		str1 = "Select descri From Objperfil WHERE  TIPOPERFIL LIKE 'FRMPF%' Order By descri "    ' orden pagina
+		str2 = "Select descri From Objperfil WHERE  TIPOPERFIL LIKE 'FRMPF%' Order By descri "    ' orden alfabetico
+	Else
+		str1 = "Select descri From Objperfil WHERE  TIPOPERFIL not LIKE 'FRMPF%' Order By descri "    ' orden pagina
+		str2 = "Select descri From Objperfil WHERE  TIPOPERFIL not LIKE 'FRMPF%' Order By descri "    ' orden alfabetico
+	End If
+	Buscar = ofv.Combobuscar(str1,str2,cn,cantregmostrarx,CantRegMoverx,ofv.vueltaasp2(""))
+
+
+	sAccion = "PerfilesdeEsquemaNormativoCons.asp?" & request.querystring
+	Celda = ofv.BotonConsultar(sAccion)
+
+	sHTML = sHTML & ofv.botoneraESSX("2",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","","no",Agregar,Buscar,celda)
+
+	Call ofv.cerrarconsulta(rs)
+	Call ofv.cerrarconn(cn)
+
+	sHTML = sHTML & "</body></html>"
+End If
+
+Response.Write sHTML
+
+%>

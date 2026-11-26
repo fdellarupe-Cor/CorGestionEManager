@@ -1,0 +1,217 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  CantRegMostrarx = 12
+  CantRegMoverx = cdbl(request.querystring("CantRegMover"))
+
+  xsolapa=request.querystring("xsolapa")
+
+   if xsolapa <> "" then
+    session("xsolapaF")=xsolapa
+    else
+    xsolapa= session("xsolapaF")
+  end if
+  vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx) & "_xsolapa=" & xsolapa
+
+  sHTML = ofv.FormHeader(session("FormN"))
+
+  'Encabezados
+  'RESPONSE.WRITE REQUEST.QUERYSTRING
+
+
+  OPCION=request.querystring("OPCION")
+  stema=cint("0" & request.form("codtema"))
+  ssubtema=cint("0" & request.form("subtema"))
+
+  if xsolapa="" then xsolapa="PORTEMA"
+
+   sImagenP = "&#0232;"
+   zstyle="style='{font-family:" & Session("CMFPNBOTFTFC") & ";color:#666666;font-size:" & Session("CMFPNBOTFTSZ") + 1 & "pt;bapckground-color:#ff0000;font-weight:bold;;border-style:solid;border-width:1;border-color:#dddddd;height:20px;cursor:pointer;}'"
+   sinput = "<a "& zstyle & " href='FILTROBUSQUEDA.asp?XSOLAPA=PORESQUEMA'"
+   sinput = sinput  & " >AGREGAR ESQUEMAS</a>"
+
+   sImagenP = "&#0232;"
+   sinput2 = "<a "& zstyle &"  href='FILTROBUSQUEDA.asp?XSOLAPA=PORTEMA'"
+   sinput2 = sinput2  & " >AGREGAR SUBTEMAS</a>"
+  FORMULARIO=sinput & "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" & sinput2 &"<br><br>"
+  IF xsolapa="PORTEMA" THEN
+  Formulario = FORMULARIO & ofv.Encabezados("ORDEN","TEMA/SUBTEMA")
+  ELSE
+  Formulario = FORMULARIO & ofv.Encabezados("ORDEN","TIPO&nbsp;DE&nbsp;ESQUEMA")
+  END IF
+
+
+  ofv.ObtenerAtributos Session("Form"),""
+  bAgregar = ofv.AAgregar
+  bModificar = ofv.AModificar
+  bSuprimir = ofv.AEliminar
+  bConsultar = ofv.AConsultar
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+
+
+
+
+
+
+  IF  xsolapa="PORTEMA" AND OPCION="si" THEN
+
+  sql3="INSERT INTO filtrobsq (orden,tipo,VALOR1,VALOR2) values ('0','ST','0','0')"
+  'RESPONSE.WRITE SQL3
+  CALL ofv.crearconsultaEx(SQL3,cn,1,parametros)
+
+  end if
+
+
+
+
+   IF  xsolapa="PORESQUEMA" AND OPCION="si" THEN
+
+    sql3="INSERT INTO filtrobsq (orden,tipo,valor1,valor2) values ('0','ESQUEMA','0','0')"
+   ' RESPONSE.WRITE SQL3
+    CALL ofv.crearconsultaEx(SQL3,cn,1,parametros)
+
+  end if
+
+
+  IF  xsolapa="PORESQUEMA" THEN
+  Strsql = "Select * From FILTROBSQ WHERE TIPO='ESQUEMA' Order By ORDEN"
+  ELSE
+   Strsql = "Select * From FILTROBSQ WHERE TIPO='ST' Order By ORDEN"
+  end if
+
+
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+  if not rs.eof then rs.move(CantRegMoverx)
+  posi = 0
+  Do While (Not rs.EOF) and (posi < CantRegMostrarx)
+    sForm = "form" & posi
+    
+  ''response.write " " & sForm & " sForm "  
+    
+    sInput = rs(0)
+
+    'Eliminar
+    if bSuprimir and sinput > "0" then
+      sHref = "asp/EliminarRegistro.asp?ID=" & ofv.convertircar(rs(0)," ","_")
+      sHref = sHref & "&Tabla=FILTROBSQ&volver=" & vuelta & "&Eliminar=NSNC"
+      Celda = ofv.BotonEliminar(rs(1),sHref)
+    else
+      Celda = ofv.GenCelda("","","","","","","","&nbsp;","si")
+    end if
+
+   IF XSOLAPA="PORTEMA" THEN
+
+
+           sInput = ofv.GenerarInput(rs(1).name,rs(1),"text",sForm,"10","dtN","")
+		          Celda = Celda & ofv.GenCelda("","","","","","","",sInput,"si")
+
+
+          StrSql="   SELECT  b.codprodserv , '<b>'+ a.descri + '</b> / ' + b.descri as descri2 FROM  tema a "
+          StrSql=StrSql & "        inner join     PRODSERV b on(a.codtema=b.codtema)"
+		  StrSql= StrSql & " order by a.descri,b.descri"
+
+            sInput = ofv.GenerarCombo(sForm,"VALOR1",rs("VALOR1"),StrSql,cn,0,1,"")
+
+           Celda = Celda & ofv.gencelda("","VTI","","40%","","","",SINPUT,"si")
+
+
+           Fila = ofv.GenRow("","","","","","","",Celda,"si")
+
+
+
+   ELSEif  xsolapa="PORESQUEMA" then
+
+          StrSql="SELECT * FROM TIPObjeto ORDER BY DESCRI"
+	      set rsx1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+	      scomK   = ""
+	      scomD   = ""
+
+           SESQUEMA = rs(3) & ""
+     '''response.write " --> " & SESQUEMA & " SESQUEMA "        
+           
+	      do while not rsx1.eof
+	          scomK = scomK & SCOMSEP & rsx1(0)
+	          scomD = scomD & SCOMSEP & rsx1(1)
+	           SCOMSEP = chr(9)
+	      rsx1.movenext
+	      loop
+
+        sInput = ofv.GenerarInput(rs(1).name,rs(1),"text",sForm,"10","dtN","")
+        Celda = Celda & ofv.GenCelda("","","","","","","",sInput,"si")
+
+        sInput = ofv.gencomboFX(sForm,"VALOR1",SESQUEMA,scomK,scomD,"")
+        
+     '''response.write " --> " & sInput & " sInput " 
+        
+        Celda = Celda & ofv.gencelda("","VTI","","40%","","","",SINPUT,"si")
+
+        Fila = ofv.GenRow("","","","","","","",Celda,"si")
+
+
+    end if
+
+
+
+    if bModificar then
+      	        sAccion = "asp/actualizar.asp?fname=" & ofv.convertircar(rs(0)," ","*")
+      	        sAccion = sAccion & "&tabla=FILTROBSQ&volver=" & vuelta
+   end if
+
+
+
+    Formulario = Formulario & ofv.GenForm(sForm,"",sAccion,"","post","",Fila,"si")
+    fila=""
+    posi = posi + 1
+    rs.Movenext
+  Loop
+
+
+
+
+
+  sHTML =   sHTML & ofv.GenTabla("","","","80%","","0","","0","0","","",Formulario,"si")
+
+  'Botonera
+  Agregar = ""
+
+  if bAgregar then
+  	
+    sAccion = "FILTROBUSQUEDA.asp?Regisvuelta=" & CantRegMoverx & "&Opcion=si&tabla=FILTROBSQ&XSOLAPA=" & XSOLAPA
+    
+    response.write " --> " & sAccion & " sAccion "
+    
+    Agregar = ofv.BotonAgregar(sAccion)
+  end if
+
+  'str1 = "Select * From FITROBSQ "    ' orden pagina
+  str2 = "Select * From FITROBSQ  "    ' orden alfabetico
+  Buscar = ""'ofv.Combobuscar(str1,str2,cn,cantregmostrarx,CantRegMoverx,ofv.vueltaasp2(""))
+
+
+
+  'sAccion = "NivelePUESTOCons.asp?" & request.querystring
+  Celda = ""'ofv.BotonConsultar(sAccion)
+
+  sHTML = sHTML & ofv.botoneraESSX("2",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","","no",Agregar,Buscar,celda)
+
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & "</body></html>"
+end if
+
+Response.Write sHTML
+
+%>

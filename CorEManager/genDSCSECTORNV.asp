@@ -1,0 +1,515 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  ofv.ObtenerAtributos Session("Form2"),""
+  bModificar = ofv.AModificar
+  if session("Nomodificar") = "S" then bModificar = False
+
+
+
+
+   sHTML = ofv.FormHeader(session("FormN"))
+
+
+  spuesto    = request.querystring("SECTOR")
+  snomsector = request.querystring("NOMSECTOR")
+
+
+
+
+  xTrColor = "#FFFFFF"
+
+  sImageva    = "<font face='corflaticon' size=2 color='#00aa00'><b>&#0252;</b></font>" & "&nbsp;&nbsp;"
+
+  wkstylof = "aaa style='font-family:arial;font-size:6pt;color:#888888;' "
+
+  BCOLORG = "#cccccc"
+  BCOLORD = "#6699CC"
+
+'''''''''''''''''''''''''''''
+
+  wkstylo1 = " style='background-color:#ddddff;color:#aaaaaa;font-weight:bold;border-style:solid;border-width:1;border-color:" & BCOLORG & ";' "
+  wkstylo2 = " style='background-color:#FeDDAA;color:#aaaaaa;font-weight:bold;border-style:solid;border-width:1;border-color:" & BCOLORG & ";' "
+  wkstylo3 = " style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#cccccc;' "
+
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+
+
+
+
+
+  'response.write "<center>"
+
+    Fila = ""
+
+
+
+
+
+    CELDAD = ""
+    CeldaD = CeldaD & ofv.GenCelda("","utI  ","","95%","","","","DESCRIPCION DE FUNCIONES DEL SECTOR","si")
+    FilaD     = ofv.genrow("","","","","","","",CeldaD,"si")
+    sFORMhed = ofv.GenTabla("","TWIND","","100%","","0","","0","1","","",FilaD,"si")
+
+
+   shtml = shtml & sFORMhed
+
+
+     fila=""
+
+
+     sperfil = spuesto
+
+
+
+
+  Strsql = "Select * FROM ECO where ECO = 0" & SPUESTO
+
+'' response.write strsql
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+
+   if  rs.eof then
+
+
+    Celda = ofv.GenCelda("","ut colspan=2 ","","","","","","&nbsp;","si")
+    Fila = fila & ofv.genrow("","","","","20","","",Celda,"si")
+
+    Celda = ofv.GenCelda("","uti colspan=2 style='border-style:solid;border-color:#888888;border-width:1;'  ","center","","","","","<big>No hay funciones descriptas para el Sector.</big>","si")
+    Fila = fila & ofv.genrow("","","","","50","","",Celda,"si")
+
+ else
+
+   Celda = ofv.GenCelda("","UTI style='background-color:#888888;color:#ffffff;' ","","30%","","","","AREA/SECTOR:","si")
+
+
+  SSECTOR = RS(1)
+  SSECTORDAT = RS(1)
+
+  SSECTORSG = "----"
+  SSECTORJR = "----"
+  SSECTORNJ = "----"
+
+
+  sSQL = "Select * From SEGMENTO WHERE CODSEG = 0" & RS(4)
+  Set rs3 = OFV.crearconsulta2(sSQL, cn)
+  If NOT rs3.EOF Then  SSECTORSG = RS3(1)
+
+
+  sSQL = "Select * From JERARQUIA WHERE CODjerar = '" & RS(6) & "' "
+  Set rs3 = OFV.crearconsulta2(sSQL, cn)
+  If NOT rs3.EOF Then  SSECTORJR = RS3(1)
+
+  sSQL = "Select * From NIVELJERAR WHERE CODnivel = 0" & RS(5)
+  Set rs3 = OFV.crearconsulta2(sSQL, cn)
+  If NOT rs3.EOF Then   SSECTORNJ = RS3(1)
+
+    'SECTOR
+    sInput = SSECTOR
+    Celda = Celda & ofv.gencelda("","utI ","","70%","","","",sInput,"si")
+
+    Fila = Fila & ofv.genrow("","AAA BGCOLOR='#F0F0F0' ","","","25","","",Celda,"si")
+
+
+    Celda = ofv.GenCelda("","UTI style='background-color:#888888;color:#ffffff;' ","","","","","","CODIGO:","si")
+
+    'CODIGO
+    sInput = rs(2)
+    Celda = Celda & ofv.gencelda("","utI ","","","","","",sInput,"si")
+
+    Fila = Fila & ofv.genrow("","AAA BGCOLOR='#F0F0F0' ","","","25","","",Celda,"si")
+
+
+    Celda = ofv.GenCelda("","UTI style='background-color:#888888;color:#ffffff;' ","","","","","","SEGMENTO:","si")
+
+    'SEGMENTO
+    sInput = SSECTORSG
+    Celda = Celda & ofv.gencelda("","utI ","","","","","",sInput,"si")
+
+    Fila = Fila & ofv.genrow("","AAA BGCOLOR='#F0F0F0' ","","","25","","",Celda,"si")
+
+    Celda = ofv.GenCelda("","UTI style='background-color:#888888;color:#ffffff;' ","","","","","","JERARQUIA:","si")
+
+    'JERARQUIA
+    sInput = SSECTORjr
+    Celda = Celda & ofv.gencelda("","utI ","","","","","",sInput,"si")
+
+    Fila = Fila & ofv.genrow("","AAA BGCOLOR='#F0F0F0' ","","","25","","",Celda,"si")
+
+    Celda = ofv.GenCelda("","UTI style='background-color:#888888;color:#ffffff;' ","","","","","","NIVEL:","si")
+
+    'NIVEL
+    sInput = SSECTORnj
+    Celda = Celda & ofv.gencelda("","utI ","","","","","",sInput,"si")
+
+    Fila = Fila & ofv.genrow("","AAA BGCOLOR='#F0F0F0' ","","","25","","",Celda,"si")
+
+
+   end if
+
+
+ shtml =shtml & "<center>" & ofv.GenTabla("","AAA style='border-style:solid;border-color:#cccccc;border-width:1;' ","","95%   ","","0","","1","1","","",fila,"si") & "</center>"
+
+
+  Formulario = ""
+
+   Celda = ofv.GenCelda("","UTI COLSPAN=3  " & wkstylo1,"","30%","","","","DESCRIPCION DEL SECTOR","si")
+ '  Celda = CELDA & ofv.GenCelda("","UTI COLSPAN=2  ","","","","","","&nbsp;","si")
+
+   Fila  = ofv.genrow("","","","","25","","",Celda,"si")
+
+
+
+  Strsql = "Select * FROM ECODESCRIPCION WHERE ECO = 0" & SPUESTO
+  Strsql = Strsql & "  ORDER BY SECUEN "
+'  RESPONSE.WRITE STRSQL & "<BR>"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+
+
+
+  posI = 0
+   IF Not rs.EOF THEN
+
+   Formulario = Formulario & FILA
+
+  Do While (Not rs.EOF)
+
+    Fila = ""
+
+
+    sinput = "sin definir"
+    Strsql = "Select * From TIPODSCSECTOR where OBJID = 0" & rs(3)
+    set rsx2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+    if not rsx2.eof then sinput = rsx2(1)
+
+
+
+   Celda = ofv.GenCelda("","UTI   " & wkstylo2,"","30%","","","",sinput,"si")
+   Celda = CELDA & ofv.GenCelda("","UTI " & wkstylo3,"","","","","","&nbsp;","si")
+   Celda = CELDA & ofv.GenCelda("","UTI " & wkstylo3,"","","","","","&nbsp;","si")
+   Fila  = Fila & ofv.genrow(""," ","","","25","","",Celda,"si")
+
+  ''  sInput = sImageva & rs(4)
+      sInput = sImageva & replace(rs(4) & "",chr(13),"<br>" & sImageva)
+
+    Celda =  ofv.GenCelda("","uti COLSPAN=3  ","","","","","",sInput ,"si")
+    Fila  = Fila & ofv.genrow("","","","","50","","",Celda,"si")
+
+    Formulario = Formulario & Fila
+
+    posi = posi + 1
+    rs.Movenext
+  Loop
+
+  sHTML = sHTML & "<br><center>" & ofv.GenTabla("","AAA style='border-style:solid;border-color:#cccccc;border-width:1;' ","","95%","","0","","1","1","","",Formulario,"si") & "</center>"
+
+
+'''''''''''
+
+      Set cn2 = OFV.conectar(OFV.strconn0)
+      Set cn3 = OFV.conectar(OFV.strconn0)
+
+          nID = spuesto
+
+          dim nusuarios
+          nusuarios=0
+
+          call getUsrInSect(nID,1)
+          arruid=split(session("SGU_UIGuserid"),chr(9))
+
+            xineco = 0
+            Strsql = "Select * FROM ECOPERFIL,tipoperfil WHERE ECOPERFIL.codperfil=tipoperfil.tipoperfil and  codsector = 0" & nID
+			              'response.write strsql
+			set rsx2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+			do while not rsx2.eof
+			  ReDim Preserve Vecoperfil(3,xineco)
+			  Vecoperfil(0,xineco)=rsx2(0)  ' objid
+			  Vecoperfil(1,xineco)=rsx2(2) ' codperfil
+			  Vecoperfil(2,xineco)=0
+			  Vecoperfil(3,xineco)=rsx2("descri")
+
+			  xineco=xineco+1
+			  rsx2.movenext
+			loop
+            call ofv.cerrarconsulta(rsx2)
+            sImageva    = "&nbsp;&nbsp;" & "<font face='corflaticon' size=2 color='#00aa00'><b>&#0252;</b></font>"
+            if session("SGU_UIGuserid") <> "" then
+              sinput = sft2 & "PERFIL/FUNCION" & sff
+			  celda =  OFV.gencelda("", "aaa bgcolor=#eeeeee style='border-style:solid;border-width:1;border-Color:#336699;'", "", "40%", "", "", "", sinput, "si")
+
+              tipo="<b><font face=corflaticon size=2 color=#aa0000 >4</font></b>"
+              sinput = sft2 & "PERSONAL" & sff
+              celda = celda & OFV.gencelda("", "aaa bgcolor=#eeeeee style='border-style:solid;border-width:1;border-Color:#336699;'", "", "40%", "", "", "", sinput, "si")
+           '''   sinput = sft2 & "NIVEL/PERFIL" & sff
+
+
+              fila = OFV.GenRow("", "", "", "", "", "", "", celda, "si")
+              dim TXESTACC0,TXESTACC1,TXESTACC2
+              TXESTACC0=0
+              TXESTACC1=0
+              TXESTACC2=0
+              flag=false
+              susuario=""
+
+
+
+
+
+
+             for Iid=0 to ubound(arruid)
+        '      Do Until rs.EOF
+                  celda=""
+                  'sinput = tipo & "&nbsp;" & sft & "<b>"  & rs(1) & "</b>" & sff
+                  usrx=getinfouser(arruid(Iid))
+                  sinput = tipo & "&nbsp;" & sft & "<b>"  & session("SGU_nombre") & "</b>" & sff
+                  if not flag then
+                   ' capo=rs(1)
+                    capo=session("SGU_nombre")
+                    flag=true
+                  end if
+                  sinput2 = "<a   style='text-decoration:none;' onmouseover='this.style.textDecoration=" & chr(34)
+		          sinput2 = sinput2  & " underline" & chr(34) & ";' onmouseout='this.style.textDecoration=" & chr(34)
+		         '''sinput2 = sinput2  & "none" & chr(34) & ";' href='javascript:void(0);' ONCLICK=" & chr(34) & "mostrarmenu('"& rs(0) &"','" & rs(1) & "');" & chr(34)
+		          sinput2 = sinput2  & "none" & chr(34) & ";' href='javascript:void(0);' "
+   	              sinput2 = sinput2  & "  ><b>" & sinput & "</b></a>"
+
+   	              sinput2 = "<b>" & sinput & "</b>"
+
+                  celdaz = OFV.gencelda("", "aaa style='border-style:solid;border-width:1;border-Color:#336699;'", "", "", "", "", "", sinput2, "si")
+                 ' XPUESTO = RS("NIVEL")
+                  XPUESTO=session("SGU_idnivel")
+
+                  sSQL = "SELECT * FROM NIVELCONFIDEN where NCCod = 0" & XPUESTO
+                ' response.write ssql
+                  Set rsX = OFV.crearconsulta2(sSQL, cn2)
+                  If Not rsX.EOF Then
+                     XPUESTO = RSX(1)
+                  ELSE
+                     XPUESTO = "---"
+                  END IF
+
+              ''' esp blp ''''''
+                  XPUESTO = ""
+              ''' fin esp blp ''''''
+
+                  sImageva    = "&nbsp;&nbsp;" & "<font face='corflaticon' size=2 color='#00aa00'><b>&#0252;</b></font>"
+
+
+                  XPUESTOP = session("SGU_codigopuesto") 'RS("PUESTO")
+
+                  for Np=0 to xineco-1
+                     if cstr(Vecoperfil(1,np) &"")=cstr(XPUESTOP &"") then
+                        Vecoperfil(2,np)=1
+
+                      exit for
+                     end if
+                  next
+
+
+               '  RESPONSE.WRITE "CC=" & CC
+
+                 sSQL = "SELECT * FROM TIPOPERFIL where TIPOPERFIL = '" & XPUESTOP & "' "
+                ' response.write ssql
+                  Set rsX = OFV.crearconsulta2(sSQL, cn)
+                  If Not rsX.EOF Then
+
+
+                     XPUESTOP = "<B>" & rsX(1) & "</B>"
+
+
+                    Strsql = "Select * FROM ECOPERFIL WHERE "
+                    'Strsql = Strsql & " codsector = 0" & nID & " AND codperfil ='" & RS("PUESTO") & "' "
+                       Strsql = Strsql & " codsector = 0" & nID & " AND codperfil ='" & session("SGU_codigopuesto") & "' "
+                   'RESPONSE.WRITE STRSQL & "<BR>"
+                    set rsx2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+                    If Not rsX2.EOF Then
+
+                      sAccion = "genPTOFUNnv.asp?PUESTO=" & rsx2(0)
+
+                      sstilo2 = "  style='text-decoration:none;' onmouseover='this.style.textDecoration=" & chr(34)
+		              sstilo2 = sstilo2  & " underline" & chr(34) & ";' onmouseout='this.style.textDecoration=" & chr(34)
+		              sstilo2 = sstilo2  & "none" & chr(34) & ";' "
+'
+      	              xsffun  = " onclick=""document.getElementById('DX4').style.display='block';"" "
+      	              sHref   = sAccion
+      	              sInput  = sft & "&nbsp;" & XPUESTOP & sff & sImageva
+      	              sInput  = ofv.GenLink("","ut" & "  ",sHref,"_blank","","",sInput,"si")
+      	              Celdaobs  = ofv.GenCelda("","ut" & xsffun & sstilo2 & " style='cursor:pointer;border-style:solid;border-width:1;border-Color:#336699;' title='VER DESCRIPCION DEL PUESTO.' ","","","1","","",sInput,"si")
+
+
+                     celda = celda    & Celdaobs & celdaz
+
+                   else
+
+                      sinput =  sft & "&nbsp;" & XPUESTOP & sff
+                      celda = celda &  OFV.gencelda("", "aaa style='border-style:solid;border-width:1;border-Color:#336699;'", "", "", "", "", "", sinput, "si") & celdaz
+
+                    end if
+
+                  ELSE
+                    XPUESTOP = "---"
+
+                    sinput =  sft & "&nbsp;" & XPUESTOP & sff
+                    celda = celda &  OFV.gencelda("", "aaa style='border-style:solid;border-width:1;border-Color:#336699;'", "", "", "", "", "", sinput, "si") & celdaz
+
+                  END IF
+
+
+
+
+
+                  fila = fila & OFV.GenRow("", "", "", "", "", "", "", celda, "si")
+          '        rs.movenext
+                  tipo="<b><font face=corflaticon size=2 color=#6699cc >=</font></b>"
+
+         '     Loop
+                next
+
+                For Np=0 to xineco-1
+				 if  Vecoperfil(2,np)=0  then
+				 sAccion = "genPTOFUNnv.asp?PUESTO=" & Vecoperfil(0,NP)
+
+				 sstilo2 = "  style='text-decoration:none;' onmouseover='this.style.textDecoration=" & chr(34)
+				 sstilo2 = sstilo2  & " underline" & chr(34) & ";' onmouseout='this.style.textDecoration=" & chr(34)
+				 sstilo2 = sstilo2  & "none" & chr(34) & ";' "
+'
+				  xsffun  = " onclick=""document.getElementById('DX4').style.display='block';"" "
+				  sHref   = sAccion
+				  sInput  = sft & "&nbsp;<b>" & Vecoperfil(3,NP) &"</b>" & sff & sImageva
+				  sInput  = ofv.GenLink("","ut" & "  ",sHref,"_blank","","",sInput,"si")
+				  Celdaobs  = ofv.GenCelda("","ut" & xsffun & sstilo2 & " style='cursor:pointer;border-style:solid;border-width:1;border-Color:#336699;' title='VER DESCRIPCION DEL PUESTO.' ","","","1","","",sInput,"si")
+
+                  celdaz = OFV.gencelda("", "aaa style='border-style:solid;border-width:1;border-Color:#336699;'", "", "", "", "", "", "---", "si")
+				  celda =  Celdaobs & celdaz
+
+                  fila = fila & OFV.GenRow("", "", "", "", "", "", "", celda, "si")
+				             '        rs.movenext
+                  tipo="<b><font face=corflaticon size=2 color=#6699cc >=</font></b>"
+				  end if
+                 next
+              'total
+                tipo="<b><font face=corflaticon size=2 color=#aa0000 >4</font></b>"
+		        sinput =  "&nbsp;"
+                 celda =  OFV.gencelda("", "aaa colspan=2 bgcolor=#eeeeee style='border-style:solid;border-width:1;border-Color:#336699;'", "", "50%", "", "", "", sinput, "si")
+               '  fila = fila & OFV.GenRow("", "", "", "", "", "", "", celda, "si")
+		         Tabla = Tabla & "<br>" & OFV.gentabla("", "", "", "100%  bgcolor=#ffffff style='border-style:solid;border-width:1;border-Color:#cccccc;' ", "", "0", "", "1", "1", "", "", fila, "si")
+
+
+
+
+          else
+
+          if xineco > 0 then
+           sinput = sft2 & "PERFIL/FUNCION" & sff
+		   celda =  OFV.gencelda("", "aaa bgcolor=#eeeeee style='border-style:solid;border-width:1;border-Color:#336699;'", "", "40%", "", "", "", sinput, "si")
+
+		   tipo="<b><font face=corflaticon size=2 color=#aa0000 >4</font></b>"
+		   sinput = sft2 & "PERSONAL" & sff
+		   celda = celda & OFV.gencelda("", "aaa bgcolor=#eeeeee style='border-style:solid;border-width:1;border-Color:#336699;'", "", "40%", "", "", "", sinput, "si")
+		   fila = OFV.GenRow("", "", "", "", "", "", "", celda, "si")
+
+                 For Np=0 to xineco-1
+				 if  Vecoperfil(2,np)=0  then
+				  sAccion = "genPTOFUNnv.asp?PUESTO=" & Vecoperfil(0,NP)
+
+				 sstilo2 = "  style='text-decoration:none;' onmouseover='this.style.textDecoration=" & chr(34)
+				 sstilo2 = sstilo2  & " underline" & chr(34) & ";' onmouseout='this.style.textDecoration=" & chr(34)
+				 sstilo2 = sstilo2  & "none" & chr(34) & ";' "
+'
+				  xsffun  = " onclick=""document.getElementById('DX4').style.display='block';"" "
+				  sHref   = sAccion
+				  sInput  = sft & "&nbsp;<font fontface=verdana color=000000>" & Vecoperfil(3,NP) &"</font>" & sff & sImageva
+				  sInput  = ofv.GenLink("","ut" & "  ",sHref,"_blank","","",sInput,"si")
+				  Celdaobs  = ofv.GenCelda("","ut" & xsffun & sstilo2 & " style='cursor:pointer;border-style:solid;border-width:1;border-Color:#336699;' title='VER DESCRIPCION DEL PUESTO.' ","","","1","","",sInput,"si")
+
+                  celdaz = OFV.gencelda("", "aaa style='border-style:solid;border-width:1;border-Color:#336699;'", "", "", "", "", "", "---", "si")
+				  celda =  Celdaobs & celdaz
+
+                  fila = fila & OFV.GenRow("", "", "", "", "", "", "", celda, "si")
+				             '        rs.movenext
+                  tipo="<b><font face=corflaticon size=2 color=#6699cc >=</font></b>"
+				  end if
+                 next
+              'total
+                tipo="<b><font face=corflaticon size=2 color=#aa0000 >4</font></b>"
+		        sinput =  "&nbsp;"
+                 celda =  OFV.gencelda("", "aaa colspan=2 bgcolor=#eeeeee style='border-style:solid;border-width:1;border-Color:#336699;'", "", "50%", "", "", "", sinput, "si")
+               '  fila = fila & OFV.GenRow("", "", "", "", "", "", "", celda, "si")
+		         Tabla = Tabla & "<br>" & OFV.gentabla("", "", "", "100%  bgcolor=#ffffff style='border-style:solid;border-width:1;border-Color:#cccccc;' ", "", "0", "", "1", "1", "", "", fila, "si")
+
+
+
+
+           end if
+
+          End If
+
+
+
+
+         ' tabp = tabp & Tabla & "<br><br>"
+
+
+  sHTML = sHTML & "<br><center>" &  Tabla & "<br><br>"
+
+
+
+
+
+
+'''''''''''''
+
+
+ ELSE
+
+ '   Formulario = Formulario & FILA
+ '   sInput = " SIN DEFINIR DESCRIPCIONES PARA EL PUESTO. "
+ '   Celda =  ofv.GenCelda("","uti COLSPAN=3  ","","","","","",sInput ,"si")
+ '   Fila = ofv.genrow("","","","","50","","",Celda,"si")
+ '   Formulario = Formulario &  FILA
+
+  END IF
+
+
+
+
+
+
+
+
+
+  Call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+  sAccion = "organigramaUNGraf.asp?ID=" & spuesto & "&Sector=" & OFV.ConvertirCar(snomsector, " ", "_")
+  Celda = ofv.BotonVolver(sAccion)
+
+
+    sHTML = sHTML & ofv.botoneraESSX("0",rs,CantRegMover,CantRegMostrar,"no","no",posi,"","","no",Celda,"no","")
+
+
+  sHTML = sHTML & "</BODY>"
+
+  sHTML = sHTML & "</HTML>"
+end if
+
+ response.write shtml
+
+
+
+%>

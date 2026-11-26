@@ -1,0 +1,773 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+
+	ofv.ObtenerAtributos Session("Form2"),""
+	bModificar = ofv.AModificar
+	If session("Nomodificar") = "S" Then bModificar = False
+	sHTML = ofv.FormHeader(session("FormN"))
+
+	'----------------------------------------------
+
+	shtml = shtml & CorPnlFnc("N","")
+
+	sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' >"
+
+	'-------------------------------------------------
+
+
+	sDocum = request.querystring("Docum")
+
+	' response.write request.querystring
+	vuelta = ofv.vueltaasp2("../") &  "?Docum=" & sDocum
+
+	masdir = request.querystring("masdir")
+
+    if session("base")="K" and masdir ="" then masdir="ARCCOMPONENTES"
+
+
+	'response.write masdir
+	If Len(masdir) = 0 Then masdir = "ARCHIVOS"
+
+
+	nblk = request.querystring("nblk")
+	If Len(nblk) = 0 Then nblk = "D"
+
+	ord = request.querystring("ord")
+	If Len(ord) = 0 Then ord = "T"
+
+	newdir = request.querystring("newdir")
+	If Len(newdir) = 0 Then newdir = "0"
+
+	opc = request.querystring("opc")
+
+	If  nblk = "X" Then
+		masdir = request.FORM("COMPX")
+		nblk = "D"
+	End If
+
+
+	'response.write nblk
+
+	nCodigo = request.querystring("Codobjeto")
+	sTipo = request.querystring("Tipobjeto")
+	vueltaC = request.querystring("volver")
+
+
+	volver2 = ofv.vueltaasp2("../")
+	If Session("EMPMUN") = "S" Then
+		Draiz="Emp" & SESSION("D" & nCodigo & "-0" ) & "/" & masdir
+	Else
+		Draiz= masdir
+	End If
+
+
+'	response.write Draiz & "<br>"
+
+	esttxt = " STYLE={font-family:tahoma;color:#000000;font-size:10pt;background-color:#f7eedd;} "
+
+	ccomp = 0
+	tcomp =  sTipo
+
+	Set cn = ofv.conectar(ofv.strconn2)
+	opc = "NO"
+
+	Strsql = "Select * From Objhtm Where objid = " & sDocum
+
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	If Not rs.eof Then
+		If opc    = "NO" Then
+			ccomp  = rs(6)
+			ccomp2 = rs(6)
+			xsdir  = rs(8) & ""
+			If xsdir = "" Then xsdir = "ARCHIVOS"
+			XSDIR = UCase(XSDIR)
+
+			If RS("TIPO")=3 Then MASDIR="URLFORM"
+			If session("EMPMUN") = "S" Then
+				docanterior="Emp" & SESSION("D" & nCodigo & "-0" ) & "/" & rs(8) & "/" & rs(6)
+			Else
+				docanterior=  rs(8) & "/" & rs(6)
+			End If
+		End If
+	End If
+     docanterior=replace(docanterior,"//","/")
+	'response.write nblk
+
+	ccompS = request.form("comp1")
+	' ccompS = request.form("comp1")
+	' response.write ccompS & "lll<br>"
+	If MASDIR <> "URLFORM" Then
+		If nblk = "S" Then ccompS = request.form("comp1")
+		If nblk = "S" Then newdir = ccompS
+		If nblk = "T" Then ccompT = request.form("comp2")
+		If nblk = "T" Then ccomp2 = ccompT
+
+		If nblk = "D" Then ccomp2 = ccomp
+
+		If nblk = "D" And ord = "F" Then
+			session("comp31") = request.form("comp31")
+			session("comp32") = request.form("comp32")
+		End If
+
+		If session("comp31") = "" Then
+			session("comp31") = "TODOS"
+		End If
+
+
+		If session("comp32") & "" = "" Then
+			session("comp32") = "TODOS"
+		End If
+
+
+		comp31 = session("comp31")
+		comp32 = session("comp32")
+
+
+
+		'   RESPONSE.WRITE "nblk=" & nblk &" ccompS=" &ccompS & "  ccompT=" & ccompT &" <br>"
+
+		'response.write ccompS
+
+
+		'  Set fso = CreateObject("Scripting.FileSystemObject")
+
+		'''  sHTML = ofv.FormBody & "<center><br>"
+
+   sHTML = ofv.FormHeader(session("FormN"))
+   xxstylo=".block1 {"
+   xxstylo=xxstylo & " width: 450px; "
+   xxstylo=xxstylo & " height: 200px; "
+   xxstylo=xxstylo & "overflow:auto;border-style:solid;border-color:#6699CC;border-width:2;"
+   xxstylo=xxstylo & "}"
+   xxstylo=xxstylo & ".block2 {height: 90%;width:1000px;xborder-color:#6699CC;border-style:none "              '; overflow: auto;overflow-x: hidden;
+   xxstylo=xxstylo & "}"
+   xxstylo=xxstylo & ".block3 {height: 90%;xborder-color:#6699CC;border-style:none "
+
+   xxstylo=xxstylo & "}"
+
+ 'sHTML=replace(sHTML,"<body","<style>" & xxstylo & "</style><body ")
+		'----------------------------------------------
+
+		shtml = shtml & CorPnlFnc("N","")
+
+		sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' ><span id=111>"
+
+		'-------------------------------------------------
+
+
+  sHTML = sHTML & ofv.GenTabla("panel","aaa  cellpadding=3 style={border-style:outset;border-width:2;} ","","90%","",0,0,0,0,"","","","no")
+
+
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td width=50%  colspan=2 class=tt align=center style={border-style:outset;border-width:2;} >"
+		sHTML = sHTML & "Descripcion:&nbsp;&nbsp;" & rs(3) & "&nbsp;-&nbsp;" & rs(4)
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "</tr>"
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td width=50%  class=tt align=center style={border-style:outset;border-width:2;} >"
+		sHTML = sHTML & "Directorios&nbsp;disponibles" & MASDIR
+		sHTML = sHTML & "</td>"
+
+		sHTML = sHTML & "<td width=50%  class=tt align=center style={border-style:outset;border-width:2;} >"
+		sHTML = sHTML & "Documentos&nbsp;disponibles"
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "</tr>"
+
+
+
+
+
+		sPath = Request.ServerVariables("PATH_INFO")
+
+		Xruta = Request.ServerVariables("SERVER_NAME") & Left(sPath,InStrRev(sPath,"/",-1) - 1)
+		' response.write Xruta & " 2<br>"
+		sPath = server.mappath(sPath)
+		'  response.write spath & " 3<br>"
+		''''  sPath1 = replace(sPath,"edArchivosProp.asp","",1,-1,1) & "ARCHIVOS"
+
+		sPath1 = Replace(sPath,"edArchivosProp.asp","",1,-1,1) & MASDIR
+
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td width=50% align=center style={border-style:outset;border-width:2;} >"
+
+
+		If bModificar Then
+			sAccion = "edArchivosProp.asp?"
+			sAccion = sAccion & "nblk=X&ord=" & ord & "&Codobjeto=" & nCodigo & "&CantRegAMover=" & CantRegAMover
+			sAccion = sAccion & "&Tipobjeto=" & sTipo & "&opc=" & opc & "&Docum=" & sDocum & "&newdir=" & newdir & "&MASdir=" & MASdir
+		Else
+			sAccion = ""
+		End If
+
+		sHTML = sHTML & "<FORM  name=fcompX ID=fcompX action="  & Chr(34) &  sAccion  & Chr(34) &  "  method=post >" & Chr(13)
+		sHTML = sHTML & "<font class=at><select   name=compX style={border-style:outset;border-width:4;} "
+		sHTML = sHTML & " onchange=" & Chr(34) & "fcompX.submit();" & Chr(34)
+
+		sHTML = sHTML & " >"
+		If session("base")="K" Then
+			If MASDIR <> "URLFORM" Then MASDIR="ARCCOMPONENTES"
+			sHTML = sHTML & "<option STYLE='background-color:#99ccee;color:#000055;' value=ArcComponentes "
+
+			sHTML = sHTML & " selected >FORMULARIOS</option>"
+			sHTML = sHTML & "<option STYLE='background-color:#99ccee;color:#000055;' value=URLFORM "
+
+			sHTML = sHTML & " >URL</option>"
+
+		Else
+
+			sHTML = sHTML & "<option STYLE='background-color:#99ccee;color:#000055;' value=ARCHIVOS "
+			If MASDIR = "ARCHIVOS" Then
+				sHTML = sHTML & " selected "
+				If session("EMPMUN") = "S" Then
+					MASDIR = "ARCHIVOS"
+				Else
+					MASDIR= "ARCHIVOS"
+				End If
+			End If
+			sHTML = sHTML & " >DOCUMENTOS ASOCIADOS</option>"
+
+			' response.write MASDIR
+
+			sHTML = sHTML & "<option STYLE='background-color:#f7aa22;color:#000055;' value=COMPONENTES "
+			If MASDIR = "COMPONENTES" Then
+				sHTML = sHTML & " selected "
+				If session("EMPMUN") = "S" Then
+
+					MASDIR ="COMPONENTES"
+				Else
+					MASDIR= "COMPONENTES"
+				End If
+			End If
+			sHTML = sHTML & " >IMAGENES DE COMPONENTES</option>"
+		End If
+
+
+
+		sHTML = sHTML & "</select></font>"
+		sHTML = sHTML & "</FORM>" & Chr(13)
+
+
+		sHTML = sHTML & "</td>"
+  sHTML = sHTML & "<td width=50% align=left style={border-style:outset;border-width:2;} >"
+		sHTML = sHTML & "&nbsp;"
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "</tR>"
+		'-------------
+
+
+		sHTML = sHTML & "<tr>"
+  sHTML = sHTML & "<td width=50% align=left style={border-style:outset;border-width:2;} >" '&  SESSION("FILETIPO") & "22222222222222222222222222222222222222"
+
+
+		If bModificar Then
+			sAccion = "edArchivosProp.asp?"
+			sAccion = sAccion & "nblk=S&ord=" & ord & "&Codobjeto=" & nCodigo & "&CantRegAMover=" & CantRegAMover
+			sAccion = sAccion & "&Tipobjeto=" & sTipo & "&opc=" & opc & "&Docum=" & sDocum & "&newdir=" & newdir & "&MASdir=" & MASdir
+		Else
+			sAccion = ""
+		End If
+		sHTML = sHTML & "<FORM name=fcomp1 ID=fcomp1 action="  & Chr(34) &  sAccion  & Chr(34) &  "  method=post >" & Chr(13)
+  sHTML = sHTML & "<div class=block1> <select size=3  name=comp1 class=block2   "
+		sHTML = sHTML & " onchange=" & Chr(34) & "fcomp1.submit();" & Chr(34)
+
+		sHTML = sHTML & " >"
+
+		'sHTML = sHTML & "<option value=" & chr(34) & "0" & chr(34)
+		' response.write ccompS
+		If ccompS = ""  Then
+			'response.write " 222"
+			'sHTML = sHTML & " selected "
+			sHTML = sHTML & "<option STYLE='background-color:#F7AA22;font-weight:bold;' value=" & Chr(34) & "" & Chr(34)
+			sHTML = sHTML & "  "
+			sHTML = sHTML & " title='" & Draiz &"'>" & Draiz &"</option>"
+		Else
+			'  response.write ccompS
+			If InStrRev(ccompS & "" ,"/") = 0  Then
+				sHTML = sHTML & "<option STYLE='background-color:#F7AA22;font-weight:bold;' value=" & Chr(34) & "" & Chr(34)
+			Else
+				sHTML = sHTML & "<option title='"  & Draiz  &"/" & ccompS & "' STYLE='background-color:#F7AA22;font-weight:bold;' value=" & Chr(34) & Left(ccompS,InStrRev(ccompS,"/",-1) - 1) & Chr(34)
+			End If
+			sHTML = sHTML & "  "
+			' response.write Draiz
+			sHTML = sHTML & " title='" &  Draiz  &"/" & ccompS & "' >" & Draiz  &"/" & ccompS & "</option>"
+		End If
+
+		sfolder=""
+
+
+		'  response.write Draiz & "/" & ccompS
+
+		If Trim(CStr(ccompS )) <> "" Then
+
+			sfolder=Split(getfolders(Draiz & "/" & ccompS,""),"|")
+		Else
+			sfolder=Split(getfolders(Draiz,""),"|")
+		End If
+
+		'  response.write  "<br>"  & ccompS
+
+		For ft=0 To UBound(sfolder)-1
+			If ccompS="" Then
+				sHTML = sHTML & "<option value=" & Chr(34)  & sfolder(ft)   & Chr(34)
+			Else
+				sHTML = sHTML & "<option value=" & Chr(34)  & ccompS & "/" & sfolder(ft)   & Chr(34)
+			End If
+
+			'if ucase(newdir) = ucase(("/" & sfolder(ft))) then   sHTML = sHTML & " selected "
+			If ccompS="" Then
+				sHTML = sHTML & " title='" & Draiz & "/"   & UCase(sfolder(ft)) & "'>" & Draiz & "/"   & UCase(sfolder(ft)) & "</option>"
+			Else
+				sHTML = sHTML & " title='"  & Draiz & "/" & ccompS  & "/" & UCase(sfolder(ft))  & "' >" & Draiz & "/" & ccompS  & "/" & UCase(sfolder(ft)) & "</option>"
+			End If
+
+		Next
+
+
+
+
+  sHTML = sHTML & "</select></div>"
+
+		sHTML = sHTML & "</FORM>" & Chr(13)
+
+		sHTML = sHTML & "</td>"
+  sHTML = sHTML & "<td width=50% align=left valign=top style={border-style:outset;border-width:2;} >"
+		'-------------
+		If bModificar Then
+			sAccion = "edArchivosProp.asp?"
+			sAccion = sAccion & "nblk=T&ord=" & ord & "&Codobjeto=" & nCodigo & "&CantRegAMover=" & CantRegAMover
+			sAccion = sAccion & "&Tipobjeto=" & sTipo & "&opc=" & opc & "&Docum=" & sDocum & "&newdir=" & newdir & "&MASdir=" & MASdir
+		Else
+			sAccion = ""
+		End If
+
+		If newdir = "0" Then
+			newdirn = MASDIR
+		Else
+			newdirn = MASDIR & newdir
+		End If
+
+		sPath2 = Replace(sPath,"edArchivosProp.asp","",1,-1,1) & newdirn
+		'  response.write spath2 & " 4<br>"
+		'Set Folder = fso.getfolder(sPath2)
+		sfilesn=Split(getfilesinfolder(Draiz & "/" & ccompS,""),"|")
+		' Set Files = Folder.Files
+
+
+		sHTML = sHTML & "<FORM  name=fcomp2 ID=fcomp2 action="  & Chr(34) &  sAccion  & Chr(34) &  "  method=post >" & Chr(13)
+  sHTML = sHTML & "<div class=block1> <font class=at><select size=10  name=comp2 class=block3 "
+		sHTML = sHTML & " onchange=" & Chr(34) & "fcomp2.submit();" & Chr(34)
+		sHTML = sHTML & " >"
+
+
+
+		sfcount = 0
+
+		If comp32 = "TODOS" Then
+			If comp31 = "TODOS" Then
+				Sfiles = "SI"
+			Else
+				Sfiles = "NO"
+			End If
+		Else
+			Sfiles = "NO"
+		End If
+
+		'For Each F in Files
+		For f=0 To UBound(sfilesn)-1
+
+
+			file=Split(sfilesn(f),"###")
+			If Sfiles = "NO" Then
+				If comp32 = "TODOS" Then
+					sfilesva1 = "SI"
+				Else
+					sfext = InStr(file(0),".")
+					If sfext = 0 Then
+						sfext = "NO"
+					Else
+						sfext = UCase(Right(file(0),Len(file(0))-sfext))
+					End If
+					If sfext = comp32 Then
+						sfilesva1 = "SI"
+					Else
+						sfilesva1 = "NO"
+					End If
+				End If
+
+				If comp31 = "TODOS" Then
+					sfilesva2 = "SI"
+				Else
+					sfextn = Len(comp31)
+					sfext = UCase(Left(file(0),sfextn))
+					If sfext = UCase(comp31) Then
+						sfilesva2 = "SI"
+					Else
+						sfilesva2 = "NO"
+					End If
+				End If
+
+				'      response.write "sfiles " & sfiles & " comp32 " & comp32 & " comp31 " & comp31 & " va1 " & sfilesva1 & " va2 " & sfilesva2 & " name " & f.name & " <br>"
+
+				If sfilesva1 = "SI" And sfilesva2 = "SI" Then
+					'           response.write " entro " & f.name & " <br>"
+					sfilesva = "SI"
+				Else
+					sfilesva = "NO"
+				End If
+			Else
+				sfilesva = "SI"
+			End If
+
+
+
+			If sfilesva = "SI" Then
+				sfcount = sfcount + 1
+				If newdir = "0" Then
+					sHTML = sHTML & "<option value=" & Chr(34) & file(0) & Chr(34)
+				Else
+					sHTML = sHTML & "<option value=" & Chr(34) & Replace(newdir,"/","/",1) & "/" & file(0) & Chr(34)
+				End If
+
+				If ccomp2 = ( file(0)) Then   sHTML = sHTML & " selected "
+				'sHTML = sHTML & " >" & Ucase(newdirn & "/" & file(0)) & "</option>"
+				sHTML = sHTML & " >" & UCase( file(0)) & "</option>"
+
+			End If
+
+		Next
+
+		If sfcount = 0 Then
+			sHTML = sHTML & "<option value=" & Chr(34) & ccomp & Chr(34)
+			sHTML = sHTML & " selected "
+			sHTML = sHTML & " >No hay imagenes disponibles</option>"
+
+		End If
+
+
+  sHTML = sHTML & "</select></font></div>"
+		sHTML = sHTML & "<INPUT TYPE=hidden NAME=comp1 VALUE=" & Chr(34)& ccompS & Chr(34) & "></INPUT>"
+		sHTML = sHTML & "</FORM>" & Chr(13)
+		'--------
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "</tr>"
+
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td width=50% align=center class=tt style={border-style:outset;border-width:2;}  >"
+		sHTML = sHTML & "&nbsp;"
+		sHTML = sHTML & "</td>"
+
+		sHTML = sHTML & "<td width=50% align=center class=tt style={border-style:outset;border-width:2;}  >"
+		sHTML = sHTML & "FILTRO: "
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "</tr>"
+
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td width=50% align=center style={border-style:outset;border-width:2;} >"
+		sHTML = sHTML & "&nbsp;"
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "<td width=50% align=center style={border-style:outset;border-width:2;} >"
+		'-------------
+
+		If bModificar Then
+			sAccion = "edArchivosProp.asp?"
+			sAccion = sAccion & "nblk=D&ord=F&Codobjeto=" & nCodigo & "&CantRegAMover=" & CantRegAMover
+			sAccion = sAccion & "&Tipobjeto=" & sTipo & "&opc=" & opc & "&Docum=" & sDocum & "&newdir=" & newdir & "&MASdir=" & MASdir
+
+		Else
+			sAccion = ""
+		End If
+		sHTML = sHTML & "<FORM  name=fcomp3 ID=fcomp3 action="  & Chr(34) &  sAccion  & Chr(34) &  "  method=post >" & Chr(13)
+
+		sHTML = sHTML & ofv.GenTabla("panel2","aaa cellpadding=3 style={border-style:outset;border-width:2;} ","","100%","",0,0,0,0,"","","","no")
+		sHTML = sHTML & "<tr>"
+
+		sHTML = sHTML & "<td width=35% align=center style={border-style:outset;border-width:2;} >"
+		IF session("APLMDCLI")="BPN" THEN
+		 sHTML = sHTML & ofv.GenerarInput("comp31",comp31,"agregar","","30","dt","")
+		ELSE
+		 sHTML = sHTML & ofv.GenerarInput("comp31",comp31,"agregar","","30","dt style='display:none'","")
+		END IF
+		sHTML = sHTML & "</td>"
+
+
+		sHTML = sHTML & "<td width=35% align=center style={border-style:outset;border-width:2;} >"
+
+		sHTML = sHTML & "<font class=at><select  name=comp32 style={border-style:outset;border-width:4;} "
+		' sHTML = sHTML & " onchange=" & chr(34) & "fcomp3.submit();" & chr(34)
+
+		sHTML = sHTML & " >"
+
+		sHTML = sHTML & "<option value=" & comp32
+		sHTML = sHTML & " selected "
+		sHTML = sHTML & " >" & comp32 & "</option>"
+
+		sHTML = sHTML & "<option value=TODOS "
+		sHTML = sHTML & " >TODOS</option>"
+		sHTML = sHTML & "<option value=HTM "
+		sHTML = sHTML & " >HTM</option>"
+		sHTML = sHTML & "<option value=HTML "
+		sHTML = sHTML & " >HTML</option>"
+		sHTML = sHTML & "<option value=PDF "
+		sHTML = sHTML & " >PDF</option>"
+		sHTML = sHTML & "<option value=MPG "
+		sHTML = sHTML & " >MPG</option>"
+		sHTML = sHTML & "<option value=DOC "
+		sHTML = sHTML & " >DOC</option>"
+		sHTML = sHTML & "<option value=XLS "
+		sHTML = sHTML & " >XLS</option>"
+		sHTML = sHTML & "<option value=XLSX "
+		sHTML = sHTML & " >XLSX</option>"
+		sHTML = sHTML & "<option value=DOCX "
+		sHTML = sHTML & " >DOCX</option>"
+
+
+
+		sHTML = sHTML & "</select></font>"
+		sHTML = sHTML & "</td>"
+
+		sHTML = sHTML & "<td width=30% align=center style={border-style:outset;border-width:2;} >"
+		sHTML = sHTML & "<INPUT TYPE=HIDDEN NAME=comp1 VALUE=" & Chr(34)& ccompS & Chr(34) & "></INPUT>"
+		sHTML = sHTML & "<input  type=SUBMIT  size=10%  value='FILTRAR' class=bt >"
+		sHTML = sHTML & "</td>"
+
+
+
+		sHTML = sHTML & "</tr>"
+		sHTML = sHTML & "</table>"
+		sHTML = sHTML & "</FORM>" & Chr(13)
+		'--------
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "</tr>"
+
+
+		sHTML = sHTML & "</table>"
+
+		sHTML = sHTML & ofv.GenTabla("panel2","aaa cellpadding=3 style={border-style:outset;border-width:2;} ","","80%","",0,0,0,0,"","","","no")
+		sHTML = sHTML & "<tr>"
+		opc = "NO"
+		If opc = "NO" Then
+			sHTML = sHTML & "<td>"
+			sHTML = sHTML & ofv.GenTabla("panel2","aaa cellpadding=3 style={border-style:outset;border-width:2;} ","","100%","",0,0,0,0,"","","","no")
+
+
+
+			sHTML = sHTML & "<tr>"
+			sHTML = sHTML & "<td  class=tt align=center style={border-style:outset;border-width:2;} >"
+			sHTML = sHTML & "Documento&nbsp;anterior"
+			sHTML = sHTML & "</td>"
+
+
+
+			sHTML = sHTML & "</tr>"
+
+			sHTML = sHTML & "<tr>"
+			sHTML = sHTML & "<td   class=cc   >"
+
+
+			If session("EMPMUN") = "S" Then
+				ncomp = XSDIR & ccomp
+			Else
+				ncomp = XSDIR & "/" & ccomp
+			End If
+			sHTML = sHTML & "<font color=#000080 ><B>" & docanterior & "</b></font>"
+			sHTML = sHTML & "</td>"
+
+
+			sHTML = sHTML & "</tr>"
+
+
+
+			sHTML = sHTML & "</table>"
+			sHTML = sHTML & "</td>"
+
+			xcolsp = ""
+
+		Else
+			xcolsp = " colspan=2 "
+
+		End If
+		sHTML = sHTML & "<td " & xcolsp & " >"
+		sHTML = sHTML & ofv.GenTabla("panel2","aaa cellpadding=3 style={border-style:outset;border-width:2;} ","","100%","",0,0,0,0,"","","","no")
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td  class=tt align=center style={border-style:outset;border-width:2;} >"
+		sHTML = sHTML & "Documento&nbsp;nuevo"
+		sHTML = sHTML & "</td>"
+
+		sHTML = sHTML & "</tr>"
+
+
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td  class=cc   >"
+
+		If session("EMPMUN") = "S" Then
+			ncomp = "Emp" & SESSION("D" & nCodigo & "-0" ) & "/" & MASDIR & vccompS & "/" & ccomp2
+		Else
+		    if right(masdir,1) <> "/" then
+		    slash="/"
+		    else
+		    slash=""
+		    end if
+
+			ncomp = MASDIR & slash &  ccomp2
+		End If
+
+		sHTML = sHTML & "<font color=#993333 ><B>" & ncomp & "</b></font>"
+		sHTML = sHTML & "</td>"
+		sHTML = sHTML & "</tr>"
+
+
+
+		sHTML = sHTML & "</table>"
+		sHTML = sHTML & "</td>"
+
+		'''''''''''''''''''''
+
+		sHTML = sHTML & "<tr>"
+		sHTML = sHTML & "<td align=center  >"
+		If bModificar Then
+
+			sAccion = "asp/ActualizarEN.asp?ID=" & rs(0) & "&Tabla=Objhtm&volver=../edArchivos.asp?Docum=" & sDocum
+			sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+
+		Else
+			sAccion = ""
+		End If
+		sHTML = sHTML & "<FORM  name=acep ID=acep action=" & sAccion & "  method=post >" & Chr(13)
+		if Session("EMPMUN")="S" then
+		'  sHTML = sHTML & ofv.GenerarInput(rs(6).name,ccompS & "/" & ccomp2,"hidden","","100","","")
+		  sHTML = sHTML & ofv.GenerarInput(rs(6).name,scomp1 & "/" & ccomp2,"hidden","","100","","")
+		else
+		 sHTML = sHTML & ofv.GenerarInput(rs(6).name,scomp1 & "/" & ccomp2,"hidden","","100","","")
+		end if
+		sHTML = sHTML & ofv.GenerarInput(rs(8).name,MASDIR,"hidden","","100","","")
+		sHTML = sHTML & "<input  type=SUBMIT  size=10%  value='ACEPTAR' class=bt >"
+		sHTML = sHTML & "</FORM>" & Chr(13)
+		sHTML = sHTML & "</td>"
+
+		sHTML = sHTML & "<td  align=center   >"
+
+		sAccion = "edArchivos.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		sHTML = sHTML & "<FORM  name=Cancel ID=Cancel action=" & sAccion & "  method=post >" & Chr(13)
+		sHTML = sHTML & "<input  type=SUBMIT  size=10%  value='CANCELAR' class=bt >"
+		sHTML = sHTML & "</FORM>" & Chr(13)
+		sHTML = sHTML & "</td>"
+
+		sHTML = sHTML & "</tr>"
+		sHTML = sHTML & "</table>"
+	Else
+
+		Strsql = "update Objhtm SET TIPO=3  Where objid = " & sDocum
+		' RESPONSE.WRITE STRSQL
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+		Strsql = "Select objid,descri,archivo,TIPO From Objhtm Where objid = " & sDocum
+
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+
+		posi=0
+
+		Formulario = ofv.Encabezados("Descripcion","url","tipo")
+		sAccion = ""
+		If  (Not rs.EOF) Then
+			sForm = "form" & posi
+
+
+			Celda = ofv.gencelda("","","","","","","","","si")
+			'Segmento
+			sInput = ofv.GenerarInput(rs(1).name,rs(1),"text",sForm,"100","dt","")
+			Celda =  Celda &  ofv.gencelda("","cc","right","50","","","",sInput,"si")
+
+
+			sInput = ofv.GenerarInput(rs(2).name,rs(2),"text",sForm,"100","dt","")
+
+
+
+
+			Celda = Celda & ofv.gencelda("","","","","","","",sInput ,"si")
+
+			SCOMSEP = Chr(9)
+			scomK = "1" & SCOMSEP & "3"
+			scomD = "FORMULARIO" & SCOMSEP & "URL"
+			If bModificar Then
+				sInput = ofv.gencomboFX(sForm,"TIPO",RS("TIPO"),scomK,scomD,"")
+			Else
+				If  RS("TIPO")= 3 Then
+					sInput="URL"
+				Else
+					sInput="FORMULARIO"
+				End If
+			End If
+			Celda = Celda & ofv.gencelda("","","","","","","",sInput,"si")
+
+			'Celda = Celda & ofv.gencelda("","","","","","","","","si")
+			Fila = ofv.genrow("","","","","","","",Celda,"si")
+
+			sAccion = ""
+			If bModificar  Then
+				sAccion = "asp/ActualizarEN.asp?ID=" & rs(0) & "&Tabla=Objhtm&volver=../edArchivosprop.asp?Docum=" & sDocum
+				sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+			End If
+
+
+
+		End If
+		xtabla = ofv.GenTabla("","","","80%","","0","","0","0","","",Formulario & fila,"si")
+		Formulario =  ofv.genform(sForm,"",sAccion,"","post","",xtabla,"si")
+
+		sHTML = sHTML & Formulario
+		'   sHTML = sHTML & ofv.GenTabla("","","","80%","","0","","0","0","","",Formulario,"si")
+
+		'Botonera
+		Agregar = ""
+
+
+
+		Call ofv.cerrarconsulta(rs)
+
+
+	End If
+			'--------------------------------------------------------------------------------
+			sHTML = sHTML & "</span></div>"
+
+			Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+			Fila = ofv.GenRow("","","","","","","",Celda,"si")
+			sHTML = sHTML &  ofv.GenTabla("TCEX1","aaa onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+
+			'Estructura del Indice
+
+			sHTML = sHTML & CorPnlIndx("N","")
+
+			'--------------------------------------------------------------------------------
+
+			Call ofv.cerrarconsulta(rs)
+			Call ofv.cerrarconn(cn)
+
+			''''  sHTML = sHTML & "</center>"
+			sAccion = "edarchivos.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & stipo
+			Celda = ofv.BotonVolver(sAccion)
+			sHTML = sHTML & ofv.botoneraESSX("0",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","",Celda,"","","")
+
+			sHTML = sHTML & "</body></html>"
+
+
+		End If
+
+		response.write sHTML
+
+		%>

@@ -1,0 +1,213 @@
+  <!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  redim nivel(9)
+  nivel(0) = "C"
+  nivel(1) = "D"
+  nivel(2) = "E"
+  nivel(3) = "F"
+  nivel(4) = "G"
+  nivel(5) = "H"
+  nivel(6) = "I"
+  nivel(7) = "J"
+  nivel(8) = "K"
+  nivel(9) = "L"
+  sImagenCampo = "ARCHIVO"
+  CantRegMostrarx = 8
+  CantRegMoverx = cdbl(request.querystring("CantRegMover"))
+  setproc = request.querystring("SETPROC")
+  vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx)
+
+  if setproc = "" then
+     setproc = session("setproc")
+  else
+     session("setproc") = setproc
+  end if
+
+ IF setproc="" THEN setproc="ALL"
+
+  sHTML = ofv.FormHeader(session("FormN"))
+ base=request.querystring("BASE")
+   IF base <>"" THEN
+     SESSION("BASE")=base
+  END IF
+'response.write base
+  ofv.ObtenerAtributos Session("Form"),""
+  bAgregar = ofv.AAgregar
+  bModificar = ofv.AModificar
+  bSuprimir = ofv.AEliminar
+  bConsultar = ofv.AConsultar
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+  Strsql = "Select * From Tipobjeto WHERE  "
+  if setproc <> "ALL" then
+     Strsql = Strsql & " aplic = '" & setproc & "' "
+     'Encabezados
+      Formulario = ofv.Encabezados("Tipo","Descripcion")
+  else
+     IF SESSION("BASE")="K" THEN
+	     STRSQL=STRSQL & " TIPOCPT='K' "
+	     ELSE
+	      STRSQL=STRSQL & " TIPOCPT <> 'K' "
+     END IF
+     Strsql = Strsql & " and (aplic = '" & wkaplic & "' or aplic = 'GLB'  or aplic = 'CG') "
+    'Encabezados
+     Formulario = ofv.Encabezados("Tipo","Descripcion","Alcance","ORDEN","MODO","Propiedades")
+  end if
+  Strsql = Strsql & " Order By descri"
+
+  'response.write StrSql
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if not rs.eof then rs.move(CantRegMoverx)
+  posI = 0
+  Do While (Not rs.EOF) and (posi < CantRegMostrarx)
+    sForm = "form" & posi
+
+    'Eliminar
+    if bSuprimir then
+      sHref = "asp/EliminarRegistro.asp?ID=" & ofv.convertircar(rs(0)," ","_")
+      sHref = sHref & "&Tabla=Tipobjeto&volver=" & vuelta & "&Eliminar=NSNC"
+      Celda = ofv.BotonEliminar(rs(1),sHref)
+    else
+      Celda = ofv.GenCelda("","","","","","","","&nbsp;","si")
+    end if
+
+    'Tipo
+    sInput = rs(0)
+    Celda = Celda & ofv.gencelda("","cc","","50","","","",sInput,"si")
+
+    'Descripcion
+    sInput = ofv.GenerarInput(rs(1).name,rs(1),"text",sForm,"150","dt","")
+    Celda = Celda & ofv.gencelda("","","","","","","",sInput,"si")
+
+  if setproc = "ALL" then
+
+    'APLICACION
+    scomK = wkaplic & chr(9) & "GLB" & chr(9) & "CG"
+    scomD = "Aplicacion" & chr(9) & "GLOBAL" & chr(9)  & "Cor&nbsp;Gestion"
+
+
+
+    if bModificar then
+        sInput = ofv.gencomboFX(sForm,rs(23).name,rs(23),scomK,scomD," ")
+    else
+        sInput = ofv.GenerarInput("",rs(23),"readonly","","10","dt","")
+    end if
+
+    Celda = Celda & ofv.GenCelda("","" ,"","","","","",sInput,"si")
+
+
+
+    'ORDEN
+    sInput = ofv.GenerarInput(rs(2).name,rs(2),"textsb",sForm,"1","dt","")
+    Celda = Celda & ofv.gencelda("","","CENTER","","","","",sInput,"si")
+
+
+    'modo
+
+    IF SESSION("BASE") ="K" THEN
+        sInput="FORMULARIO"
+       ELSE
+       scomK = "D" & chr(9) & "C" &  chr(9) & "PD" &  chr(9) & "SN"
+    scomD = "Documento" & chr(9) & "Carpeta" & chr(9) & "Pedido" & chr(9) & "Solicitud"
+
+    if bModificar then
+        sInput = ofv.gencomboFX(sForm,rs(21).name,rs(21),scomK,scomD," ")
+    else
+        sInput = ofv.GenerarInput("",rs(21),"readonly","","10","dt","")
+    end if
+    end if
+    Celda =  Celda & ofv.gencelda("","vt","","","","","",sInput,"si")
+
+
+
+
+
+   'sImagenP = "&#0232;"
+    'sFuncAnc = " onmouseover=""this.className='ft1o';"" onmouseout=""this.className='ft1n';"" "
+    sinput = "<a href='TiposdeEsquemaProp.asp?wperfil=" & rs(0) & "&CantRegMover=" & CantRegMoverx
+    sinput = sinput  & "&CantRegMostrar=" & CantRegMostrarx
+    sinput = sinput  & "' title='Propiedades de " & rs(1) & "' ><i class='las la-arrow-right'></i></a>"
+    Celda = Celda & ofv.gencelda("","ft","center","","2%","","",sInput,"si")
+
+   END IF
+
+    Fila = ofv.genrow("","","","","","","",Celda,"si")
+
+    sAccion = ""
+    if bModificar then
+      sAccion = "asp/actualizar.asp?fname=" & ofv.convertircar(rs(0)," ","*")
+      sAccion = sAccion & "&tabla=Tipobjeto&volver=" & vuelta
+    end if
+    Formulario = Formulario & ofv.genform(sForm,"",sAccion,"","post","",Fila,"si")
+
+    posi = posi + 1
+    rs.Movenext
+  Loop
+
+  ftab = ofv.GenTabla("","","","50%","","0","","0","0","","",Formulario,"si")
+
+    Celda = ofv.GenCelda("","","","","","","",ftab,"si")
+    FilaS = filas & ofv.GenRow("","","","","","","",Celda,"si")
+
+    sHTML = sHTML & ofv.GenTabla("","aaa","","","","0","","0","0","","",filas,"si")
+
+ ' sHTML = sHTML & ofv.GenTabla("","","","50%","","0","","0","0","","",Formulario,"si")
+
+  'Botonera
+  Agregar = ""
+  if bAgregar then
+    sAccion = "AgregarTipodeEsquema.asp?Regisvuelta=" & CantRegMoverx
+    sAccion = sAccion & "&Opcion=si&tabla=Tipobjeto"
+    Agregar = ofv.BotonAgregar(sAccion)
+  end if
+
+ ' str1 = "Select descri From Tipobjeto Order By descri "    ' orden pagina
+  'str2 = "Select descri From Tipobjeto Order By descri "    ' orden alfabetico
+'response.write setproc
+  ' str1 = "Select descri From Tipobjeto WHERE  "
+    IF SESSION("BASE")="K" THEN
+          str1 = "Select descri From Tipobjeto WHERE  TIPOCPT='K' AND"
+        else
+          str1 = "Select descri From Tipobjeto WHERE TIPOCPT <> 'K' AND"
+   end if
+
+    if setproc <> "ALL" then
+       str1 = str1 & " aplic = '" & setproc & "' "
+    else
+     str1 = str1 & " (aplic = '" & wkaplic & "' or aplic = 'GLB' OR APLIC='CG') order by descri"
+   end if
+
+   'response.write str1
+  str2=str1
+  Buscar = ofv.Combobuscar(str1,str2,cn,cantregmostrarx,CantRegMoverx,ofv.vueltaasp2(""))
+
+
+  'consulta
+  sinput = "<a  href=TiposdeEsquemaCons.asp?"& request.querystring & "&setproc=" & setproc & " target=_new ><b>consulta</b></a>"
+  Celda = ofv.gencelda("","tt style='border-style:outset;border-width:2;' ","center","","15%","","",sInput,"si")
+
+  sAccion = "TiposdeEsquemaCons.asp?" & request.querystring '& "&setproc=" & setproc
+  Celda = ofv.BotonConsultar(sAccion)
+
+  sHTML = sHTML & ofv.botoneraESSX("2",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","","no",Agregar,Buscar,celda)
+
+
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & "</body></html>"
+end if
+
+Response.Write sHTML
+
+%>

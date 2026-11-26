@@ -1,0 +1,2691 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+  bModificar = False
+  ofv.ObtenerAtributos Session("Form2"),""
+  bModificar = ofv.AModificar
+
+
+  if session("APLMDCLI")="" then
+  	    aplcheck()
+  end if
+
+  if session("APLMDCLI")="BGAL" then
+  lengtd=""
+  ELSE
+  lengtd="20"
+  END IF
+
+ ' response.write lengtd& "22222222222"
+  if session("Nomodificar") = "S" then bModificar = False
+
+  sTipo     = request.querystring("Tipo")
+  sCodigo   = request.querystring("Codigo")
+  sFuncion  = request.querystring("Funcion")
+  sSClick   = request.querystring("SSClick")
+  sMenu     = request.querystring("Menu")
+  sSector   = request.querystring("Sector")
+  sNIV1     = request.querystring("NIV1")
+  sNIV2     = request.querystring("NIV2")
+  sNIV3     = request.querystring("NIV3")
+  sNIV4     = request.querystring("NIV4")
+  sNIV5     = request.querystring("NIV5")
+  sMAINAPL = request.querystring("MAINAPL")
+
+''  response.write "recibe " & request.querystring & "<br>"
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+
+
+  sHTML = "<html>"
+
+     wxs = "<script language=JavaScript>" & Chr(13)
+     wxs = wxs & " var Fbtini = 0;" & Chr(13)
+     wxs = wxs & " function IniWin() { " & Chr(13)
+     wxs = wxs & "  if (document.getElementById('SSOLACT')) { " & chr(13)
+     wxs = wxs & " document.getElementById('SSOLACT').submit(); " & Chr(13)
+     wxs = wxs & " } else { " & chr(13)
+     wxs = wxs & "           if (Fbtini > 10) {} else { Fbtini++; " & chr(13)
+     wxs = wxs & " setTimeout (""IniWin()"", 100); } " & chr(13)
+     wxs = wxs & "  } " & chr(13)
+     wxs = wxs & " } " & Chr(13)
+     wxs = wxs & " </script>" & Chr(13)
+
+    sHTML = sHTML & wxs
+
+  sHTML = sHTML & "<body onload='IniWin();' >"
+
+
+
+  if sFuncion = "E" then
+     smodosol = "SP"
+  else
+     smodosol = "TB"
+  end if
+
+
+  dim stabla(20)
+  dim solord(20)
+  dim Nombres(20)
+  dim ASPs(20)
+  dim Solapas(20)
+  dim Solapas2(20)
+
+
+  ASPs(0) = "CoWKFselect.asp?SKIND=1"
+
+  wwwsaltador = "<BR>"
+
+
+ IF SMAINAPL = "OR" OR SMAINAPL = "PL" THEN
+
+
+
+	ASPs(0) = "COWKFVERIFICACION.asp?SKIND=1"
+
+  solord(0) = 0
+  solord(1) = 1
+  solord(2) = 2
+  solord(3) = 3
+  solord(4) = 4
+  solord(5) = 5
+  solord(6) = 6
+  solord(7) = 7
+  solord(8) = 8
+  solord(9) = 9
+  solord(10) = 10
+  solord(11) = 11
+  solord(12) = 12
+  solord(13) = 13
+  solord(14) = 14
+  solord(15) = 15
+  solord(16) = 16
+  solord(17) = 17
+  solord(18) = 18
+  solord(19) = 19
+  solord(20) = 20
+
+
+
+  perfilsp = "S"
+
+     IF SMAINAPL = "OR" THEN
+        sEsquema = "CIRCUITO AUTOEVALUACION"
+     ELSE
+        sEsquema = "PLAN DE CONTINGENCIAS"
+     END IF
+
+     xestado = 1
+
+     Strsql = "Select estado,CODOBJETO,TIPOBJETO,RELLINK From ORRSKCIRCUITO Where OBJID = 0" & sCodigo
+     set rsx1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+     if not rsx1.eof then
+        xestado = rsx1(0)
+        sCodigoVINC = rsx1(1)
+        sTIPOVINC = rsx1(2)
+        sRELVINC = rsx1(3)
+     end if
+     call ofv.cerrarconsulta(rsx1)
+
+
+	if (sFuncion = "CD") then
+		ASPs(1) = "ORMATRIXIMPACTO.asp?FILSEL=CRT&PROCESO=" & sCodigoVINC & "&SUBFILTRO=ALL&PROCMOD=WKF&SOLOCONSULTA=0"
+	else
+		ASPs(1) = "ORMATRIXIMPACTO.asp?FILSEL=CRT&PROCESO=" & sCodigoVINC & "&SUBFILTRO=ALL&PROCMOD=WKF&SOLOCONSULTA=1"
+	end if
+
+
+
+
+  for z=0 to 20
+      Solapas(z) = "N"
+  next
+
+
+    for xx = 1 to 20
+        Nombres(xx) = "N"
+    next
+
+     'Solapas(1)  = REPLACE("DETALLE DEL CIRCUITO"," ","*")
+     Solapas(1)  = REPLACE("MATRIZ DE AUTOEVALUACION"," ","*")
+     Solapas2(1) = ASPs(1)
+     xstrsol      = 1
+     xfinal       = 1
+  '''   sSClick      = 99
+
+
+
+  if session("ModMain") = "WK"  then
+     Solapas(0)  = "WORKFLOW"
+     Solapas2(0) = ASPs(0)
+     xstrsol     = 0
+
+  else
+     xstrsol     = 1
+  end if
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+ ELSE
+
+
+  ASPs(1) = "edPropiedades.asp?SKIND=1"
+
+  if sFuncion = "E" then
+    ''' ASPs(2) = "edConsideraciones.asp?SKIND=1"
+     ASPs(2) = "EDNWEDT.asp?SKIND=1"
+  else
+ '''    ASPs(2) = "CoConsideraciones.asp?SKIND=1"
+     ASPs(2) = "CONWEDT.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(3) = "edSectores.asp?SKIND=1"
+  else
+    ASPs(3) = "CoSectores.asp?SKIND=1"
+  end if
+
+
+
+  ASPs(4) = "edEventos.asp?SKIND=1"
+
+  if sFuncion = "E" then
+    ASPs(5) = "edProcedimientos.asp?SKIND=1"
+  else
+    ASPs(5) = "CoProcedimientos.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(16) = "CorVerTodoseventos.asp?SKIND=1"
+  else
+    ASPs(16) = "CorVerTodoseventos.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+     ASPs(6) = "edObjDsc.asp?SKIND=1"
+  else
+     ASPs(6) = "CoObjDsc.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(7) = "edControles.asp?SKIND=1"
+  else
+    ASPs(7) = "CoControles.asp?SKIND=1"
+  end if
+  if sFuncion = "E" then
+    ASPs(8) = "edEsquemas.asp?SKIND=1"
+  else
+    ASPs(8) = "CoEsquemas.asp?SKIND=1"
+  end if
+  if sFuncion = "E" then
+    ASPs(9) = "edTablas.asp?SKIND=1"
+  else
+    ASPs(9) = "CoTablasCons.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(10) = "edarchivos.asp?SKIND=1"
+  else
+    ASPs(10) = "CoArchCons.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(11) = "edestr.asp?SKIND=1"
+  else
+  ''  ASPs(11) = "Coestrex.asp?SKIND=1"
+    ASPs(11) = "CoestrCons.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(12) = "edProcedimientos.asp?SKIND=1"
+  else
+    ASPs(12) = "CursogramaLnch.asp?SKIND=1"
+   ' ASPs(12)="CursogramaView.asp?SKIND=2"
+  end if
+
+  sMAINAPL = request.querystring("MAINAPL")
+  if sFuncion = "E" then
+    ASPs(13) = "edarchivos.asp?SKIND=2"
+  else
+    ASPs(13) = "CoArchCons.asp?SKIND=2"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(14) = "edFAQ.asp?SKIND=1"
+  else
+    ASPs(14) = "CoFAQ.asp?SKIND=1"
+  end if
+
+
+  if sFuncion = "E" then
+    ASPs(15) = "edGeneral.asp?SKIND=1"
+  else
+    ASPs(15) = "CoGeneral.asp?SKIND=1"
+  end if
+
+  if sFuncion = "E" then
+    ASPs(20) = "edportada.asp?SKIND=1"
+  else
+    ASPs(20) = "Coportada.asp?SKIND=1"
+  end if
+
+
+
+  solord(0) = 0
+  solord(1) = 15
+  solord(2) = 1
+  solord(3) = 6
+  solord(4) = 3
+  solord(5) = 2
+  solord(6) = 4
+  solord(7) = 5
+  solord(8) = 7
+  solord(9) = 8
+  solord(10) = 11
+  solord(11) = 10
+  solord(12) = 9
+  solord(13) = 12
+  solord(14) = 13
+  solord(15) = 14
+  solord(16) = 16
+  solord(17) = 17
+  solord(18) = 18
+  solord(19) = 19
+  solord(20) = 20
+
+
+
+
+  perfilsp = "S"
+
+
+  siconmas = "ICorAcciones.jpg"
+  Strsql = "Select * From Tipobjeto Where tipobjeto ='" & stipo & "'"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if not rs.eof then
+     sEsquema = rs(1)
+     sPerfil = rs(3)
+  end if
+
+  call ofv.cerrarconsulta(rs)
+
+
+  for z=0 to 20
+      Solapas(z) = "N"
+  next
+
+
+
+
+  Strsql = "Select * From Objperfildoc Where codobjeto =" & sCodigo & " and tipobjeto ='" & stipo & "' "
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if rs.eof then
+     perfilsp = "N"
+  end if
+
+  if perfilsp = "N" then
+     call ofv.cerrarconsulta(rs)
+     Strsql = "Select * From Objperfil Where tipoperfil='" & sPerfil & "'"
+     set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  end if
+
+  if Session("Segco") <> "S" then
+    for xx = 1 to 20
+        Nombres(xx) = "N"
+    next
+
+     Solapas(15)  = REPLACE(RS(31)," ","*")
+     Solapas2(15) = ASPs(15)
+     xstrsol      = 1
+     xfinal       = 1
+     sSClick      = 99
+
+
+  else
+
+    for xx = 1 to 20
+        solord(xx) = 17
+        Nombres(xx) = "N"
+    next
+
+
+
+    for xx = 2 to 16
+        stabla (xx - 1) = rs(xx + 30)
+    next
+
+
+
+    yy = 0
+    for xx = 1 to 15
+
+        if cint(stabla (xx)) < 99 then
+           yy = yy + 1
+           solord (stabla (xx)) = xx
+        end if
+    next
+    tyy = yy
+
+
+
+'''  if session("ModMain") = "WK" and sFuncion = "E" then
+  if session("ModMain") = "WK"  then
+'  if session("ModMain") = "WK" and ( session("MODSTART") <> "XP" or (session("MODSTART") = "XP" and session("WKFCODIGO") = sCodigo) ) then
+     Solapas(0)  = "WORKFLOW"
+     Solapas2(0) = ASPs(0)
+
+    ''' xstrsol     = 0
+     xstrsol     = 0
+     if session("APLMDCLI")<> "BC" then
+        if sSClick      = 99 then sSClick      = solord(1)
+     end if
+  else
+     xstrsol     = 1
+  end if
+
+
+
+
+
+  X=0
+
+  if (session("APLMDCLI") =  "BC" or session("APLMDCLI") =  "BANELCO" ) and sFuncion <> "E"  then
+
+  'if sFuncion <> "E" then
+
+           Solapas(20)  = "PORTADA"
+           Solapas2(20) = ASPs(20)
+
+
+           Strsql = "SELECT OBJportada.detcon, OBJportada.detsecuen, OBJportada.dettipo from OBJportada "
+           Strsql = Strsql & " where OBJportada.codobjeto=" & sCodigo & " and OBJportada.detcon > 0 and OBJportada.dettipo <> 'N' "
+
+  ' response.write strsql
+           set rsxx1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+           if not rsxx1.eof then
+
+
+             for xiord=0 to 19
+
+                 if solord(xiord) = 1 then
+
+                    xmovey = 20
+
+                  '  for xiord2=xiord + 1 to 19
+                  '      xmoven           = solord(xiord2)
+                  '      solord(xiord2)   = xmovey
+                  '      xmovey           = xmoven
+                  '  next
+
+
+
+                    exit for
+                 end if
+             next
+
+
+             WWWMOVER = 20
+
+             for xiord=1 to 20
+
+                 XXXMOVER      = solord(xiord)
+                 solord(xiord) = WWWMOVER
+                 WWWMOVER      = XXXMOVER
+
+             next
+
+          end if
+
+
+  end if
+
+  for z = 2 to 16
+
+    if rs(z) Then
+
+
+
+
+      if (sFuncion = "E"  ) or (sFuncion = "C" and z <> 2 and z <> 4 and z <> 5 ) or (sFuncion = "CD" and z <> 2 and z <> 5 )  or (sFuncion = "D"  and z = 4 ) then
+          x = x + 1
+          Solapas(z-1)  = REPLACE(RS(z + 15)," ","*")
+          Solapas2(z-1) = ASPs(z-1)
+
+
+          if sFuncion <> "E" and z = 6 then
+
+             Solapas(16)  = "CIRCUITO COMPLETO"
+             Solapas2(16) = ASPs(16)
+
+             for xiord=0 to 19
+
+                 if solord(xiord) = 5 then
+
+                    xmovey = 16
+
+                    for xiord2=xiord + 1 to 19
+                        xmoven           = solord(xiord2)
+                        solord(xiord2)   = xmovey
+                        xmovey           = xmoven
+                    next
+
+
+
+                    exit for
+                 end if
+             next
+
+
+          end if
+
+      end if
+    end if
+
+  next
+
+
+  xfinal = ubound(Solapas)
+
+ end if
+
+ ''' response.write Solapas2(0) & xestado & sFuncion & "<br>"
+
+  call ofv.cerrarconsulta(rs)
+
+
+ END IF
+
+
+  TABELEN = ""
+  FTABELEN = ""
+
+
+
+  xSolasp = ""
+  xSolasp = xSolasp & "BarraSol.asp?Tipo=" & sTipo & "&Codigo="
+  xSolasp = xSolasp & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&MAINAPL=" & SMAINAPL
+  xSolasp = xSolasp & "&Funcion=" & sFuncion
+  xSolasp = xSolasp & "&NIV1=0&NIV2=0&NIV3=0&NIV4=0&NIV5=0"
+  xSolasp = xSolasp & "&SSCLICK="
+
+
+  xSolaspd = ""
+  xSolaspd = xSolaspd & "BarraSol.asp?Tipo=" & sTipo & "&Codigo="
+  xSolaspd = xSolaspd & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&MAINAPL=" & SMAINAPL
+  xSolaspd = xSolaspd & "&Funcion=" & sFuncion
+  xSolaspd = xSolaspd & "&SSCLICK="
+
+
+ r1 = ""
+
+
+     If ofv.ModTitCls = "1" Or ofv.ModTitCls = "0" Then
+        xGenConta = ofv.GetTit(clng(ofv.ModTitCls) + 5)
+        xGenConta = ofv.FTitDat1
+
+        xsclase = "xts"
+
+     else
+
+
+
+        xsclase = "xts"
+
+     End If
+
+      xsimagenf  = "<font FACE=WingDINGS COLOR='#ffffff' SIZE=2 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#0167;</font>&nbsp;&nbsp;"
+      xsimagend  = "<font FACE=WingDINGS COLOR='#ffffff' SIZE=2 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >0</font>&nbsp;&nbsp;"
+
+
+
+  xsolini = 99
+
+
+  if session("WEBDESK") = "S" and session("ModMain") = "WK" then
+
+     sInput  = "<font color='#990000' >"
+     sInput  = sInput & "Este documento requiere su confirmacion en el workflow!!!</font>"
+     sLink   = sInput
+
+     CTABELEN = ofv.GenCelda("","vT  style='font-size:8pt;background-color:#ffffff;border-style:solid;border-width:1;border-color:#000000;padding-left:5px;' ","","","","","",sLink,"si")
+   '  FTABELEN = FTABELEN & ofv.GenRow("","","","","25","","",CTABELEN,"si")
+
+  end if
+
+  if session("WEBDESK") = "S" and session("ModMain") <> "WK" and (sFuncion = "C" or sFuncion = "CD") then
+
+     xverasp = "CoObjRecomendar.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+     xverasp = xverasp & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&MAINAPL=" & SMAINAPL
+     xverasp = xverasp & "&NIV1=" & sNIV1  & "&NIV2=" & sNIV2  & "&NIV3=" & sNIV3  & "&NIV4=" & sNIV4  & "&NIV5=" & sNIV5
+
+
+     sInput  = "<b><font color='#ff0000' size=2  >&#058;&#0183;)</font></b>&nbsp;&nbsp;"
+   '''  sInput  = ""
+     sInput  = sInput & "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#cccccc;' >Recomendar</font>"
+   '''  sInput  = sInput & "&nbsp;<font color='#ff0000' size=2 >&#033;</font>"
+     sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#000000;font-weight:bold;'  ", xverasp, "Principal", "", "", sInput, "si")
+     Celda   = Celda & wwwsaltador & "<span ><font color='#ff0000' size=2 >&#0124;</font>&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+     wwwestilo = " style='background-color:#FFEEDD;border-style:dotted;border-width:2;border-color:#990000;padding-left:10px;' "
+
+     CTABELEN = ofv.GenCelda("","uT  " & wwwestilo & " ","","","","","",sLink,"si")
+    ' FTABELEN = FTABELEN & ofv.GenRow("","","","","20","","",CTABELEN,"si")
+
+  end if
+
+
+  for x = xstrsol to xfinal
+ '' for x = xstrsol to 2
+      if solapas(solord(x)) <> "N" then
+         sSolapa =  solapas(solord(x))
+
+         if  xsolini = 99 then  xsolini = solord(x)
+
+         if  sSClick = 99 then  sSClick = xsolini
+
+         If ofv.ModTitCls = "1" Or ofv.ModTitCls = "0" Then
+
+
+            sInput  = replace(Ucase(sSolapa),"*"," ")
+            xsclase = "at style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#dddddd;padding-left:10px;'"
+
+
+         else
+
+            sInput  = "&nbsp;" & replace(Ucase(sSolapa),"*","&nbsp;") & "&nbsp;"
+            xsclase = "at style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#dddddd;padding-left:10px;'"
+
+         End If
+
+        if session("WEBDESK") = "S" then
+
+
+           sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#cccccc;' >" & replace(Capitalize(replace(Ucase(sSolapa),"*"," "))," ","&nbsp;") & "</font>"
+        '   ssMnnSOL = "MNNSOL" & X
+        '   sLink   = "<span id='" & ssMnnSOL & "'  class='XX' >" & sInput & "</span> "
+        '   sLink   = OFV.GenLink("", "cmb  onclick=" & chr(34) & "SetMnnSOL('"&ssMnnSOL&"');" & chr(34) & "style='font-size:8pt;cursor:hand;text-decoration:none;color:#993333;font-weight:bold;'  ", xSolasp & solord(x), "WK1", "", "", sInput, "si")
+           sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#993333;font-weight:bold;'  ", xSolasp & solord(x), "WK1", "", "", sInput , "si")
+'
+           Celda   = Celda & wwwsaltador & "<span ><font color='#ff0000' size=2 >&#0124;</font>&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+           wwwestilo = " style='background-color:#f0f0f0;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#FF0000;padding-left:10px;' "
+
+           if (solord(x)) = 0 then
+              wwwestilo = " style='background-color:#ffffff;border-style:solid;border-width:2;border-color:#990000;padding-left:10px;' "
+           end if
+
+
+           CTABELEN = ofv.GenCelda("","uT  " & wwwestilo & " ","","","","","",sLink,"si")
+           FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+
+           if sFuncion = "E" or sFuncion = "ED"  then
+
+           else
+              xxxx = GetIndice(solord(x))
+           end if
+
+
+        ELSE
+
+           t3 = xsimagenf & "<a  href='" & xSolasp & solord(x) & "' target='WK1' >"
+           t3 = t3 & sInput
+           t3 = t3 & "</A>"
+
+           t4 = ofv.GenCelda("",xsclase,"","","","","",t3,"si")
+
+           r1 = r1 & ofv.GenRow("","","","",lengtd,"","",t4,"si")
+
+        END IF
+
+         if clng(sSClick) = clng(solord(x)) then
+            session("codSol")=sSClick
+            xverasp = solapas2(solord(x)) & "&Tipobjeto=" & sTipo & "&Codobjeto="
+            xverasp = xverasp & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&MAINAPL=" & SMAINAPL
+            xverasp = xverasp & "&GLBSOLN=S" & solord(x)
+            xverasp = xverasp & "&NIV1=" & sNIV1  & "&NIV2=" & sNIV2  & "&NIV3=" & sNIV3  & "&NIV4=" & sNIV4  & "&NIV5=" & sNIV5
+
+            sHTML1 = ""
+
+            sHTML1 = sHTML1 & "<form name=SSOLACT id=SSOLACT  action='" & xverasp & "' "
+            sHTML1 = sHTML1 & " method=post target='Principal' style='display:none;' >" & chr(13)
+            sHTML1 = sHTML1 & "<input type=hidden size=10 name=boton value=menu></input>" & chr(13)
+            sHTML1 = sHTML1 & "</form>" & chr(13)
+
+            sHTML1 = sHTML1 & "<script language=JavaScript>" & Chr(13)
+            sHTML1 = sHTML1 & " window.top.CorSol='" & replace(Ucase(sSolapa),"*"," ") & "'; " & Chr(13)
+            sHTML1 = sHTML1 & "</script>" & Chr(13)
+
+
+         if session("WEBDESK") = "S" then
+
+
+
+
+         ELSE
+
+             IF  Session("FULLGUI") = "N" THEN
+                 styl = "background-color:#888888;"
+             else
+                 styl = XspEx("#888888","#cccccc",0) & ";"
+             end if
+
+             xlfun = " onclick=""document.all.MDBEDL.style.display='block'; document.all.DBEDTD1.style.display='none'; document.all.DBEDTD2.style.display='block'; document.all.MM2.style.display='block'; "" "
+             xlfun2 = " onclick=""document.all.MDBEDL.style.display='none'; document.all.DBEDTD1.style.display='block'; document.all.DBEDTD2.style.display='none'; document.all.MM2.style.display='none'; "" "
+
+             macel = ofv.GenCelda("","at style='border-right-style:solid;border-right-width:1;border-right-color:#dddddd;padding-left:10px;' " & xlfun,"","90%","","","",replace(Ucase(sSolapa),"*"," "),"si")
+
+             xsclase2 = "at style='border-right-style:solid;border-right-width:1;border-right-color:#dddddd;display:block;font-family:webdings;font-size:10pt;color:#cc0000;cursor:hand;"
+
+
+             macel = macel & OFV.gencelda("DBEDTD1", xsclase2 & "display:block;' ", "center title='Ver solapas.' " & xlfun, "center", "1", "", "", "1", "si")
+             macel = macel & OFV.gencelda("DBEDTD2", xsclase2 & "display:none;' ", "center title='Ocultar Solapas.' " & xlfun2, "center", "1", "", "", "0", "si")
+
+             marow = ofv.GenRow("","","","",lengtd,"","",macel,"si")
+
+             sHTML = sHTML & OFV.GenTabla("DBED", "aaa style='border-style:solid;border-color:#ffffff;border-width:1;" & styl & "' ", "", "100%", "", "0", "", "-2", "-2", "", "", marow, "si")
+
+           END IF
+
+         end if
+
+
+      end if
+  next
+
+ IF SMAINAPL = "OR" OR SMAINAPL = "PL" THEN
+
+ ELSE
+
+''-----------------------------------------------------------------------------------------------------
+
+''''''''''''''''''''''''''''''''''''''''''''
+'' Accesos directos del documento ''''''''''
+''''''''''''''''''''''''''''''''''''''''''''
+
+  dim ATABSCPT(200,2)
+
+  ISCPT = 0
+  TSCPT = 0
+
+    ''    response.write "entro1"
+
+      if sFuncion <> "X"   then
+
+      ''  response.write "entro2"
+
+         ReDim Preserve bConsultar(4)
+
+      if sFuncion = "E"   then
+
+         bConsultar(2) = 0
+         bConsultar(4) = 0
+
+         bConsultar(1) = 1
+         bConsultar(3) = 1
+
+      else
+
+         bConsultar(2) = 0
+         bConsultar(4) = 0
+
+         bConsultar(1) = 0
+         bConsultar(3) = 1
+
+      end if
+
+
+         sVerEstado = "  and Objetos.objnivel >= " & Session("SegNivel") & " "
+
+         sverestado = sverestado & " and Objprty.Estado In (9,"
+         For i = 1 To 4
+             If bConsultar(i) Then sVerEstado = sVerEstado & i & ","
+         Next
+         sVerEstado = Left(sVerEstado, Len(sVerEstado) - 1) & ") "
+
+'''''''''''''''''''''''''''''''''''''''''
+
+
+
+  sActcon  = "Consultar.asp?Codigo=NNNN&Tipo=TTTT"
+  sActcon  = sActcon & "&Datos=*smenu=PORESTADO*lista=3"
+  sHref    = "&nbsp;"
+' response.write sActcon
+  sFuncion = " onclick=" & Chr(34) & " window.top.abreWin('" & sActcon & "','TTTT'); return false;" & Chr(34)
+
+
+  Strsql = "SELECT * FROM objacd  "
+  Strsql = Strsql & " Where codobjeto=" & sCodigo
+  Strsql = Strsql & " And tipobjeto = '" & stipo & "' "
+
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  do until rs.eof
+
+    ''   response.write "entro3"
+
+
+     if  rs(3) = "S" then
+'''' Carpeta superior
+
+       if  rs(6) = "S" then
+
+''----------------
+
+         strsql  = "select * from csbarr where codojasoc = " & sCodigo
+         Strsql  = Strsql & " and tipobjasoc = '" & sTipo & "'"
+         set rs1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+         if  not rs.eof then
+             essCodigo = rs1(1)
+             essTipo   = rs1(2)
+
+         else
+             essCodigo = 0
+             essTipo   = "NO"
+         end if
+         call ofv.cerrarconsulta(rs1)
+
+
+         sNIVE   = "no"
+
+         StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+         StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & essTipo & "'"
+         Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+         If Not rsIcono.EOF Then
+
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+
+         End If
+         Call OFV.cerrarconsulta(rsIcono)
+
+         if sNIVE   = "C"  then
+
+            strsql  = "select * from csbarr where codojasoc = " & essCodigo
+            Strsql  = Strsql & " and tipobjasoc = '" & essTipo & "'"
+            set rs1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+            if  not rs.eof then
+
+                essCodigo = rs1(1)
+                essTipo   = rs1(2)
+
+            end if
+            call ofv.cerrarconsulta(rs1)
+
+
+'''''''''''''''''''''''''''''''''''''''''
+
+         StrSql = "SELECT DISTINCT OBJETOS.codobjeto, OBJETOS.descri, OBJETOS.tipobjeto, Estados.estado, "
+         StrSql = StrSql & "Relaobj.tipobjasoc, OBJPRTY.fecemis, OBJPRTY.fecvigen, OBJPRTY.fecbaja,"
+         StrSql = StrSql & " OBJPRTY.autor,OBJPRTY.aprobo, OBJPRTY.elimino, OBJPRTY.fecvto, OBJETOS.OBJUN"
+         StrSql = StrSql & " FROM RELAOBJ, OBJETOS, OBJPRTY, Estados "
+         StrSql = StrSql & " where "
+         StrSql = StrSql & " RELAOBJ.codojasoc = OBJETOS.codobjeto and "
+         StrSql = StrSql & " OBJPRTY.estado    = Estados.objid and "
+         StrSql = StrSql & " OBJETOS.codobjeto = OBJPRTY.codobjeto  and "
+         StrSql = StrSql & " (objetos.objun =  " & session("UN") & " or "
+         StrSql = StrSql & "  objetos.objun =  1 )  and "
+         StrSql = StrSql & " RELAOBJ.codobjmaster = " & essCodigo
+         StrSql = StrSql & " and relaobj.tipobjmaster = '" & essTipo & "' " & sVerEstado
+         StrSql = StrSql & " order by OBJETOS.tipobjeto, OBJETOS.descri, Estados.estado "
+      ''  response.write "<br>" & strsql & "<br>"
+         sVino = "N"
+         Set rs2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+         If  not rs2.EOF Then
+
+        Do Until rs2.EOF
+
+             if cstr(rs2(0) & "")  <> cstr(scodigo & "") then
+
+             sVinook = "N"
+             if  cstr(rs2(12) & "") = cstr(session("UN") & "") then
+   '' response.write "<br><br>entro"
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+
+          if SESSION("EMPMUN") = "S" THEN
+             StrSql = "Select OBJMEMPALC.CODEMPRE  from OBJMEMPALC "
+             StrSql = StrSql & " where "
+             StrSql = StrSql & " OBJMEMPALC.codobjeto = " & rs2(0) & " and "
+             StrSql = StrSql & " OBJMEMPALC.CODEMPRE = " & Session("UN") & " "
+             Set rsmas2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+             If  Not rsmas2.EOF Then
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+          end if
+
+          sNIVE   = "D"
+
+        if  sVinook = "S" then
+
+            stitem = rs2(4)
+            StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+            StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & rs2(4) & "'"
+            Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+            If Not rsIcono.EOF Then
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+
+                sitem = sTipoE & ": " & rs2(1)
+
+            End If
+            Call OFV.cerrarconsulta(rsIcono)
+
+            if sNIVE   = "D"  then
+
+
+               sSolapa =  sitem
+
+               If ofv.ModTitCls = "1" Or ofv.ModTitCls = "0" Then
+
+                  sInput = replace(Ucase(sSolapa),"*"," ")
+
+               else
+
+                  sInput = "&nbsp;" & replace(Ucase(sSolapa),"*","&nbsp;") & "&nbsp;"
+
+               End If
+
+               sFuncionDSP = REPLACE(sFuncion,"NNNN",rs2(0))
+               sFuncionDSP = REPLACE(sFuncionDSP,"TTTT",rs2(2))
+
+
+
+
+
+        if session("WEBDESK") = "S" then
+
+
+           sInput  = ">" & replace(Capitalize(replace(Ucase(sSolapa),"*"," "))," ","&nbsp;") & ""
+           sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#993333;font-weight:bold;' " & sFuncionDSP & " ", "javascript:void(0);", "", "", "", sInput, "si")
+           Celda   = Celda & wwwsaltador & "<span ><font color='#ff0000' size=2 >&#0124;</font>&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+           wwwestilo = " style='background-color:#f0f0f0;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#FF0000;padding-left:10px;' "
+
+           CTABELEN = ofv.GenCelda("","uT  " & wwwestilo & " ","","","","","",sLink,"si")
+           FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+
+
+        ELSE
+
+               t3 = xsimagend & "<a  href='javascript:void(0);' " & sFuncionDSP &  " >"
+               t3 = t3 & sInput
+               t3 = t3 & "</A>"
+
+               t4 = ofv.GenCelda("",xsclase,"","","","","",t3,"si")
+
+               r1 = r1 & ofv.GenRow("","","","",lengtd,"","",t4,"si")
+
+        END IF
+
+
+
+
+
+            else
+
+
+
+
+
+            end if
+
+
+         end if
+
+        end if
+
+         rs2.movenext
+         loop
+
+
+       end if
+
+
+
+'''''''''''''''''''''''''''''''''''''''
+
+        end if
+
+''----------------
+
+
+
+       end if
+
+
+
+
+
+     elseif  rs(3) = "P" then
+'''' Carpeta primaria
+
+       if  rs(6) = "S" then
+
+         strsql  = "select * from csbarr where codojasoc = " & sCodigo
+         Strsql  = Strsql & " and tipobjasoc = '" & sTipo & "'"
+         set rs1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+         if  not rs.eof then
+             essCodigo = rs1(1)
+             essTipo   = rs1(2)
+
+         else
+             essCodigo = 0
+             essTipo   = "NO"
+         end if
+         call ofv.cerrarconsulta(rs1)
+
+
+         sNIVE   = "no"
+
+         StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+         StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & essTipo & "'"
+         Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+         If Not rsIcono.EOF Then
+
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+
+         End If
+         Call OFV.cerrarconsulta(rsIcono)
+
+
+
+
+         StrSql = "SELECT DISTINCT OBJETOS.codobjeto, OBJETOS.descri, OBJETOS.tipobjeto, Estados.estado, "
+         StrSql = StrSql & "Relaobj.tipobjasoc, OBJPRTY.fecemis, OBJPRTY.fecvigen, OBJPRTY.fecbaja,"
+         StrSql = StrSql & " OBJPRTY.autor,OBJPRTY.aprobo, OBJPRTY.elimino, OBJPRTY.fecvto, OBJETOS.OBJUN"
+         StrSql = StrSql & " FROM RELAOBJ, OBJETOS, OBJPRTY, Estados "
+         StrSql = StrSql & " where "
+         StrSql = StrSql & " RELAOBJ.codojasoc = OBJETOS.codobjeto and "
+         StrSql = StrSql & " OBJPRTY.estado    = Estados.objid and "
+         StrSql = StrSql & " OBJETOS.codobjeto = OBJPRTY.codobjeto  and "
+         StrSql = StrSql & " (objetos.objun =  0" & session("UN") & " or "
+         StrSql = StrSql & "  objetos.objun =  1 )  and "
+         StrSql = StrSql & " RELAOBJ.codobjmaster = " & essCodigo
+         StrSql = StrSql & " and relaobj.tipobjmaster = '" & essTipo & "' " & sVerEstado
+         StrSql = StrSql & " order by OBJETOS.tipobjeto, OBJETOS.descri, Estados.estado "
+     ''   response.write "<br>" & strsql & "<br>"
+         sVino = "N"
+         Set rs2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+         If  not rs2.EOF Then
+
+        Do Until rs2.EOF
+
+             if cstr(rs2(0) & "")  <> cstr(scodigo & "") then
+
+             sVinook = "N"
+             if  cstr(rs2(12) & "") = cstr(session("UN") & "") then
+   '' response.write "<br><br>entro"
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+
+          if SESSION("EMPMUN") = "S" THEN
+             StrSql = "Select OBJMEMPALC.CODEMPRE  from OBJMEMPALC "
+             StrSql = StrSql & " where "
+             StrSql = StrSql & " OBJMEMPALC.codobjeto = " & rs2(0) & " and "
+             StrSql = StrSql & " OBJMEMPALC.CODEMPRE = " & Session("UN") & " "
+             Set rsmas2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+             If  Not rsmas2.EOF Then
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+          end if
+
+          sNIVE   = "D"
+
+        if  sVinook = "S" then
+
+            stitem = rs2(4)
+            StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+            StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & rs2(4) & "'"
+            Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+            If Not rsIcono.EOF Then
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+
+                sitem = sTipoE & ": " & rs2(1)
+
+            End If
+            Call OFV.cerrarconsulta(rsIcono)
+
+            if sNIVE   = "D"  then
+
+
+               sSolapa =  sitem
+
+               If ofv.ModTitCls = "1" Or ofv.ModTitCls = "0" Then
+                  sInput = replace(Ucase(sSolapa),"*"," ")
+               else
+                  sInput = "&nbsp;" & replace(Ucase(sSolapa),"*","&nbsp;") & "&nbsp;"
+               End If
+
+               sFuncionDSP = REPLACE(sFuncion,"NNNN",rs2(0))
+               sFuncionDSP = REPLACE(sFuncionDSP,"TTTT",rs2(2))
+
+
+
+
+        if session("WEBDESK") = "S" then
+
+
+
+
+       '    sInput  = "" & replace(Capitalize(replace(Ucase(sSolapa),"*"," "))," ","&nbsp;") & ""
+       '    sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#000000;font-weight:normal;'  " & sFuncionDSP & " ", "javascript:void(0);", "", "", "", sInput, "si")
+       '    Celda   = Celda & wwwsaltador & "<span ><font color='#ff0000' size=2 >&#0124;</font>&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+       '    CTABELEN = ofv.GenCelda("","UT  style='background-color:#f0f0f0;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#FF0000;padding-left:10px;' ","","","","","",sLink,"si")
+       '    FTABELEN = FTABELEN & ofv.GenRow("","","","","20","","",CTABELEN,"si")
+
+
+
+           sInput  = ">" & replace(Capitalize(replace(Ucase(sSolapa),"*"," "))," ","&nbsp;") & ""
+           sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#993333;font-weight:bold;' " & sFuncionDSP & " ", "javascript:void(0);", "", "", "", sInput, "si")
+           Celda   = Celda & wwwsaltador & "<span ><font color='#ff0000' size=2 >&#0124;</font>&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+           wwwestilo = " style='background-color:#f0f0f0;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#FF0000;padding-left:10px;' "
+
+           CTABELEN = ofv.GenCelda("","uT  " & wwwestilo & " ","","","","","",sLink,"si")
+           FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+
+
+        ELSE
+
+               t3 = xsimagend & "<a  href='javascript:void(0);' " & sFuncionDSP &  " >"
+               t3 = t3 & sInput
+               t3 = t3 & "</A>"
+
+               t4 = ofv.GenCelda("",xsclase,"","","","","",t3,"si")
+
+               r1 = r1 & ofv.GenRow("","","","",lengtd,"","",t4,"si")
+
+        END IF
+
+
+            else
+
+
+            end if
+
+
+         end if
+
+        end if
+
+         rs2.movenext
+         loop
+
+
+'''''''''''''''''''''''''''''''''''''''
+
+        end if
+
+
+
+
+       end if
+
+
+
+
+     elseif  rs(3) = "R" then
+'''' Carpeta dependiente
+
+       if  rs(6) = "S" then
+
+''----------------
+
+               TSCPT = TSCPT + 1
+
+               ATABSCPT(TSCPT,0) = ""
+               ATABSCPT(TSCPT,1) = sCodigo
+               ATABSCPT(TSCPT,2) = sTipo
+
+
+
+         strsql  = "select * from csbarr where codojasoc = " & sCodigo
+         Strsql  = Strsql & " and tipobjasoc = '" & sTipo & "'"
+         set rs1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+         if  not rs.eof then
+             essCodigo = rs1(1)
+             essTipo   = rs1(2)
+
+         else
+             essCodigo = 0
+             essTipo   = "NO"
+         end if
+         call ofv.cerrarconsulta(rs1)
+
+
+         sNIVE   = "no"
+
+         StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+         StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & essTipo & "'"
+         Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+         If Not rsIcono.EOF Then
+
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+
+         End If
+         Call OFV.cerrarconsulta(rsIcono)
+
+         if sNIVE   = "C"  then
+
+           '  essCodigo = sCodigo
+           '  essTipo   = sTipo
+
+'''''''''''''''''''''''''''''''''''''''''
+
+         StrSql = "SELECT DISTINCT OBJETOS.codobjeto, OBJETOS.descri, OBJETOS.tipobjeto, Estados.estado, "
+         StrSql = StrSql & "Relaobj.tipobjasoc, OBJPRTY.fecemis, OBJPRTY.fecvigen, OBJPRTY.fecbaja,"
+         StrSql = StrSql & " OBJPRTY.autor,OBJPRTY.aprobo, OBJPRTY.elimino, OBJPRTY.fecvto, OBJETOS.OBJUN"
+         StrSql = StrSql & " FROM RELAOBJ, OBJETOS, OBJPRTY, Estados "
+         StrSql = StrSql & " where "
+         StrSql = StrSql & " RELAOBJ.codojasoc = OBJETOS.codobjeto and "
+         StrSql = StrSql & " OBJPRTY.estado    = Estados.objid and "
+         StrSql = StrSql & " OBJETOS.codobjeto = OBJPRTY.codobjeto  and "
+         StrSql = StrSql & " (objetos.objun =  " & session("UN") & " or "
+         StrSql = StrSql & "  objetos.objun =  1 )  and "
+         StrSql = StrSql & " RELAOBJ.codobjmaster = " & essCodigo
+         StrSql = StrSql & " and relaobj.tipobjmaster = '" & essTipo & "' " & sVerEstado
+         StrSql = StrSql & " order by OBJETOS.tipobjeto, OBJETOS.descri, Estados.estado "
+     ''   response.write "<br>" & strsql & "<br>"
+         sVino = "N"
+         Set rs2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+         If  not rs2.EOF Then
+
+        Do Until rs2.EOF
+
+             if cstr(rs2(0) & "")  <> cstr(scodigo & "") then
+
+             sVinook = "N"
+             if  cstr(rs2(12) & "") = cstr(session("UN") & "") then
+   '' response.write "<br><br>entro"
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+
+          if SESSION("EMPMUN") = "S" THEN
+             StrSql = "Select OBJMEMPALC.CODEMPRE  from OBJMEMPALC "
+             StrSql = StrSql & " where "
+             StrSql = StrSql & " OBJMEMPALC.codobjeto = " & rs2(0) & " and "
+             StrSql = StrSql & " OBJMEMPALC.CODEMPRE = " & Session("UN") & " "
+             Set rsmas2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+             If  Not rsmas2.EOF Then
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+          end if
+
+          sNIVE   = "D"
+
+        if  sVinook = "S" then
+
+            stitem = rs2(4)
+            StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+            StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & rs2(4) & "'"
+            Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+            If Not rsIcono.EOF Then
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+
+                sitem = sTipoE & ": " & rs2(1)
+
+            End If
+            Call OFV.cerrarconsulta(rsIcono)
+
+            if sNIVE   = "D"  then
+
+
+
+
+            else
+
+
+               TSCPT = TSCPT + 1
+
+               ATABSCPT(TSCPT,0) = ""
+               ATABSCPT(TSCPT,1) = rs2(0)
+               ATABSCPT(TSCPT,2) = rs2(2)
+
+
+            end if
+
+
+         end if
+
+        end if
+
+         rs2.movenext
+         loop
+
+        end if
+
+
+
+         DO WHILE NOT ISCPT > TSCPT
+
+            IF ISCPT = 0 THEN ISCPT = 1
+
+
+         FOR ISCPT=ISCPT TO TSCPT
+
+
+
+         StrSql = "SELECT DISTINCT OBJETOS.codobjeto, OBJETOS.descri, OBJETOS.tipobjeto, Estados.estado, "
+         StrSql = StrSql & "Relaobj.tipobjasoc, OBJPRTY.fecemis, OBJPRTY.fecvigen, OBJPRTY.fecbaja,"
+         StrSql = StrSql & " OBJPRTY.autor,OBJPRTY.aprobo, OBJPRTY.elimino, OBJPRTY.fecvto, OBJETOS.OBJUN"
+         StrSql = StrSql & " FROM RELAOBJ, OBJETOS, OBJPRTY, Estados "
+         StrSql = StrSql & " where "
+         StrSql = StrSql & " RELAOBJ.codojasoc = OBJETOS.codobjeto and "
+         StrSql = StrSql & " OBJPRTY.estado    = Estados.objid and "
+         StrSql = StrSql & " OBJETOS.codobjeto = OBJPRTY.codobjeto  and "
+         StrSql = StrSql & " (objetos.objun =  " & session("UN") & " or "
+         StrSql = StrSql & "  objetos.objun =  1 )  and "
+         StrSql = StrSql & " RELAOBJ.codobjmaster = 0" & ATABSCPT(ISCPT,1)
+         StrSql = StrSql & " and relaobj.tipobjmaster = '" & ATABSCPT(ISCPT,2) & "' " & sVerEstado
+         StrSql = StrSql & " order by OBJETOS.tipobjeto, OBJETOS.descri, Estados.estado "
+    ''    response.write "<br>" & strsql & "<br>"
+         sVino = "N"
+         Set rs2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+         If  not rs2.EOF Then
+
+         Do Until rs2.EOF
+
+             if cstr(rs2(0) & "")  <> cstr(scodigo & "") then
+
+
+
+             sVinook = "N"
+             if  cstr(rs2(12) & "") = cstr(session("UN") & "") then
+   '' response.write "<br><br>entro"
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+
+          if SESSION("EMPMUN") = "S" THEN
+             StrSql = "Select OBJMEMPALC.CODEMPRE  from OBJMEMPALC "
+             StrSql = StrSql & " where "
+             StrSql = StrSql & " OBJMEMPALC.codobjeto = " & rs2(0) & " and "
+             StrSql = StrSql & " OBJMEMPALC.CODEMPRE = " & Session("UN") & " "
+             Set rsmas2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+             If  Not rsmas2.EOF Then
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+          end if
+
+          sNIVE   = "D"
+
+        if  sVinook = "S" then
+
+            stitem = rs2(4)
+            StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+            StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & rs2(4) & "'"
+            Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+            If Not rsIcono.EOF Then
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+
+                sitem = sTipoE & ": " & rs2(1)
+
+            End If
+            Call OFV.cerrarconsulta(rsIcono)
+
+            if sNIVE   = "D" then
+
+
+               sSolapa =  sitem
+
+               If ofv.ModTitCls = "1" Or ofv.ModTitCls = "0" Then
+                  sInput = replace(Ucase(sSolapa),"*"," ")
+               else
+                  sInput = "&nbsp;" & replace(Ucase(sSolapa),"*","&nbsp;") & "&nbsp;"
+               End If
+
+               sFuncionDSP = REPLACE(sFuncion,"NNNN",rs2(0))
+               sFuncionDSP = REPLACE(sFuncionDSP,"TTTT",rs2(2))
+
+
+
+        if session("WEBDESK") = "S" then
+
+
+
+         '  sInput  = "" & replace(Capitalize(replace(Ucase(sSolapa),"*"," "))," ","&nbsp;") & ""
+         '  sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#000000;font-weight:normal;'  " & sFuncionDSP & " ", "javascript:void(0);", "", "", "", sInput, "si")
+         '  Celda   = Celda & wwwsaltador & "<span ><font color='#ff0000' size=2 >&#0124;</font>&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+         '  CTABELEN = ofv.GenCelda("","UT  style='background-color:#f0f0f0;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#FF0000;padding-left:10px;' ","","","","","",sLink,"si")
+         '  FTABELEN = FTABELEN & ofv.GenRow("","","","","20","","",CTABELEN,"si")
+
+
+           sInput  = ">" & replace(Capitalize(replace(Ucase(sSolapa),"*"," "))," ","&nbsp;") & ""
+           sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#993333;font-weight:bold;' " & sFuncionDSP & " ", "javascript:void(0);", "", "", "", sInput, "si")
+           Celda   = Celda & wwwsaltador & "<span ><font color='#ff0000' size=2 >&#0124;</font>&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+           wwwestilo = " style='background-color:#f0f0f0;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#FF0000;padding-left:10px;' "
+
+           CTABELEN = ofv.GenCelda("","uT  " & wwwestilo & " ","","","","","",sLink,"si")
+           FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+        ELSE
+
+               t3 = xsimagend & "<a  href='javascript:void(0);' " & sFuncionDSP &  " >"
+               t3 = t3 & sInput
+               t3 = t3 & "</A>"
+
+               t4 = ofv.GenCelda("",xsclase,"","","","","",t3,"si")
+
+               r1 = r1 & ofv.GenRow("","","","",lengtd,"","",t4,"si")
+
+        END IF
+
+
+
+            else
+
+
+
+               TSCPT = TSCPT + 1
+
+               ATABSCPT(TSCPT,0) = ""
+               ATABSCPT(TSCPT,1) = rs2(0)
+               ATABSCPT(TSCPT,2) = rs2(2)
+
+
+            end if
+
+
+         end if
+
+
+         end if
+
+         rs2.movenext
+         loop
+
+         end if
+
+
+         NEXT
+
+         LOOP
+
+
+
+       end if
+
+
+
+       end if
+
+
+    else
+
+''''' documentos o subcarpetas independientes
+
+
+     end if
+
+
+''''''''''''''''''''''''''''
+
+
+'''''''''''''''''''''''''''''
+
+
+
+ rs.movenext
+ loop
+
+end if
+
+''''''''''''''''''''''''''''''''''''''''''''
+
+
+''-----------------------------------------------------------------------------------------------------
+
+
+END IF
+
+
+
+        if session("WEBDESK") = "S" then
+
+
+        '''    sHTML = sHTML & Celda
+       '''     sHTML = sHTML & "<span ><font color='#ff0000' size=2 >&#0124;</font></span>"
+
+            sHTML = sHTML & "<div id='WKTBSP1'  >"
+            sHTML = sHTML & OFV.GenTabla("WKTBSP1TT", "aaa  ", "", "100%", "", "0", "", "1", "1", "", "", FTABELEN, "si")
+            sHTML = sHTML & "</div>"
+
+        ELSE
+
+            sHTML = sHTML & "<div id='MDBEDL' style='display:none;height:240px;overflow:auto;" & WStyl & "' >"
+
+
+            IF  Session("FULLGUI") = "N" THEN
+                styl = "background-color:#888888;"
+            else
+                styl = XspEx("#888888","#cccccc",0) & ";"
+            end if
+
+            styl = ""
+
+            If ofv.ModTitCls = "1" Then
+              sHTML = sHTML & OFV.GenTabla("DBEDL", "aaa style='border-style:solid;border-color:#ffffff;border-width:1;" & styl & "' ", "", "100%", "", "0", "", "-2", "-2", "", "", r1, "si")
+            else
+              sHTML = sHTML & OFV.GenTabla("DBEDL", "aaa style='border-style:solid;border-color:#ffffff;border-width:1;" & styl & "' ", "", "100%", "", "0", "", "-2", "-2", "", "", r1, "si")
+            end if
+
+            sHTML = sHTML & "</div>"
+
+        END IF
+
+
+
+
+
+
+
+
+  sHTML = sHTML & sHTML1
+
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & "</body></html>"
+
+
+end if
+if session("APLMDCLI")="BGAL" THEN
+Response.Write replace(sHTML,"&nbsp;"," ") 'sHTML
+ELSE
+Response.Write SHTML
+END IF
+
+function GetIndice(gtsolapa)
+
+
+
+  wwsNIV1     = gtsolapa
+  wwsNIV2     = "0"
+  wwsNIV3     = "0"
+  wwsNIV4     = "0"
+  wwsNIV5     = "0"
+
+
+  sft   = "<font face=tahoma,arial size=1 color=#336699>&nbsp;<b>"
+  sfta  = "<font face=tahoma,arial size=1 color=#993333>&nbsp;<b>"
+  sfidc = "<font face=wingdings size=2 color=#336699>0</font>"
+  sfida = "<font face=wingdings size=2 color=#993333>1</font>"
+  sfitc = "<font face=wingdings size=2 color=#336699>0</font>"
+  sfita = "<font face=wingdings size=2 color=#993333>1</font>"
+  sftc  = "</b></font>"
+
+
+'  ASPs(1)  = "edPropiedades.asp?SKIND=1"
+'  ASPs(2)  = "CONWEDT.asp?SKIND=1"
+'  ASPs(3)  = "CoSectores.asp?SKIND=1"
+'  ASPs(4)  = "edEventos.asp?SKIND=1"
+'  ASPs(5)  = "CoProcedimientos.asp?SKIND=1"
+'  ASPs(6)  = "CoObjDsc.asp?SKIND=1"
+'  ASPs(7)  = "CoControles.asp?SKIND=1"
+'  ASPs(8)  = "CoEsquemas.asp?SKIND=1"
+'  ASPs(9)  = "CoTablasCons.asp?SKIND=1"
+'  ASPs(10) = "CoArchCons.asp?SKIND=1"
+'  ASPs(11) = "CoestrCons.asp?SKIND=1"
+'  ASPs(12) = "CursogramaLnch.asp?SKIND=1"
+'  ASPs(13) = "CoArchCons.asp?SKIND=2"
+'  ASPs(14) = "CoFAQ.asp?SKIND=1"
+'  ASPs(15) = "CoGeneral.asp?SKIND=1"
+'  ASPs(16) = "CorVerTodoseventos.asp?SKIND=1"
+
+ gtselinx = ""
+
+
+  select case cstr(gtsolapa & "")
+
+         case "1"
+
+         case "2"
+
+         case "3"
+
+         case "4"
+
+         case "5"
+
+    eveant = ""
+
+    Strsql = "SELECT *  "
+    Strsql = Strsql & " from CSCEventoSectorPerfil Where obcodobjeto = " & sCodigo
+  ''  Strsql = Strsql & sSelecx
+   '' strsql = strsql & addperfil
+    strsql = strsql & " order by secuen, secuencia,codproced "
+  ''  response.write strsql
+    set rsx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+    do while not rsx.eof
+
+       if eveant <> rsx(4) then
+
+      '    Celdat  = "<td class=uts >" & sfidkA & "</td>"
+      '    Celdat  = Celdat & "<td class=utg  >" & rsx(2) & ".&nbsp;" & rsx(4) & "</td>"
+      '    Filat   = filat & ofv.GenRow("","","","","","","",Celdat,"si")
+
+          eveant  = rsx(4)
+       end if
+
+          sAccion = "CoProcedimientos.asp?INXMOD=N&CantRegAMover=A&Codobjeto=" & sCodigo & "&Menu=" & sMenux
+          sAccion = sAccion & "&Sector=" & sSectorx & "&Tipobjeto=" & sTipo & "&proced=" & rsx(0)
+          sOnClik1 = ""
+          sOnClik2 = " onclick=""document.all.ASC" & rsx(0) & ".click();"" "
+
+     '  if rsx(0)  = rs(0).value then
+     '     sfidkD  = sfidkc
+     '     stexto1 = "<u>" & rsx(6) & ".&nbsp;" & rsx(3) & "&nbsp;-&nbsp;" & rsx(5) & "</u>"
+
+     '  else
+          sfidkD  = sfidkB
+          stexto1 = rsx(2) & "." & rsx(6) & "."  & Capitalize(rsx(4) & "")  & "." & Capitalize(rsx(3) & "") & " - " & Capitalize(rsx(5) & "")
+          stexto1 = replace(stexto1," ","&nbsp;")
+
+     '  end if
+
+        '  Celdat  = stexto1
+
+        '  stexto1 = "<A ID='ASC" & rsx(0) & "' NAME='ASC" & rsx(0) & "' class=nt href='" & sAccion & "' " & sOnClik1 & " "
+        '  stexto1 = stexto1 & "   >" & Celdat & "</a>"
+
+        '  Celdat  = "<td class=utis >" & sfidkD & "</td>"
+        '  Celdat  = Celdat & "<td class=uti style='cursor:hand;' " & sOnClik2 & " >" & stexto1 & "</td>"
+        '  Filat   = filat & ofv.GenRow("","","","","","","",Celdat,"si")
+
+          wwsNIV2     = (rsx(0) & "")
+          wwsNIV3     = "0"
+
+          sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+
+           sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#CCCCCC;' >" & stexto1 & "</font>"
+           sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput , "si")
+           Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;&nbsp;&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp</span> "
+
+           CTABELEN = ofv.GenCelda("","UT  style='background-color:#E9E9E9;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#ffaa22;padding-left:25px;' ","","","","","",sLink ,"si")
+           FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+
+
+      rsx.movenext
+   loop
+
+
+
+         case "6"
+
+         case "7" '' controles
+
+
+               wwbbusca = "0"
+
+               Strsql = "SELECT * from cscontrolsel "
+               Strsql = Strsql & " Where codobjeto = " & sCodigo
+
+               set rsx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+               do while not rsx.eof
+
+                  if cstr(rsx(0) & "")   = wwbbusca then
+                     sfidkD  = sfidkC
+                     stexto1 = rsx(1)
+                     stextoact = stexto1
+                  else
+                     sfidkD   = sfidkA
+                     stexto1  = rsx(1) & ""
+                     sAccion  = "CoControles.asp?CantRegAMover=A&Codobjeto=" & nCodigo & "&Menu=" & sMenux
+                     sAccion  = sAccion & "&Sector=" & sSectorx & "&Tipobjeto=" & sTipo & "&control=" & rsx(0)
+                     sOnClik1 = ""
+                     sOnClik2 = " onclick=""document.all.ASC" & rsx(0) & ".click();"" "
+
+                '    Celdat  = stexto1
+                '    stexto1 = "<A ID='ASC" & rsx(0) & "' NAME='ASC" & rsx(0) & "' class=ut href='" & sAccion & "' " & sOnClik1 & " "
+                '    stexto1 = stexto1 & "   >" & Celdat & "</a>"
+
+                '     Celdat  = "<td class=uts style='cursor:hand;' " & sOnClik2 & " >" & sfidkD & "</td>"
+                '     Celdat  = Celdat & "<td class=ut  >" & stexto1  & "zz" & "</td>"
+                '     Filat  = filat & ofv.GenRow("","","","","","","",Celdat,"si")
+
+                    stexto1 = replace(Capitalize(stexto1 & "")," ","&nbsp;")
+
+                    wwsNIV2     = cstr(rsx(0) & "")
+                    wwsNIV3     = "0"
+
+                    sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+                    sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#CCCCCC;' >" & stexto1 & "</font>"
+                    sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput, "si")
+                    Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;&nbsp;&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+                    CTABELEN = ofv.GenCelda("","UT  style='background-color:#E9E9E9;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#ffaa22;padding-left:25px;' ","","","","","",sLink,"si")
+                    FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+                  end if
+
+                 rsx.movenext
+              loop
+
+
+
+         case "8" '' esquemas
+
+               wwbbusca = "0"
+
+               Strsql = "SELECT * from csesquemasel "
+               Strsql = Strsql & " Where codobjeto = " & sCodigo
+
+               set rsx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+               do while not rsx.eof
+
+                  if cstr(rsx(0) & "")   = wwbbusca then
+                     sfidkD  = sfidkC
+                     stexto1 = rsx(1)
+                     stextoact = stexto1
+                  else
+                     sfidkD   = sfidkA
+                     stexto1  = rsx(1) & ""
+                     sAccion  = "CoEsquemas.asp?CantRegAMover=A&Codobjeto=" & sCodigo & "&Menu=" & sMenux
+                     sAccion  = sAccion & "&Sector=" & sSectorx & "&Tipobjeto=" & sTipo & "&selcom=" & rsx(0)
+                     sOnClik1 = ""
+                     sOnClik2 = " onclick=""document.all.ASC" & rsx(0) & ".click();"" "
+
+                '    Celdat  = stexto1
+                '    stexto1 = "<A ID='ASC" & rsx(0) & "' NAME='ASC" & rsx(0) & "' class=ut href='" & sAccion & "' " & sOnClik1 & " "
+                '    stexto1 = stexto1 & "   >" & Celdat & "</a>"
+
+                '     Celdat  = "<td class=uts style='cursor:hand;' " & sOnClik2 & " >" & sfidkD & "</td>"
+                '     Celdat  = Celdat & "<td class=ut  >" & stexto1  & "zz" & "</td>"
+                '     Filat  = filat & ofv.GenRow("","","","","","","",Celdat,"si")
+
+                    stexto1 = replace(Capitalize(stexto1 & "")," ","&nbsp;")
+
+                    wwsNIV2     = cstr(rsx(0) & "")
+                    wwsNIV3     = "0"
+
+                    sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+                    sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#CCCCCC;' >" & stexto1 & "</font>"
+                    sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput, "si")
+                    Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;&nbsp;&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+                    CTABELEN = ofv.GenCelda("","UT  style='background-color:#E9E9E9;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#ffaa22;padding-left:25px;' ","","","","","",sLink,"si")
+                    FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+                  end if
+
+                 rsx.movenext
+              loop
+
+
+
+         case "9"  ''' bloque de tablas
+
+    Strsql = "SELECT * "
+    Strsql = Strsql & " from ObjTabDef Where codobjeto = " & sCodigo
+    Strsql = Strsql & " order by tabsecuen "
+
+  set rsxx1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if not rsxx1.eof then
+    '' if sdocum = "" then sdocum = cstr(rsxx1(0))
+
+    ' tomo todas las tablas
+
+      stexto1 = "Seleccionar&nbsp;tabla"
+    '  Celdat  = stexto1
+
+      sAccion = "javascript:void(0);"
+      sOnClik = " onclick=""document.all.TIND2.style.display='block';document.all.TIND1.style.display='none';"" "
+
+
+      stexto1 = "<A ID='ASCO' NAME='ASCO' class=utg href='" & sAccion & "' " & sOnClik & " "
+      stexto1 = stexto1 & "   >" & Celdat & "</a>"
+
+
+    '  Celdat  = "<td class=uts style='cursor:hand;' " & sOnClik & " >" & sfidk0 & "</td>"
+    '  Celdat  = Celdat & "<td class=utg  >" & stexto1 & "</td>"
+
+
+      stexto1 = "Tablas"
+
+    '  Celdat  = "<td class=uts >" & sfidk0 & "</td>"
+     ' Celdat  = Celdat & "<td class=utg  >" & stexto1 & "</td>"
+     ' Filatt   = filatt & ofv.GenRow("","","","","","","",Celdat,"si")
+
+
+    do until rsxx1.eof
+
+        wwsarch  = "0" & rsxx1(0)
+
+
+
+   '    if  sdocum = cstr(rsxx1(0)) then
+   '        sarch  = rsxx1(0)
+   '    end if
+
+    '   if  rsxx1(3) <> "" then
+         ''  Celda  = ofv.GenCelda("","cc","","1%","","","",stexto1,"si")
+         ''  Celda  = Celda & ofv.GenCelda("","","","2","","","","&nbsp;","si")
+         ''  Formulario = Formulario & Celda
+     '  end if
+
+
+    '   if  sdocum = cstr(rsxx1(0)) then
+    '       sfidkD  = sfidkC
+    '       stexto1 = replace(rsxx1(4)," ","&nbsp;")
+    '       stextoact = stexto1
+
+    '   else
+           sfidkD  = sfidkA
+       ''''    stexto1 = replace(rsxx1(4)," ","&nbsp;")
+
+           stexto1 = replace(Capitalize(rsxx1(4) & "")," ","&nbsp;")
+           sAccion = "CoTablasCons.asp?INXMOD=N&Codobjeto=" & scodigo & "&Tipobjeto=" & stipo & "&sdocum=" & rsxx1(0)
+           sOnClik1 = ""
+           sOnClik2 = " onclick=""document.all.ASC" & rsxx1(0) & ".click();"" "
+
+
+            Celdat  = stexto1
+
+          '  stexto1 = "<A ID='ASC" & rsxx1(0) & "' NAME='ASC" & rsxx1(0) & "' class=ut href='" & sAccion & "' " & sOnClik1 & " "
+          '  stexto1 = stexto1 & "   >" & Celdat & "</a>"
+
+          '  Celdat  = "<td class=uts style='cursor:hand;' " & sOnClik2 & " >" & sfidkD & "</td>"
+          '  Celdat  = Celdat & "<td class=uti  >" & stexto1 & "</td>"
+          '  Filat  = filat & ofv.GenRow("","","","","","","",Celdat,"si")
+
+                    wwsNIV2     = (rsxx1(0) & "")
+                    wwsNIV3     = "0"
+
+           sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+           sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#CCCCCC;' >" & stexto1 & "</font>"
+           sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput, "si")
+           Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;&nbsp;&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+           CTABELEN = ofv.GenCelda("","UT  style='background-color:#E9E9E9;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#ffaa22;padding-left:25px;' ","","","","","",sLink,"si")
+           FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+     '  end if
+
+           Strsql = "SELECT * From Objtabblk Where Tabdef = " & wwsarch & " order by tabblksec"
+           set rsxx2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+           do until rsxx2.eof
+              wwnID      = rsxx2(0)
+              wwnSec     = rsxx2(4)
+              wwnBTitulo = rsxx2(5)
+
+              if len(wwnBTitulo) > 0 then
+                 wwltitu = len(wwnBTitulo)
+                 if  wwnBTitulo <> space(wwltitu) and Ucase(wwnBTitulo) <> "NO" then
+
+                       stexto1 = wwnSec & "." & replace(Capitalize(wwnBTitulo & "")," ","&nbsp;")
+                       stexto1 = replace(stexto1," ","&nbsp;")
+
+                     '  Celdat  = stexto1
+                     '  stexto1 = "<A class=ut href='javascript:void(0);' "
+                     '  stexto1 = stexto1 & "   >" & Celdat & "</a>"
+                     '  Celdat  = "<td class=utis style='cursor:hand;' onclick=""document.all['TBLMAIN'].style.visibility='hidden';creawin('" & sPoint & "');document.all['TBLMAIN'].style.visibility='visible';"" >" & sfidkB & "</td>"
+                     '  Celdat  = Celdat & "<td class=uti onclick=""document.all['TBLMAIN'].style.visibility='hidden';creawin('" & sPoint & "');document.all['TBLMAIN'].style.visibility='visible';"" >" & stexto1 & "</td>"
+                     '  Filat   = filat & ofv.GenRow("","","","","","","",Celdat,"si")
+
+                    wwsNIV2     = (rsxx1(0) & "")
+                    wwsNIV3     = (wwnID & "")
+
+                     sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+                     sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#bbbbbb;' >" & stexto1 & "</font>"
+                     sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput, "si")
+                     Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;&nbsp;&nbsp;&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+                     CTABELEN = ofv.GenCelda("","UT  style='background-color:#e5e5ff;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#9966dd;padding-left:40px;' ","","","","","",sLink,"si")
+                     FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+               end if
+             end if
+
+           rsxx2.movenext
+           loop
+
+
+    rsxx1.movenext
+    loop
+
+  else
+
+
+  end if
+
+
+         case "10"
+
+         case "11" '' bloque de contenido ----------------------------------------------------------------------------------------
+
+             Dim Inx
+             dim nrs(100)
+
+             redim preserve bsec(8)
+             redim preserve bnum(8)
+             redim preserve bnumG(8)
+
+
+             dim Pdef(13,18)
+
+            strsql = "Select * From Objestr Where codobjeto =" & sCodigo
+            Strsql = Strsql & " order by CONsecuen "
+ ' response.write strsql & "<br>"
+            set rsxx1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+            bsecuen = ""
+            bDescri = " "
+            bobj = ""
+            do while not rsxx1.eof
+               bsecuen = rsxx1(4)
+               bDescri = rsxx1(3)
+               bobj    = rsxx1(0)
+
+   '  stexto1 = "<A ID='ATIT" & rsxx1(0) & "' NAME='ATIT" & rsxx1(0) & "' "  & chr(13)
+   '  stexto1 = stexto1 & " class=nt href='coestrCons.asp?Codobjeto=" & ncodigo & "&Tipobjeto=" & stipo
+   '  stexto1 = stexto1 & "&sdocum=" & sdocum & "&sdocc=" & rsxx1(0)
+   '  stexto1 = stexto1 & "'   >" & sfidkc & "&nbsp;<big>" & rsxx1(3) & "</big></a>" & chr(13)
+
+   '  Celdat = "<td class=ut style='cursor:hand;'  onclick='document.all.ATIT" & rsxx1(0) & ".click();' >" & stexto1 & "</td>"
+   '  Filat  = filat & ofv.GenRow("","","","","","","",Celdat,"si") & chr(13)
+
+               stexto1 = bsecuen & "." & replace(Capitalize(bDescri & "")," ","&nbsp;")
+               stexto1 = replace(stexto1," ","&nbsp;")
+
+                    wwsNIV2     = bobj & ""
+                    wwsNIV3     = "0"
+
+            sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+           sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#CCCCCC;' >" & stexto1 & "</font>"
+           sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput, "si")
+           Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+           CTABELEN = ofv.GenCelda("","UT  style='background-color:#E9E9E9;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#ffaa22;padding-left:10px;' ","","","","","",sLink,"si")
+           FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+             wentro = 0
+
+             strsql = "Select * From SysEstprty"
+             set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+             t = 0
+             do until rs.eof
+                for ti = 1 to 18
+                  if (rs(ti) & "") = "" then
+                     sti = ""
+                  else
+                     sti = rs(ti)
+                  end if
+
+                  Pdef(t,ti - 1) = sti
+
+                next
+             rs.movenext
+             t = t + 1
+             loop
+
+            call ofv.cerrarconsulta(rs)
+
+            strsql = "Select * From ObjEstPrty where detcon = " & bobj
+            set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+            t = 0
+            do until rs.eof
+            select case rs(4)
+             case "A"
+                  t = 0
+             case "B"
+                  t = 1
+             case "C"
+                  t = 2
+             case "D"
+                  t = 3
+             case "E"
+                  t = 4
+             case "F"
+                  t = 5
+             case "G"
+                  t = 6
+            end select
+
+            for ti = 5 to 22
+             if (rs(ti) & "") = "" then
+                 sti = ""
+             else
+                 sti = rs(ti)
+                 Pdef(t,ti - 5) = sti
+             end if
+
+
+
+          next
+          rs.movenext
+         loop
+
+         call ofv.cerrarconsulta(rs)
+
+         PInden = Pdef(0,7)
+         if PInden <> "NO" then PInden = "SI"
+
+         PNumer = Pdef(0,12)
+         if PNumer <> "NO" then PNumer = "SI"
+
+         PNumCls = Pdef(0,14)
+         redim preserve PNumTip(13)
+         for i=0 to 13
+             PNumTip(i) = Pdef(i,13)
+             if PNumTip(i) = "" then PNumTip(i) = "1"
+         next
+
+         sant = "X"
+         bseci = 0
+         bsecix = 0
+
+         for i=0 to 8
+             bsec(i) = 0
+             bnum(i) = 0
+             bnumG(i) = 0
+         next
+
+         inx = 0
+
+             strsql = " SELECT * FROM CSESTDET "
+             strsql = strsql & " where detcon = " & bobj & "  "
+             strsql = strsql & " and (modi = 0 or (modi <> 0 and tipmodi <> 'E')) "
+             strsql = strsql & " and not ( "
+             strsql = strsql & " NOVA = 'N' OR (BDATO is null AND DETDEPEN > 0 ) "
+             strsql = strsql & " ) and stmodi = '' "
+
+             if session("APLMDCLI")="BC" THEN
+              strsql=strsql & " AND DETTIPO < 'G'"
+             END IF
+             strsql = strsql & " order by TSEC  "
+       '  response.write strsql
+
+             Set Rsxx = Server.CreateObject("ADODB.Recordset")
+             Rsxx.CursorType = 3
+             Rsxx.CacheSize = 100
+
+             Rsxx.Open strsql, cn
+
+
+             if not rsxx.eof then
+                ars = rsxx.GetRows()
+
+             else
+                campos = rsxx.fields.count - 1
+                redim  ars(cint(campos),0)
+                ars(39,0) = "N"
+                wentro=1
+             end if
+
+
+             rsxx.Close
+             set rsxx = nothing
+
+             do while wentro = 0
+
+
+
+                for Inx = inx to UBound(ars,2)
+
+
+
+                    SCLAVE   = ars(0,inx)
+                     Stip     = ars(5,inx)
+
+      'Secuencia
+      select case stip
+             case "A"
+                  t = 7
+                  bseci = 0
+                  bsecix = 0
+                  bsec(1) = ars(4,inx)
+                  bnum(0) = bnum(0) + 1
+                  bnumG(0) = bnumG(0) + 1
+                  for i=bseci + 1 to 8
+                      bnum(i) = 0
+                      bnumG(i) = 0
+                  next
+             case "B"
+                  t = 8
+                  bseci = 1
+                  bsecix = 1
+                  bsec(2) = ars(4,inx)
+                  bnum(1) = bnum(1) + 1
+                  bnumG(1) = bnumG(1) + 1
+                  for i=bseci + 1 to 8
+                      bnum(i) = 0
+                      bnumG(i) = 0
+                  next
+             case "C"
+                  t = 9
+                  bseci = 2
+                  bsecix = 2
+                  bsec(3) = ars(4,inx)
+                  bnum(2) = bnum(2) + 1
+                  bnumG(2) = bnumG(2) + 1
+                  for i=bseci + 1 to 8
+                      bnum(i) = 0
+                      bnumG(i) = 0
+                  next
+             case "D"
+                  t = 10
+                  bseci = 3
+                  bsecix = 3
+                  bsec(4) = ars(4,inx)
+                  bnum(3) = bnum(3) + 1
+                  bnumG(3) = bnumG(3) + 1
+                  for i=bseci + 1 to 8
+                      bnum(i) = 0
+                      bnumG(i) = 0
+                  next
+             case "E"
+                  t = 11
+                  bseci = 4
+                  bsecix = 4
+                  bsec(5) = ars(4,inx)
+                  bnum(4) = bnum(4) + 1
+                  bnumG(4) = bnumG(4) + 1
+                  for i=bseci + 1 to 8
+                      bnum(i) = 0
+                      bnumG(i) = 0
+                  next
+             case "F"
+                  t = 12
+                  bseci = 5
+                  bsecix = 5
+                  bsec(6) = ars(4,inx)
+                  bnum(5) = bnum(5) + 1
+                  bnumG(5) = bnumG(5) + 1
+                  for i=bseci + 1 to 8
+                      bnum(i) = 0
+                      bnumG(i) = 0
+                  next
+             case "G"
+                  t = 13
+
+
+
+
+                  select case cstr(spsecn & "")
+                         case "1"
+                              ta = 7
+                              bseci = 0
+                         case "2"
+                               'ta = 8
+                              ta = 7
+                              bseci = 1
+                         case "3"
+                              ta = 9
+                              bseci = 2
+                         case "4"
+                              ta = 10
+                              bseci = 3
+                         case "5"
+                              ta = 11
+                              bseci = 4
+                         case "6"
+                              ta = 12
+                              bseci = 5
+                  end select
+
+
+                  bnum(6) = bnum(6) + 1
+                  bnumG(6) = bnumG(6) + 1
+
+                  bsecix = bseci
+                  bsec(7) = ars(4,inx)
+
+             case "H"
+                  select case sant
+                         case "A"
+                              bseci = 0
+                         case "B"
+                              bseci = 1
+                         case "C"
+                              bseci = 2
+                         case "D"
+                              bseci = 3
+                         case "E"
+                              bseci = 4
+                         case "F"
+                              bseci = 5
+                  end select
+                  bnum(7) = bnum(7) + 1
+                  bnumG(7) = bnumG(7) + 1
+                  bsecix = bseci + 1
+                  bsec(7) = ars(4,inx)
+             case "I"
+                  select case sant
+                         case "A"
+                              bseci = 0
+                         case "B"
+                              bseci = 1
+                         case "C"
+                              bseci = 2
+                         case "D"
+                              bseci = 3
+                         case "E"
+                              bseci = 4
+                         case "F"
+                              bseci = 5
+                  end select
+                  bnum(8) = bnum(8) + 1
+                  bnumG(8) = bnumG(8) + 1
+                  bsecix = bseci + 1
+                  bsec(7) = ars(4,inx)
+             case "J"
+                  select case sant
+                         case "A"
+                              bseci = 0
+                         case "B"
+                              bseci = 1
+                         case "C"
+                              bseci = 2
+                         case "D"
+                              bseci = 3
+                         case "E"
+                              bseci = 4
+                         case "F"
+                              bseci = 5
+                  end select
+                  bnum(8) = bnum(8) + 1
+                  bnumG(8) = bnumG(8) + 1
+                  bsecix = bseci + 1
+                  bsec(8) = ars(4,inx)
+
+      end select
+
+
+
+  if stip <> "H" and stip <> "I"  and stip <> "J" then
+
+     for ti = 0 to 17
+         Pdef(t,ti) = Pdef(t-7,ti)
+     next
+     Pdef(t,18) = "SI"
+
+
+     if ars(31,inx) = "NO" then
+        for ti = 11 to 28
+            if (ars(ti,inx)&"") = "" then
+               sti = ""
+            else
+               sti             = ars(ti,inx)
+               Pdef(t,ti - 11) = sti
+            end if
+
+
+
+        next
+        Pdef(t,18) = "NO"
+
+     end if
+  end if
+
+      BsecD = ""
+      for i=1 to bsecix
+          BsecD = BsecD & bsec(i) & "."
+      next
+
+
+
+
+
+      'response.write strsql
+      if Pdef(t,18) = "NO" then
+         tx = t
+      else
+         tx = t - 7
+      end if
+
+
+         PNumCls = Pdef(tx,14)
+         if PNumCls = "" then PNumCls = "Simple"
+
+
+
+         if stip <> "H" and stip <> "I"  and stip <> "J" then
+            PNumTip(tx) = Pdef(tx,13)
+            if  PNumTip(tx) = "" then PNumTip(tx) = "1"
+         end if
+
+         if stip = "G" then
+            if Pdef(tx,9) = "NO" then
+               MPvin = "NO"
+            else
+                MPvin = "SI"
+            end if
+         end if
+
+' Anula la numeracion para este tipo o elemento
+        if  PNumTip(tx) = "NO" then PNumCls = PNumTip(tx)
+
+         PFont  = Pdef(tx,0)
+         PFsize = Pdef(tx,1)
+         PFcol  = Pdef(tx,2)
+         Pbgcol = Pdef(tx,3)
+         PBorde = Pdef(tx,4)
+         PFtipo = Pdef(tx,5)
+
+         if marca = "CA" then
+            PFont  = "VERDANA"
+            if smodi then
+               PFcol  = "#000080"
+            else
+               PFcol  = "#aaaaaa"
+            end if
+            PFsize = "8"
+            Pbgcol = ""
+            PBorde = ""
+            PFtipo = ""
+         end if
+
+
+         PSang  = Pdef(tx,6)
+         txi = tx
+         if tx > 6 then txi = tx - 7
+         PEspa  = Pdef(txi,8)
+
+
+
+         Palign = Pdef(tx,16)
+         if Palign = "" then Palign = "left"
+         Ptalig = Pdef(tx,17)
+
+
+      txx = ta
+
+      xmpvin = "NO"
+
+      if stip = "G" and Pdef(txx,9) = "SI" then
+         xmpvin = "SI"
+      end if
+
+      if stip = "G" and MPvin  = "NO" then
+         xmpvin = "NO"
+      end if
+
+     xPNumS = "NO"
+
+     if stip = "G" then
+        if Pnumer = "SI" Then
+           select case Ucase(Pnumcls)
+                case "SIMPLE"
+                     xPnumS = "SI"
+                case "COMPUESTA"
+                     xPnumS = "SI"
+           end select
+
+        end if
+      end if
+
+
+ ' TITULOS Y SUBTITULOS --------------------------------------------------
+
+     if stip <> "G" and stip <> "H" and stip <> "I"  and stip <> "J" then
+      'Descripcion
+      PNumS = ""
+      if Pnumer = "SI" Then
+         select case Ucase(Pnumcls)
+                case "SIMPLE"
+                     select case PnumTip(tx)
+                            case "1"
+                                 BnumS = BnumG(bseci)
+                            case else
+                                 BnumS = ConvNumer(BnumG(bseci),PnumTip(tx))
+                     end select
+
+                     PnumS = BnumS & ". "
+                case "COMPUESTA"
+                     for i=0 to bseci
+                     select case PnumTip(i + 7)
+                            case "NO"
+                                 BnumS = ""
+                            case "1"
+                                 BnumS = BnumG(i) & "."
+                            case else
+                                 BnumS = ConvNumer(BnumG(i),PnumTip(i + 7)) & "."
+                     end select
+
+                     PnumS = PnumS & BnumS
+                     next
+                     PnumS = PnumS & " "
+         end select
+
+      end if
+
+
+
+'''''''''' arma tabla de indices '''''''''''''''''''''''''
+
+
+
+                     stexto1 = PnumS & Capitalize(ars(7,inx) & "")
+                     stexto1 = replace(stexto1," ","&nbsp;")
+
+                     for nn=0 to (bseci+1)
+                    '''    stexto1 = "&nbsp;&nbsp;&nbsp;&nbsp;" & stexto1
+                        stexto1 = "&nbsp;" & stexto1
+                     next
+
+                    wwsNIV2     = bobj & ""
+                    wwsNIV3     = (ars(0,inx) & "")
+
+                     sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+                     sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#bbbbbb;' >" & stexto1 & "</font>"
+                     sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput, "si")
+                     Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+                     CTABELEN = ofv.GenCelda("","UT  style='background-color:#e5e5ff;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#9966dd;padding-left:10px;' ","","","","","",sLink,"si")
+                     FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+
+     end if
+
+
+
+ ' PARRAFOS DE TEXTO    --------------------------------------------------
+
+     if stip = "G" then
+
+        PNumS = ""
+        if Pnumer = "SI" Then
+           select case Ucase(Pnumcls)
+                case "NO"
+                     BnumG(6) = BnumG(6) - 1
+
+                case "SIMPLE"
+                     select case PnumTip(tx)
+                            case "1"
+                                 BnumS = BnumG(6)
+                            case else
+                                 BnumS = ConvNumer(BnumG(6),PnumTip(tx))
+                     end select
+
+                     PnumS = BnumS & ". "
+                case "COMPUESTA"
+                     for i=0 to 6
+                         if BnumG(i) > 0 then
+                            select case PnumTip(i + 7)
+                              case "NO"
+                                   BnumS = ""
+                              case "1"
+                                   BnumS = BnumG(i) & "."
+                              case else
+                                   BnumS = ConvNumer(BnumG(i),PnumTip(i + 7)) & "."
+                            end select
+                            PnumS = PnumS & BnumS
+                         end if
+                     next
+                     PnumS = PnumS & " "
+           end select
+
+           if Ucase(Pnumcls) <> "NO" then
+
+              sTextoV =  ars(8,inx)
+
+              if len(sTextoV) > 50 then sTextoV =  left(sTextoV,50) & "..."
+
+'''''''''' arma tabla de indices '''''''''''''''''''''''''
+
+
+
+                     stexto1 = PnumS & Capitalize(sTextoV & "")
+                     stexto1 = replace(stexto1," ","&nbsp;")
+
+                     for nn=0 to (bseci+1)
+                    '''    stexto1 = "&nbsp;&nbsp;&nbsp;&nbsp;" & stexto1
+                        stexto1 = "&nbsp;" & stexto1
+                     next
+
+                    wwsNIV2     = bobj & ""
+                    wwsNIV3     = (ars(0,inx) & "")
+
+                     sAccion = xSolaspd & solord(x) & "&NIV1=" & wwsNIV1  & "&NIV2=" & wwsNIV2  & "&NIV3=" & wwsNIV3  & "&NIV4=" & wwsNIV4  & "&NIV5=" & wwsNIV5
+
+                     sInput  = "<font style='border-bottom-style:solid;border-bottom-width:1;border-bottom-color:#bbbbbb;' >" & stexto1 & "</font>"
+                     sLink   = OFV.GenLink("", "cmb  style='font-size:8pt;cursor:hand;text-decoration:none;color:#555555;font-weight:normal;'  ", sAccion, "WK1", "", "", sInput, "si")
+                     Celda   = Celda & wwwsaltador & "<span ><font color='#ffaa22' size=2 >&#0124;</font>&nbsp;" & sLink & "&nbsp;&nbsp;</span> "
+
+                     CTABELEN = ofv.GenCelda("","UT  style='background-color:#e5e5ff;border-LEFT-style:solid;border-LEFT-width:1;border-LEFT-color:#9966dd;padding-left:10px;' ","","","","","",sLink,"si")
+                     FTABELEN = FTABELEN & ofv.GenRow("","","","",lengtd,"","",CTABELEN,"si")
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+            end if
+
+        end if
+
+     end if
+
+'------------------------------------------------
+
+
+         select case stip
+                case "A"
+                     sant     = "A"
+                     sVinoAnt = sant
+
+                case "B"
+                     sant     = "B"
+                     sVinoAnt = sant
+                case "C"
+                     sant     = "C"
+                     sVinoAnt = sant
+                case "D"
+                     sant     = "D"
+                     sVinoAnt = sant
+                case "E"
+                     sant     = "E"
+                     sVinoAnt = sant
+                case "F"
+                     sant     = "F"
+                     sVinoAnt = sant
+                case else
+
+                     sVinoAnt = stip
+
+          end select
+
+ next
+
+         if inx > UBound(ars,2) then
+            exit do
+
+         end if
+
+      ssale = "no"
+      do until ssale = "si"
+
+         if     sant = "A" then
+
+            sant = "X"
+         elseif sant = "B" then
+
+            sant = "A"
+         elseif sant = "C" then
+
+            sant = "B"
+         elseif sant = "D" then
+
+            sant = "C"
+         elseif sant = "E" then
+
+            sant = "D"
+         elseif sant = "F" then
+
+            sant = "E"
+         end if
+
+      if sant = "X" then
+         ssale = "si"
+      end if
+
+      loop
+
+ loop
+
+  rsxx1.movenext
+  loop
+  call ofv.cerrarconsulta(rsxx1)
+
+
+         case "12"
+
+         case "13"
+
+         case "14"
+
+         case "15"
+
+         case "16"
+
+
+
+  end select
+
+ GetIndice = "ok"
+
+end function
+
+'''''''''''''''''''''''''''''''
+function ConvNumer(CNumero,CTipo)
+
+CLetra = "abcdefghijklmnopqrstuvwxyz"
+
+dim CRuni(9)
+CRuni(1) = "I"
+CRuni(2) = "II"
+CRuni(3) = "III"
+CRuni(4) = "IV"
+CRuni(5) = "V"
+CRuni(6) = "VI"
+CRuni(7) = "VII"
+CRuni(8) = "VIII"
+CRuni(9) = "IX"
+
+dim CRdec(9)
+CRdec(1) = "X"
+CRdec(2) = "XX"
+CRdec(3) = "XXX"
+CRdec(4) = "XL"
+CRdec(5) = "L"
+CRdec(6) = "LX"
+CRdec(7) = "LXX"
+CRdec(8) = "LXXX"
+CRdec(9) = "XC"
+
+dim CRcen(9)
+CRcen(1) = "C"
+CRcen(2) = "CC"
+CRcen(3) = "CCC"
+CRcen(4) = "CD"
+CRcen(5) = "D"
+CRcen(6) = "DC"
+CRcen(7) = "DCC"
+CRcen(8) = "DCCC"
+CRcen(9) = "CM"
+
+
+select case Ctipo
+       case "a","A"
+          Ci = 0
+          CR = CNumero
+
+             for ci=0 to 28
+                 if CR < 28 then exit for
+                 CR = CR - 27
+             next
+
+          if ci > 27 then
+             ConvNumer = "XX"
+          else
+             if ci > 0 then ConvNumer = mid(CLetra,ci,1)
+             ConvNumer = ConvNumer & mid(CLetra,CR,1)
+          end if
+          if Ctipo = "A" then ConvNumer = Ucase(ConvNumer)
+
+       case "I","i"
+          CR = CNumero
+          Ci = len(CR)
+          if Ci < 1 or ci > 3 then
+             ConvNumer = "AAAA"
+          else
+             cx = 1
+             for CL=ci to 1 step -1
+             select case cx
+                    case 1
+                         ConvNumer = CRuni(mid(cr,cl,1))
+                    case 2
+                         ConvNumer = CRdec(mid(cr,cl,1)) & ConvNumer
+                    case 3
+                         ConvNumer = CRcen(mid(cr,cl,1)) & ConvNumer
+             end select
+
+             cx = cx + 1
+             next
+             if Ctipo = "i" then ConvNumer = Lcase(ConvNumer)
+          end if
+end select
+
+
+end function
+
+
+%>

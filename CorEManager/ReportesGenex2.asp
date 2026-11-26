@@ -1,0 +1,81 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+
+<!-- #INCLUDE FILE="IncFile/reportesex.inc" -->
+
+<!-- #INCLUDE FILE="../coress20/IncFile/CorStyles.inc" -->
+<%
+Session("usuario") = "GOOGLE"
+dim Sbase
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+  Response.Write sHTML
+else
+
+call ofv.browser()
+
+
+set oPrtG = new ClsReportes
+
+Set oPrtG.Ofv = Ofv
+
+  Sbase =Left(request.servervariables("SCRIPT_NAME"), InstrRev(request.servervariables("SCRIPT_NAME"),"/"))
+
+'  End If
+
+
+   If session("URLPORT") = "N" Then
+        Sbase = "http://" & request.servervariables("SERVER_NAME") & Sbase
+   Else
+        Sbase = "http://" & request.servervariables("SERVER_NAME") & ":" & request.servervariables("SERVER_PORT") & Sbase
+   End If
+
+
+sbloque1 =     oPrtG.Generar() '& "<script type='text/javascript' src='hashtable.js'></script><script>"& jsHashPefiles & ";" & jsHashsectores & ";change_span('',hashperfiles,'spanpf');change_span('',hashsectores,'spansec');</script>"
+
+
+'If session("URLTYP") = "V" Then
+
+
+
+response.write  request.form("formato")
+IF request.form("formato")="HTML" or request.form("formato")="" THEN
+
+oPrtG.shead=replace(oPrtG.shead,"&&","")
+
+
+%>
+<html><Title>COR EManager - Reporte de Esquemas Normativos</title><meta HTTP-EQUIV="expires" CONTENT="60" >
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+<head>
+<style>P {margin-top :0px;margin-bottom:0 px;};</style>
+
+<%
+
+response.write corstyler2()
+
+%>
+</head>
+<body >
+
+<%=sbloque1%>
+
+
+
+
+
+
+
+
+ </body></html>
+
+
+
+<%
+end if
+
+END IF
+
+%>

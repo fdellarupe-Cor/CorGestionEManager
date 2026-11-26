@@ -1,0 +1,139 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+  nCodigo = request.querystring("Codobjeto")
+  sTipo = request.querystring("Tipobjeto")
+  sCod = request.querystring("Cod")
+  sCIRCUITO    = request.querystring("CIRCUITO")
+  sResp = request.querystring("tiposeg")
+  Volver = request.querystring("Volver")
+  Volver = Volver & "?Cod=" & sCod & "_CIRCUITO=" & SCIRCUITO
+  sxopc1 = ""
+
+
+     session("RGPROC") = RGPROC
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+     sHTML = ofv.FormHeader("Agregar Usuario")
+
+
+
+     SHTML = SHTML & GenBuscaUsr("N","N","N","S",CHR(9),CHR(9),"N","USR-")
+
+     IF SESSION("FBUSR") <> "NO" THEN
+
+        set cn = ofv.conectar(ofv.strconn2)
+
+        IF session("modalidad") = "PRGCOR" THEN
+
+           strsql = "Select OBJID, * From ORRSKCIRCUITOSDKDET "
+
+           WKSPTABLA = "ORRSKCIRCUITOSDKDET"
+
+
+        ELSEIF session("modalidad") = "PRGESTADO" THEN
+
+           strsql = "Select OBJID, * From ORESTADOSPER "
+
+           WKSPTABLA = "ORESTADOSPER"
+
+
+        ELSE
+           if sTipo="PDCORXY" or sTipo="SN" then
+           strsql = "Select * From pedidoSDKdet "
+
+           WKSPTABLA = "pedidoSDKdet"
+           else
+
+
+
+
+           strsql = "Select * From objsdkdet "
+
+           WKSPTABLA = "OBJSDKdet"
+
+       END IF
+       END IF
+
+
+       set rs = ofv.crearconsultaEx(StrSql,cn,1,volver)
+         if sTipo="PDCORXYq" then
+          f1a = "ESQUEMAScircdet.asp?acc=upd&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Cod=" & sCod  & "&CIRCUITO=" & SCIRCUITO & "&volver=ESQUEMAScircdet.asp"
+         else
+
+
+        f1a = "asp/AgregarEN.asp?Tabla=" & WKSPTABLA & "&tiposeg=" & sResp
+        f1a = f1a & "&volver=" & volver & "&Codobjeto=" & nCodigo
+        f1a = f1a & "&Tipobjeto=" & sTipo
+         end if
+
+        IF session("modalidad") = "PRGESTADO" THEN
+           f1a = "ORESTADOSSDKDET.ASP?OPCION=SI"
+        end if
+
+        sHTML = sHTML & ofv.GenForm("AgreArchb","",f1a,"","post","","","no")
+
+        IF session("modalidad") = "PRGCOR" THEN
+           sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & sCIRCUITO & "' NAME='codrsk' >"
+        ELSEIF session("modalidad") = "PRGESTADO" THEN
+           sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & sCIRCUITO & "' NAME='ESTADO' >"
+           sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & SESSION("UN") & "' NAME='codemp' >"
+        end if
+        sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & SESSION("FBUSR") & "' NAME='" & RS(4).NAME & "' >"
+        sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & sCod & "' NAME='" & RS(3).NAME & "' >"
+       ' sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & SESSION("UN") & "' NAME='codemp' >"
+       SELECT CASE session("APLMDCLI")
+	   	     CASE "GP"
+	   		  sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & session("SETIDEMPRE") & "' NAME='codemp' >"
+	   		CASE ELSE
+	   		  sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & SESSION("UN") & "' NAME='codemp' >"
+	    END SELECT
+
+      ELSE
+
+        sAccion = "ESQUEMAScircdet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Cod=" & sCod  & "&CIRCUITO=" & SCIRCUITO & "&volver=ESQUEMAScircdet.asp"
+
+        IF session("modalidad") = "PRGESTADO" THEN
+           sAccion = "ORESTADOSSDKDET.ASP"
+        end if
+
+
+        sHTML = sHTML & ofv.GenForm("AgreArchb","",sAccion,"","post","","","no")
+
+
+      END IF
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+
+
+
+  'Botones Aceptar y Cancelar
+  sAccion = "ESQUEMAScircdet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Cod=" & sCod & "&volver=ESQUEMAScircdet.asp" & "&CIRCUITO=" & SCIRCUITO
+
+
+
+  sHTML = sHTML & ofv.AgregarBoton("AgreArchb",sAccion,"_self")
+
+
+ sHTML = sHTML & ofv.botoneraESSX("0","","","","","","","","","no",Agregar,Buscar,"")
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & "</body></html>"
+end if
+
+response.write sHTML
+
+%>

@@ -1,0 +1,216 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+
+	nCodigo = request.querystring("Codigo")
+	sTipo   = request.querystring("Tipo")
+	sPerfil = request.querystring("Perfil")
+	moveresquema   = request.querystring("MOVERESQUEMA")
+	ESQUEMASUP     = request.querystring("ESQSUP")
+	SACC		     =request.querystring("ACC")
+	IDPEDIDO		     =request.querystring("IDPEDIDO")
+
+	If moveresquema="SI" Then
+		sREADONLY= " DISABLED"
+	Else
+		sREADONLY= " "
+	End If
+
+	ReDim aEsquema(0)
+	ReDim aEsquemab(0)
+
+
+
+	Set cn  = ofv.conectar(ofv.strconn2)
+	If  SESSION("BASE")="K" Then
+		strsql  = "Select * From Tipobjeto where tipocpt='K' and aplic in ('EM', 'GLB') order by descri "
+	Else
+		strsql  = "Select * From Tipobjeto where tipocpt<>'K' and aplic in ('EM', 'GLB') order by descri "
+	End If
+
+	Set rs  = ofv.crearconsultaEx(StrSql,cn,1,volver)
+	ii      = 0
+	Do  Until rs.eof
+		ReDim Preserve aEsquema(ii)
+		ReDim Preserve aEsquemab(ii)
+		aEsquema(ii) = UCase(rs(1))
+		aEsquemab(ii) = "'" & UCase(rs(0)) & "' "
+		If UCase(sTipo) = UCase(rs(0)) Then aEsquemab(ii) = aEsquemab(ii) & " selected "
+		ii = ii + 1
+		rs.movenext
+	Loop
+	Call ofv.cerrarconsulta(rs)
+
+
+	sHTML = ofv.FormBody
+
+	sHTML = sHTML & "<script language=JavaScript>" & Chr(13)
+	sHTML = sHTML & "function AbrirVentana(opcion,empresa) {" & Chr(13)
+	sHTML = sHTML & " var datos1 = '" & "Copiar2.asp?Codigo=" & nCodigo &"&MOVERESQUEMA=" & moveresquema & "&ESQSUP=" & ESQUEMASUP
+	sHTML = sHTML & "&Tipo=" & sTipo & "&Perfil=" & sPerfil & "&ACC=" & SACC  & "&IDPEDIDO=" & IDPEDIDO & "&Opcion=' + opcion + '&empresa=' + empresa; "
+	sHTML = sHTML & " myWin= open(datos1," & Chr(34) & "copi" & Chr(34) & "," & Chr(34)
+	sHTML = sHTML & "menubar=no,toolbar=no,height=570,width=790,left=0,top=0,resizable=yes,scrollbars=yes" & Chr(34)
+	If (SACC="MODIF" Or SACC="BAJAF") And SESSION("BASE")="K" Then
+		sHTML = sHTML & " ); " & Chr(13) & "window.top.close(); " & Chr(13) & " } " & Chr(13)
+	Else
+		sHTML = sHTML & " ); " & Chr(13) & "window.close(); " & Chr(13) & " } " & Chr(13)
+	End If
+	sHTML = sHTML & "</script>" & Chr(13)
+
+	sHTML = sHTML & "<center>" & Chr(13)
+
+
+	If ESQUEMASUP="Y" Then
+
+		sHTML = sHTML & ofv.GenTabla("","aaa  style='border-style=solid;border-width:1;border-color:#eeeeee;' ","","95%","","0","","2","2","","","","no")
+
+		Celda = ofv.GenCelda("","ttt","center colspan=2","100%","","","","MOVER DOCUMENTO" ,"si")
+		sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+		Celda = ofv.GenCelda("","VT ","center colspan=2","100%","","","","&nbsp;","si")
+		sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+		Strsql = "Select * From Subtema WHERE tipobjeto='"& stipo &"' and (aplic = '" & wkaplic & "' or aplic = 'GLB') Order By descri"
+		' response.write strsql
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+		If Not rs.eof Then sNombredOC = rs("descri") &":"
+		Call ofv.cerrarconsulta(rs)
+		strsql = "SELECT DESCRI FROM PRODSERV where codprodserv = " & nCodigo
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+		If Not rs.eof Then sNombredOC = sNombredOC & rs(0)
+		Call ofv.cerrarconsulta(rs)
+
+		Celda = ofv.GenCelda("","VT ","center colspan=2","100%","","","",sNombredOC,"si")
+		sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+
+		'  sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+
+	Else
+
+		sHTML = sHTML & ofv.GenTabla("","aaa  style='border-style=solid;border-width:1;border-color:#eeeeee;' ","","95%","","0","","2","2","","","","no")
+
+		Celda = ofv.GenCelda("","ttt","center colspan=2","100%","","","","COPIA DE DOCUMENTOS","si")
+		sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+		Celda = ofv.GenCelda("","VT ","center colspan=2","100%","","","","&nbsp;","si")
+		sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+		Celda = ofv.GenCelda("","VT ","center colspan=2","100%","","","","COPIAR&nbsp;COMO","si")
+		sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+		sHTML = sHTML & ofv.GenForm("Copiar","","","","post","","","no")
+		sInput = "<font class=at><select name=opcion "& sREADONLY &">"
+		For i = 0 To UBound(aEsquema)
+			sInput = sInput & "<option value=" & aEsquemab(i) & " >" & aEsquema(i)  &  "</option>"
+		Next
+		sInput = sInput & "</select></font>"
+
+		Celda = ofv.GenCelda("","VT","","20%","","","","TIPO:&nbsp;","si")
+		Celda = Celda & ofv.GenCelda("","uti","","80%","","","",sInput,"si")
+
+		sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+	End If
+
+	sInput = "<font class=at><select name=empresa "
+
+	If SESSION("EMPMUN") = "S" Then
+
+		sInput = sInput & "  >"
+
+		XXXX = NEWEMPRE("NO")
+
+		WACTUALVA = "S"
+		If ATREMP(0,3) = 0 Then WACTUALVA = "N"
+
+
+		For IAEMP=1 To TAEMP
+
+			' RESPONSE.WRITE  ATREMP(IAEMP,3)
+
+			'IF ATREMP(IAEMP,2) = 1 AND ATREMP(IAEMP,3) = 1 THEN
+			If ATREMP(IAEMP,2) = 1  Then
+				sInput = sInput & "<option value=" & ATREMP(IAEMP,0) & " "
+				If WACTUALVA <> "X" Then
+					If WACTUALVA = "S" Then
+						If ATREMP(0,0) = ATREMP(IAEMP,0) Then
+							sInput = sInput & " SELECTED "
+							WACTUALVA = "X"
+						End If
+					End If
+					If WACTUALVA = "N" Then
+						sInput = sInput & " SELECTED "
+						WACTUALVA = "X"
+					End If
+				End If
+				sInput = sInput & " >" & ATREMP(IAEMP,4) & "</option>"
+
+
+			End If
+
+		Next
+
+		sInput = sInput & "</select></font>"
+
+		Celda = ofv.GenCelda("","VT","","","","","","EMPRESA:&nbsp;","si")
+		Celda = Celda & ofv.GenCelda("","uti","","","","","",sInput,"si")
+
+	Else
+
+		sInput = sInput & " STYLE='DISPLAY:NONE;' >"
+		sInput = sInput & "<option value=1 SELECTED >1</option>"
+		sInput = sInput & "</select></font>"
+		Celda = ofv.GenCelda("","","center colspan=2","100%","","","",sInput,"si")
+
+	End If
+
+
+	sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+	Celda = ofv.GenCelda("","VT STYLE='BORDER-BOTTOM-STYLE:RIDGE;BORDER-BOTTOM-COLOR:#F7AA22;BORDER-BOTTOM-WIDTH:2;' ","center colspan=2","100%","","","","&nbsp;","si")
+	sHTML = sHTML & ofv.GenRow("","","","","","","",Celda,"si")
+
+	If ESQUEMASUP="Y" Then
+		sFunc = "AbrirVentana('"&sTipo&"',empresa.options[empresa.selectedIndex].value)"
+		sFunc2 = "AbrirVentana('TODOS',empresa.options[empresa.selectedIndex].value)"
+		sInput = ofv.GenerarInput("","TODOS","button","","10","bt",sFunc2)
+		Celda = ofv.GenCelda("","uti","","","","","",sInput,"si")
+		sInput = ofv.GenerarInput("","Aceptar","button","","10","bt",sFunc)
+		Celda = CELDA & ofv.GenCelda("","uti","","","","","",sInput,"si")
+	Else
+		sFunc = "AbrirVentana(opcion.options[opcion.selectedIndex].value,empresa.options[empresa.selectedIndex].value)"
+		sInput = ofv.GenerarInput("","Aceptar","button","","10","bt",sFunc)
+		Celda = ofv.GenCelda("","uti","","","","","",sInput,"si")
+	End If
+
+
+
+
+
+	Fila = Celda & ofv.GenFForm() '& sFunc
+
+	sFunc = "window.close()"
+	sInput = ofv.GenerarInput("","Cancelar","button","","10","bt",sFunc)
+	Celda = ofv.GenCelda("","uti","","","","","",sInput,"si")
+	Formulario = ofv.GenForm("","","","","post","",Celda,"si")
+
+	sHTML = sHTML & ofv.GenRow("","","","","","","",Fila & Formulario,"si")
+
+	sHTML = sHTML & "<br>" & ofv.GenFTabla()
+
+	sHTML = sHTML & "</body></html>"
+End If
+
+response.write sHTML
+
+%>

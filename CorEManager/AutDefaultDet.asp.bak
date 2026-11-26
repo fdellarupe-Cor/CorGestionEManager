@@ -1,0 +1,161 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  if request.querystring("seg") <> "" then
+    Session("Form") = ofv.convertircar(request.querystring("seg"),"_"," ")
+  end if
+  ofv.ObtenerAtributos Session("Form"),""
+  bAgregar = ofv.AAgregar
+  bModificar = ofv.AModificar
+  bSuprimir = ofv.AEliminar
+  bConsultar = ofv.AConsultar
+
+  vuelta = ofv.vueltaasp2("../")
+  vuelta2 = ofv.vueltaasp2("")
+
+
+  sHTML = ofv.FormHeader("Autorizantes Default")
+
+
+
+  set cn = ofv.conectar(ofv.strconn2)
+  set cn3 = ofv.conectar(ofv.strconn6)
+
+
+  Fila  = ""
+  Celda = ofv.gencelda("","ttt colspan=6","center","2%","","","","Lista de Autorizantes","si")
+  Fila  = fila & ofv.GenRow("","","","","25","","",Celda,"si")
+
+  Celda = ofv.gencelda("","ttr","","2%","","","","&nbsp;","si")
+  Celda = Celda & ofv.gencelda("","ttr","","2%","","","","Orden","si")
+  Celda = Celda & ofv.gencelda("","ttr","","60%","","","","Usuario","si")
+
+'''Nuevo -15012014-
+ 'CIRCUITO
+  Celda = Celda & ofv.GenCelda("","ttr","","40%","","","","Autorizacion","si")
+  Fila = ofv.GenRow("","","","","","","",Celda,"si")
+  Formulario = Fila
+
+     celda = ""
+
+''
+'''Nuevo -15012014- Fin
+
+  Strsql = "SELECT * FROM OBJwfldet  "
+  Strsql = Strsql & " Where codobjeto=0"
+  Strsql = Strsql & " order by orden,objid"
+
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+''  Formulario = ""
+
+  vinoSC = 0
+
+  do until rs.eof
+
+    sForm = "wfl" & rs(0)
+
+    if bModificar then
+      sHref = "asp/EliminarEN.asp?ID=" & rs(0) & "&Tabla=Objwfldet&volver="
+      sHref = sHref  & vuelta
+      sHref = sHref & "&Codobjeto=0&Tipobjeto=ALL&Eliminar=NSNC"
+    end if
+    if sHref <> "" then
+      Celda = ofv.BotonEliminar("Usuario",sHref)
+    else
+      Celda = ofv.GenCelda("","","","","","","","&nbsp;","si")
+    end if
+
+    'Orden
+    if bModificar then
+       sInput = ofv.GenerarInput(rs(3).name,rs(3),"text",sForm,"2","dtn","SI")
+       sInput = ofv.gencelda("","ut","","1%","","","",sInput,"si")
+ 
+    else
+       sinput = ofv.gencelda("","ut","","1%","","","",rs(3),"si")
+    end if
+    Celda = Celda & sinput
+
+    sTabla = "Usuario"
+
+    sBusca = rs(4)
+
+    sGrpUsr = "S/D"
+    'set cx = ofv.conectar(ofv.strconn0)
+
+    Strsql = "SELECT * FROM " & sTabla & "s"
+    Strsql = Strsql & " Where ID = '" & sBusca & "' "
+
+    'set rx = ofv.crearconsultaEx(StrSql,cx,1,parametros)
+    'if not rx.eof then sGrpUsr = sTabla & ": " & rx(0) & " - " & rx(1)
+    'call ofv.cerrarconsulta(rx)
+    'call ofv.cerrarconn(cx)
+    'response.writers(4)
+    xxx=getinfouser(sbusca)
+    sGrpUsr = sTabla & ": " & sBusca & " - " & session("SGU_nombre")
+
+    sinput = ofv.gencelda("","ut ","","100%","","","",sGrpUsr,"si")
+
+    Celda = Celda & sinput
+
+'' Nuevo 15012014
+    SEGWHERE = " WHERE INI = 1 AND INICIO = 'A' AND ( (OBJTIPO = 'COR')) "
+    StrSql1 = "Select * From WKFCKTMASTER " & SEGWHERE & " ORDER BY DESCRIPCION "
+''  response.write strsql1   
+    sInput = ofv.GenerarCombo(sForm,rs(2).name,rs(2).value,StrSql1,cn3,0,1,"")
+    Celda = Celda & ofv.gencelda("","VTI","","70%","","","",sInput,"si")                        
+    Fila = ofv.GenRow("","","","","","","",Celda,"si")                                          
+
+    sAccion = ""
+    if bModificar then
+      sAccion = "asp/actualizar.asp?fname=" & rs(0)
+      sAccion = sAccion & "&tabla=OBJwfldet&volver=" & vuelta
+    end if
+'' Nuevo 15012014 Fin
+
+    Formulario = Formulario & ofv.genform(sForm,"",sAccion,"","post","",Fila,"si")
+
+   rs.movenext
+  loop
+
+
+
+  sHTML = sHTML & "<br><center>"
+''''''''sHTML = sHTML & ofv.GenTabla("","aa  border=0","","70%","","0","0","1","1","","",Formulario & fila,"si")
+  sHTML = sHTML & ofv.GenTabla("","aa  border=0","","70%","","0","0","1","1","","",Formulario,"si")
+
+  sHTML = sHTML & "</center>"
+
+  call ofv.cerrarconsulta(rs)
+
+  call ofv.cerrarconn(cn)
+
+  'Botonera
+  Agregar = ""
+  if bAgregar then
+    sAccion = "AgregarLista.asp?caller=AUT&Codobjeto=0&indice=NO"
+    sAccion = sAccion & "&Tipobjeto=ALL&cod=ALL&volver=" & vuelta
+    Agregar = ofv.BotonAgregar(sAccion)
+  end if
+
+  sAccion = "AutDefault.asp"
+  Celda = ofv.BotonVolver(sAccion)
+
+
+  sHTML = sHTML & ofv.botoneraESSX("0","","","","","","","","","",Agregar,Buscar,Celda)
+
+
+  sHTML = sHTML & "</body></html>"
+end if
+
+response.write sHTML
+
+%>

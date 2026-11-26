@@ -1,0 +1,602 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+	bModificar = False
+	ofv.ObtenerAtributos Session("Form2"),""
+	bModificar = ofv.AModificar
+	bModificaresp = ofv.AModificar
+	If session("APLMDCLI")="" Then
+		aplcheck()
+	End If
+
+	session("SETIDEMPRE")=""
+
+	If session("Nomodificar") = "S" Then bModificar = False
+
+	sTipo    = request.querystring("Tipo")
+	sCodigo  = request.querystring("Codigo")
+	sFuncion = request.querystring("Funcion")
+	sSClick  = request.querystring("SSClick")
+	sMenu    = request.querystring("Menu")
+	sSector  = request.querystring("Sector")
+	sNIV1    = request.querystring("NIV1")
+	sNIV2    = request.querystring("NIV2")
+	sNIV3    = request.querystring("NIV3")
+	sNIV4    = request.querystring("NIV4")
+	sNIV5    = request.querystring("NIV5")
+	sMAINAPL = request.querystring("MAINAPL")
+
+	session("modalidad") = "ESP"
+
+	'response.write "recibe " & Session("Form2") &"          "  &session("APLMDCLI")
+
+
+	'response.write sTipo & " sTipo " & "<br>"
+
+	Set cn = ofv.conectar(ofv.strconn2)
+
+
+	sql="select objid,codobjeto,tipobjeto,origen,instrumen,instid,fecemis,fecvigen,fecbaja,estado,autor,aprobo,elimino,fecvto,version,nrover,"
+	sql = sql & " fecacta,nroacta,prtylink,prtylink2,fecpublic from objprty where codobjeto='" & sCodigo &  "'" & " and autor='" & session("usuario") & "'"
+	Set rs = ofv.crearconsultaEx(sql,cn,1,parametros)
+	If Not rs.eof Then
+		bModificaresp=True
+	Else
+		bModificaresp=False Or ofv.AModificar
+	End If
+
+	Call ofv.cerrarconsulta(rs)
+	sHTML = "<html>"
+
+	wxs = "<script language=JavaScript>" & Chr(13)
+	wxs = wxs & " var Fbtini = 0;" & Chr(13)
+	wxs = wxs & " function IniWin() { " & Chr(13)
+	wxs = wxs & "  if (document.getElementById('festad')) { " & Chr(13)
+	' wxs = wxs & " alert('yaaaa!!'); " & Chr(13)
+	wxs = wxs & " document.festad.submit(); " & Chr(13)
+	wxs = wxs & " } else { " & Chr(13)
+	wxs = wxs & "           if (Fbtini > 10) {} else { Fbtini++; " & Chr(13)
+	wxs = wxs & " setTimeout (""IniWin()"", 100); } " & Chr(13)
+	wxs = wxs & "  } " & Chr(13)
+	wxs = wxs & " } " & Chr(13)
+	wxs = wxs & " </script>" & Chr(13)
+
+	sHTML = sHTML & wxs
+
+	sHTML = sHTML & "<body onload='IniWin();' >"
+
+
+	siconmas = "ICorAcciones.jpg"
+
+
+
+
+
+	''''''''''
+
+
+	sImagen0   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#57422;</FONT>"
+	sImagen0p   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#57354;</FONT>"
+	sImagen1   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#57415;</FONT>"
+	sImagen2   = "<FONT FACE=CorFlaticon COLOR='#0000ff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#0000ff';"" >&#57387;</FONT>"
+	sImagen2O  = "<FONT FACE=CorFlaticon COLOR='#ff0000' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ff0000';"" >&#57362;</FONT>"
+	sImagen2H  = "<FONT FACE=CorFlaticon COLOR='#FFFFFF' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#FFFFFF';"" >&#57436;</FONT>"
+	sImagen3   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#57349;</FONT>"
+	sImagen4   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#57393;</FONT>"
+	sImagen5   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#57383;</FONT>"
+	sImagen6   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >q</FONT>"
+	sImagen7   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#57417;</FONT>"
+
+
+	'''''''
+	''''''''''
+
+	'sImagen0   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#064;</FONT>"
+	sImagen0   = "<i class='las la-pen-fancy' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'sImagen0p   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#0163;</FONT>"
+	sImagen0p   = "<i class='las la-image' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'sImagen1   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#0202;</FONT>"
+	sImagen1   = "<i class='las la-print' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'sImagen2   = "<FONT FACE=CorFlaticon COLOR='#0000ff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#0000ff';"" >&#0130;</FONT>"
+	sImagen2   = "<i class='las la-user-check' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'sImagen8   = "<FONT FACE=CorFlaticon COLOR='#0000ff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#0000ff';"" >&#0130;</FONT>"
+	sImagen8   = "<i class='las la-clipboard' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	sImagen2O  = "<FONT FACE=CorFlaticon COLOR='#ff0000' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ff0000';"" >&#094;</FONT>"
+
+	'sImagen2H  = "<FONT FACE=CorFlaticon COLOR='#FFFFFF' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#FFFFFF';"" >&#095;</FONT>"
+	sImagen2H  = "<i class='las la-comments' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'sImagen3   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#0194;</FONT>"
+	sImagen3   = "<i class='las la-share-alt' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'sImagen4   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#0209;</FONT>"
+	sImagen4   = "<i class='las la-key' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'sImagen5   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#0204;</FONT>"
+	sImagen5   = "<i class='las la-list' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	sImagen6   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >q</FONT>"
+
+	'sImagen7   = "<FONT FACE=CorFlaticon COLOR='#ffffff' SIZE=3 onmouseover=""this.color='#bb0000';"" onmouseout=""this.color='#ffffff';"" >&#043;</FONT>"
+	sImagen7   = "<i class='las la-link' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+    'sImagenEst   = "<i class='las la-info-circle' style='color:#ffffff;font-size: 12pt;' ></i>"
+    sImagenEst   = "<i class='las la-chart-bar' style='color:" & Session("CMFPNBOTFT") & ";font-size: 12pt;' ></i>"
+
+	'''''''
+
+
+
+	If session("WEBDESK") = "S" Then
+
+		StyL  = " STYLE='cursor:pointer;font-weight:normal;padding-left:5px;padding-right:5px;"
+		StyL  = StyL & "border-style:solid;border-width:1;border-color:#000000;background-color:#aa99cc;"
+		StyL  = StyL & "' "
+
+		sHTML1 = ""
+		sHTML1 = sHTML1 & ofv.GenTabla("panelM","","","1%","",0,0,1,2,"","","","no")
+		sHTML1 = sHTML1 & ofv.GenRow("","","","","","","","","no")
+
+		'  sHTML1 = sHTML1 & ofv.GenCelda("","aT " & StyL & " ","","1","","","","&nbsp;","si")
+
+
+
+	Else
+
+		StyL  = " STYLE='cursor:pointer;filter:dropShadow(OFFY=1,OFFX=1,color=#dddddd);"
+		StyL  = StyL & "border-right-style:solid;border-right-width:1;border-right-color:#dddddd;font-weight:normal;"
+		StyL  = StyL & "' "
+
+		sHTML1 = ""
+		sHTML1 = sHTML1 & ofv.GenTabla("panelM","aaa ","","1%","",0,0,-2,-1,"","","","no")
+		sHTML1 = sHTML1 & ofv.GenRow("","","","","","","","","no")
+
+	End If
+
+
+
+
+
+	If SMAINAPL = "OR" Or SMAINAPL = "PL" Then
+
+		sHTML1 = sHTML1 & ofv.GenCelda("","UT  ","","","","","","&nbsp;","si")
+
+		'   HISTORIAL DE OBSERVACIONES -----------------
+		If  Session("Segce") = "S" Then
+
+			t2 = "<a href='COOBSHIST.asp?"
+			t2 = t2 & "Tipobjeto=" & sTipo & "&Codobjeto="
+			t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPWFL"  & "' target=Principal>"
+			t2 = t2 & sImagen2H & "</a>"
+			SBOTTIT = "HISTORIAL&nbsp;de&nbsp;Observaciones. "
+			sHTML1 = sHTML1 & ofv.GenCelda("","aT title='" & SBOTTIT & "' " & StyL & " ","","6","","","",t2,"si")
+
+		End If
+
+	Else
+
+		scktAuto = "NO"
+		scktObs  = "NO"
+
+		Strsql = "Select * From Tipobjeto Where tipobjeto ='" & stipo & "'"
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+		If  Not rs.eof Then
+			sEsquema = rs(1)
+			siconmas = rs("archivo")
+			sPerfil  = rs(3)
+			sAcceso  = rs(16)
+			sResol   = rs(17)
+			scktAuto = rs(19)
+			scktObs  = rs(20)
+			sTipoCPT = rs(21)
+		End If
+		Call ofv.cerrarconsulta(rs)
+
+		sPrint = "S"
+
+		If sAcceso = "N" Then
+			sPrint = "N"
+		ElseIf session("USACC") = "R" And sAcceso = "L" Then
+			sPrint = "N"
+		ElseIf session("USRES") = "B" And sResol = "A" Then
+			sPrint = "N"
+		End If
+
+
+	   If   false and sFuncion = "E" And Session("Segct") = "S" And session("ModMain") = "ED" Then
+	  ' response.write "aca"
+'		If  bModificar Then
+			t2 = "<a href='corest.asp?SKIND=1&Tipobjeto=" & sTipo & "&Codobjeto="
+			t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPPRF"  & "' target=Principal>"
+			t2 = t2 & sImagenEst & "</a>"
+			SBOTTIT = "Estadisticas&nbsp;del&nbsp;esquema."
+			sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+'		End If
+		End If
+		If  sFuncion = "E" And Session("Segct") = "S" And session("ModMain") = "ED" Then
+			If  bModificar Then
+				t2 = "<a href='edportada.asp?SKIND=1&Tipobjeto=" & sTipo & "&Codobjeto="
+				t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPPRF"  & "' target=Principal>"
+				t2 = t2 & sImagen0p & "</a>"
+				SBOTTIT = "Editar&nbsp;Portada&nbsp;del&nbsp;esquema."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+			End If
+		End If
+
+		If  sFuncion = "E" And Session("Segct") = "S" And session("ModMain") = "ED" And (Left(Session("Form2"),4) = "DESA" Or Session("Form2")="CLIMS4681274004444386061790") Then
+			If  bModificar Or bModificaresp Then
+				t2 = "<a href='EDperfilesdocProp.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+				t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPPRF"  & "' target=Principal>"
+				t2 = t2 & sImagen0 & "</a>"
+				SBOTTIT = "Editar&nbsp;perfil&nbsp;del&nbsp;esquema."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+			End If
+		End If
+
+		If  sFuncion = "E" And Session("Segct") = "S" And session("ModMain") = "ED"  Then
+			If  bModificar Then
+				t2 = "<a href='EDPRINTPNL.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+				t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPPRF"  & "' target=Principal>"
+				t2 = t2 & sImagen1 & "</a>"
+				SBOTTIT = "Configura&nbsp;impresion&nbsp;del&nbsp;esquema."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+			End If
+
+		Else
+
+
+			sPrint = "N"
+
+			Strsql = "Select * From OBJPRINTPNL where  CODOBJETO = '" & sCodigo & "' AND TIPOBJETO = '" & sTipo & "' "
+			'' RESPONSE.WRITE STRSQL & "<BR>"
+			Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+			If rs.eof Then
+
+				strsql = "Insert into OBJPRINTPNL ("
+				strsql = strsql & " CODOBJETO,TIPOBJETO,IMPADMITE,IMPTIPO,IMPARCHIVO"
+				strsql = strsql & " ) "
+				strsql = strsql & " values ("
+				strsql = strsql & "'" & sCodigo & "','" & sTipo & "','S','D',''"
+				strsql = strsql & ")"
+				Call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+				Strsql = "Select * From OBJPRINTPNL where  CODOBJETO = '" & sCodigo & "' AND TIPOBJETO = '" & sTipo & "' "
+				'' RESPONSE.WRITE STRSQL & "<BR>"
+				Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+			End If
+
+			If Not rs.eof Then
+
+				sADMITE     = (rs(3) & "")
+				simptipo    = (rs(4) & "")
+				simpARCHIVO = (rs(5) & "")
+
+				If  sADMITE     = "S" Then
+					sPrint = "S"
+
+					If  simptipo     = "DA" And simpARCHIVO <> "" Then
+						sPrint = "SA"
+
+
+					End If
+
+				End If
+
+			End If
+
+
+		End If
+
+
+
+
+		'RESPONSE.WRITE Session("Form2")
+		'IF  session("APLMDCLI")="BC" OR  session("APLMDCLI")="TARSHOP" THEN
+
+		If  sFuncion = "E" And Session("Segct") = "S" And session("ModMain") = "ED" And ( ((sTipoCPT = "K" Or sTipoCPT = "D") And (Left(Session("Form2"),4) = "ELIM") Or Session("Form2")="CLIMS4681274004444386061790") Or ((sTipoCPT = "K" Or sTipoCPT = "D") And (Left(Session("Form2"),4) = "PARA") Or Session("Form2")="CLIMS4681274004444386061790") Or  ((sTipoCPT = "K" Or sTipoCPT = "D") And (Left(Session("Form2"),4) = "TEMA") Or  Session("Form2")="CLIMS4681274004444386061790") Or  ((sTipoCPT = "K" Or sTipoCPT = "D") And (Left(Session("Form2"),4) = "DESA") Or Session("Form2")="CLIMS4681274004444386061790"  ) Or (sTipoCPT = "C") ) Then
+			If  bModificar    Or bModificaresp  Then
+				t2 = "<a href='edobjsdk.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+				t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPSDK"  & "' target=Principal>"
+				t2 = t2 & sImagen4 & "</a>"
+				SBOTTIT = "Permisos&nbsp;del&nbsp;Esquema."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxxx & " ","","6","","","",t2,"si")
+			End If
+		End If
+
+		'ELSE
+		'  if  sFuncion = "E" and Session("Segct") = "S" and session("ModMain") = "ED" AND ( (sTipoCPT = "D" and LEFT(Session("Form2"),4) = "DESA") or (sTipoCPT = "C") ) then
+		'      if  bModificar    or bModificaresp  then
+		'          t2 = "<a href='edobjsdk.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+		'          t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPSDK"  & "' target=Principal>"
+		'          t2 = t2 & sImagen4 & "</a>"
+		'          SBOTTIT = "Permisos&nbsp;del&nbsp;Esquema."
+		'          sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxxx & " ","","6","","","",t2,"si")
+		'      end if
+		'  end if
+		'END IF
+
+
+
+       	'7/11/2018 agregado por pedido gp no quieren que aparezca el icono corexpress a los docs corporativos
+	'	Sobjun="S"
+	 '   If Session("CORUNQ") = "S" And session("APLMDCLI")="GP" Then
+'
+	'	 sqlun="select objun from objetos where codobjeto=0" & sCodigo & " and tipobjeto='" & sTipo & "'"
+'
+	'	 Set rsun = ofv.crearconsultaEx(sqlun,cn,1,parametros)
+	'	 If Not rsun.eof Then
+'
+	'		If rsun(0) & "" =  "1" Then Sobjun="N"
+'
+	'	 End If
+	'	  Call ofv.cerrarconsulta(rsun)
+'
+	'	 End If
+
+		If  sFuncion = "E" And Session("Segct") = "S" And session("ModMain") = "ED" And Session("CORUNQ") = "S"  Then
+			t2 = "<a href='CoobjURL.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+			t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPSDK"  & "' target=Principal>"
+			t2 = t2 & sImagen7 & "</a>"
+			SBOTTIT = "Direccion&nbsp;del&nbsp;Esquema."
+			sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+		End If
+
+		If  sFuncion = "E" And Session("Segce") = "S" Then
+
+			If  session("ModMain") = "WK"  Then
+				t2 = "<a href='coWKFREDIR.asp?sopcion=VER&"
+			ElseIf session("ModMain") = "ED" And (Left(Session("Form2"),4) = "PARA" Or Session("Form2")="CLIMS48112739033140999275609") Then
+				t2 = "<a href='coWKFREDIR.asp?sopcion=APR&"
+			ElseIf session("ModMain") = "ED" And Left(Session("Form2"),4) <> "PARA" And Session("Form2") <> "CLIMS48112739033140999275609" And Not Session("SegcT") = "S" Then
+				t2 = "<a href='coWKFREDIR.asp?sopcion=VER2&"
+			Else
+				If scktAuto = "NO" Then
+					t2 = "<a href='coWKFREDIR.asp?sopcion=NOVA&"
+				Else
+					t2 = "<a href='edobjwfl.asp?"
+				End If
+			End If
+
+			t2 = t2 & "PASO=AUTO&Tipobjeto=" & sTipo & "&Codobjeto="
+			t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPWFL"  & "' target=Principal>"
+			t2 = t2 & sImagen2 & "</a>"
+			SBOTTIT = "Circuito&nbsp;de&nbsp;Autorizaci&oacute;n&nbsp;del&nbsp;Esquema."
+			sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxxx & " ","","6","","","",t2,"si")
+
+		End If
+
+
+		' AGREGADO NUEVO  PASO OBSERVACION-----------------
+		If  sFuncion = "E" And Session("Segce") = "S" Then
+
+			If  session("ModMain") = "WK"  Then
+				t2 = "<a href='coWKFREDIR.asp?sopcion=VER&"
+			ElseIf session("ModMain") = "ED" And (Left(Session("Form2"),4) = "PARA" Or Session("Form2")="CLIMS48112739033140999275609") Then
+				t2 = "<a href='coWKFREDIR.asp?sopcion=APR&"
+			ElseIf session("ModMain") = "ED" And Left(Session("Form2"),4) <> "PARA" And Session("Form2") <> "CLIMS48112739033140999275609" And Not Session("SegcT") = "S" Then
+				t2 = "<a href='coWKFREDIR.asp?sopcion=VER2&"
+			Else
+				If scktObs  = "NO" Then
+					t2 = "<a href='coWKFREDIR.asp?sopcion=NOVA&"
+				Else
+					t2 = "<a href='edobjwfl.asp?"
+				End If
+			End If
+
+			t2 = t2 & "PASO=OBS&Tipobjeto=" & sTipo & "&Codobjeto="
+			t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPWFL"  & "' target=Principal>"
+			t2 = t2 & sImagen8 & "</a>"
+			SBOTTIT = "Circuito&nbsp;de&nbsp;Observaciones. "
+			sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxxx & " ","","6","","","",t2,"si")
+
+		End If
+
+		' HISTORIAL DE OBSERVACIONES -----------------
+		If  sFuncion = "E" And Session("Segce") = "S" Then
+
+			t2 = "<a href='COOBSHIST.asp?"
+			t2 = t2 & "Tipobjeto=" & sTipo & "&Codobjeto="
+			t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPWFL"  & "' target=Principal>"
+			t2 = t2 & sImagen2H & "</a>"
+			SBOTTIT = "HISTORIAL&nbsp;de&nbsp;Observaciones. "
+			sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+
+		End If
+
+		'------------------------------
+		If session("APLMDCLI")="BGAL" Then
+			XARBOL= (Left(Session("Form2"),4) = "DESA") Or (Session("Form2") = "PARA APROBAR") OR (SESSION("FORM2")="CLIMS4681274004444386061790")
+		Else
+			XARBOL= True 'LEFT(Session("Form2"),4) = "DESA"
+		End If
+
+		'RESPONSE.WRITE session("APLMDCLI") & " " & Session("Form2")
+		If  sFuncion = "E" And Session("Segct") = "S"  And session("ModMain") = "ED" And XARBOL  Then
+
+			'if  sFuncion = "E" and Session("Segct") = "S"  and session("ModMain") = "ED"   then
+			If  bModificar Or bModificaresp  Then
+
+				t2 = "<a href='edobjdist.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+				t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPDST" & "' target=Principal>"
+				t2 = t2 & sImagen3 & "</a>"
+				SBOTTIT = "Lista&nbsp;de&nbsp;distribuci&oacute;n."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+
+			End If
+		End If
+
+		If  sFuncion = "Exx" And Session("Segct") = "S" And session("ModMain") = "ED"  Then
+			If  bModificar Then
+
+				t2 = "<a href='edGenEstad.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+				t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPGST"  & "' target=Principal>"
+				t2 = t2 & sImagen5 & "</a>"
+				SBOTTIT = "Estadisticas&nbsp;del&nbsp;Esquema."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+
+			End If
+		End If
+		'response.write sFuncion & "       " & Session("Segct") &  LEFT(Session("Form2"),4) & bModificar
+		' if  sFuncion = "E" and Session("Segct") = "S"  and session("ModMain") = "ED"   then
+
+		If session("APLMDCLI")="BGAL" Then
+			XARBOL= (Left(Session("Form2"),4) = "DESA") Or (Session("Form2") = "PARA APROBAR") Or (SESSION("FORM2")="CLIMS4681274004444386061790")
+		Else
+			XARBOL= Left(Session("Form2"),4) = "DESA"
+		End If
+
+		If  sFuncion = "E" And Session("Segct") = "S"  And session("ModMain") = "ED" And XARBOL  Then
+			If  bModificar Or bModificaresp Then
+
+				t2 = "<a href='edobjACD.asp?Tipobjeto=" & sTipo & "&Codobjeto="
+				t2 = t2 & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&GLBSOLN=" & "ESPDST" & "' target=Principal>"
+				t2 = t2 & sImagen5 & "</a>"
+				SBOTTIT = "Lista de accesos directos para el documento."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+
+			End If
+		End If
+
+		''''Agregado para incorporar la opcion de "test"
+
+		'response.write sFuncion & " sFuncion " & "<br>"
+		'response.write Session("Segct") & " Session("Segct") " & "<br>"
+		'response.write session("ModMain") & " session("ModMain") " & "<br>"
+
+
+		If  sFuncion = "E" And Session("Segct") = "S"  And session("ModMain") = "ED" And XARBOL Then
+
+			''if  sFuncion = "E" and Session("Segco") = "S"  then
+			''and session("ModMain") = "ED" AND XARBOL
+			'if  bModificar or bModificaresp then
+			shref= " Consultar.asp?Codigo=" & sCodigo & "&Tipo=" & STIPO
+
+			t2 = "<a class='' href='"& shref
+			t2 = t2 & "&GLBSOLN=" & "ESPDST" & "' target=_new>"
+			''''''t2 = t2 & sImagen5 & "</a>"
+			t2 = t2 & "TestGral" & "</a>"
+			SBOTTIT = "Test General"
+			sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","","6","","","",t2,"si")
+
+			'end if
+		End If
+
+		''''Agregado para incorporar la opcion de "test"
+
+	End If
+
+	xxxxx = Session("Segco") & "-" & sPrint & "-"  & session("ModMain") & "-"  & sFuncion
+
+	If  (Session("Segco") = "S" And (sPrint = "S" Or sPrint = "SA") And session("ModMain") <> "ED") Or  (  sFuncion = "E"  And session("ModMain") = "ED" ) Then
+
+		If sPrint = "S" Then
+			If sTipoCPT = "K"  Then
+			Else
+				t2 = "<a class='' href='Reportes.asp?ID=" & sCodigo & "&Titulo=Esquemas_Normativos&perfil="
+				t2 = t2 & sPerfil & "&tipobj=" & xtipobj & "&GLBSOLN=" & "ESPREP"  & "' Target=_new>"
+				t2 = t2 & "Impresion"  & "</a>"
+
+
+				SBOTTIT = "Vista&nbsp;previa&nbsp;de&nbsp;impresión&nbsp;del&nbsp;Esquema." '& session("ModMain")
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","center","6","","","",t2,"si")
+			End If
+
+		Else
+			If sTipoCPT = "K"  Then
+
+			Else
+
+				t2 = "<a class='' href='" & simpARCHIVO & "' Target=_blank>"
+				't2 = t2 & sImagen1 & "</a>"
+				t2 = t2 & "Impresion"  & "</a>"
+
+				SBOTTIT = "Archivo&nbsp;de&nbsp;impresión&nbsp;del&nbsp;Esquema."
+				sHTML1 = sHTML1 & ofv.GenCelda("","bietx title='" & SBOTTIT & "' " & StyLxxx & " ","center","6","","","",t2,"si")
+
+
+
+			End If
+
+
+
+		End If
+	End If
+
+	sHTML1 = sHTML1 & ofv.GenFRow()
+	sHTML1 = sHTML1 & ofv.GenFTabla()
+
+
+	If session("WEBDESK") = "S" Then
+
+		sHTML = sHTML & ofv.GenTabla("panel","aaa  ","","100%","",0,0,"-2","-2","","","","no")
+		sHTML = sHTML & ofv.GenRow("","","","","","","","","no")
+		sHTML = sHTML & ofv.GenCelda("","ut","right","99%","","","",sHTML1,"si")
+		sHTML = sHTML & ofv.GenCelda("","ut","right","1%","","","","&nbsp;","si")
+		sHTML = sHTML & ofv.GenFRow()
+		sHTML = sHTML & ofv.GenFTabla()
+
+	Else
+
+		If  Session("FULLGUI") = "N" Then
+			styl = "background-color:#888888;border-style:solid;border-color:#ffffff;border-width:1;"
+		Else
+			styl = XspEx("#888888","#cccccc",0) & ";border-style:solid;border-color:#ffffff;border-width:1;"
+		End If
+
+		sHTML = sHTML & ofv.GenTabla("panel","aaa style='" & styl & "' ","","100%","",0,0,"-2","-2","","","","no")
+		sHTML = sHTML & ofv.GenRow("","","","","","","","","no")
+
+		sHTML = sHTML & ofv.GenCelda("","ut","right","1%","","","","&nbsp;","si")
+		sHTML = sHTML & ofv.GenCelda("","ut","","1%","","","",sHTML1,"si")
+
+		sHTML = sHTML & ofv.GenCelda("","ut","","99%","","","","&nbsp;","si")
+		sHTML = sHTML & ofv.GenFRow()
+		sHTML = sHTML & ofv.GenFTabla()
+
+	End If
+
+
+
+
+
+	xSolasp = ""
+
+
+	xSolasp = xSolasp & "BarraSol.asp"
+	xSolasp = xSolasp & "?Tipo=" & sTipo & "&Codigo="
+	xSolasp = xSolasp & sCodigo & "&Menu=" & sMenu & "&Sector=" & sSector & "&MAINAPL=" & SMAINAPL
+	xSolasp = xSolasp & "&Funcion=" & sFuncion & "&SSCLICK=" & sSClick
+	xSolasp = xSolasp & "&NIV1=" & sNIV1  & "&NIV2=" & sNIV2  & "&NIV3=" & sNIV3  & "&NIV4=" & sNIV4  & "&NIV5=" & sNIV5
+
+	sHTML = sHTML & "<form name=festad  id=festad action='" & xSolasp  & "' "
+	sHTML = sHTML & " method=post target='WK1' style='display:none;' >"
+	sHTML = sHTML & "<input type=hidden size=10 name=boton value=menu></input>" & Chr(13)
+	sHTML = sHTML & "</form>"
+
+
+
+	Call ofv.cerrarconn(cn)
+
+	sHTML = sHTML & "</body></html>"
+
+
+End If
+
+Response.Write sHTML
+
+%>

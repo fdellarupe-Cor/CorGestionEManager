@@ -1,0 +1,773 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+	
+	ReDim nivel(9)
+	nivel(0) = "C"
+	nivel(1) = "D"
+	nivel(2) = "E"
+	nivel(3) = "F"
+	nivel(4) = "G"
+	nivel(5) = "H"
+	nivel(6) = "I"
+	nivel(7) = "J"
+	nivel(8) = "K"
+	nivel(9) = "L"
+	sImagenCampo = "ARCHIVO"
+	CantRegMostrarx = CDbl(request.querystring("CantRegMostrar"))
+	CantRegMoverx = CDbl(request.querystring("CantRegMover"))
+	wPerfil = request.querystring("wPerfil")
+	wNivel = request.querystring("wNivel")
+	
+	If IsNull(wNivel) Then wNivel = "NO"
+	If Len(wNivel) = 0  Then wNivel = "NO"
+	
+	
+	vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx) & "_wPerfil=" & wPerfil
+	
+	sHTML = ofv.FormHeader(session("FormN"))
+	sHTML = shtml & "<link type='text/css' rel='stylesheet' href='incfile/modal.css'/>"
+	
+	
+	ofv.ObtenerAtributos Session("Form"),""
+	bAgregar = ofv.AAgregar
+	bModificar = ofv.AModificar
+	bSuprimir = ofv.AEliminar
+	bConsultar = ofv.AConsultar
+	
+	'' Response.Write bModificar & " bModificar "
+	'' Response.Write bAgregar   & " bAgregar   "
+	'' Response.Write bSuprimir  & " bSuprimir  "
+	'' Response.Write bConsultar & " bConsultar "
+	
+	
+	Set cn = ofv.conectar(ofv.strconn2)
+	Set cn3 = ofv.conectar(ofv.strconn6)
+	Set cn2 = ofv.conectar(ofv.strconn0)
+	
+	Strsql = "Select * From Tipobjeto where tipobjeto = '" & wperfil & "' "
+	' Response.Write Strsql & " Strsql "
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	If Not rs.eof Then
+		posI = 0
+		
+		sForm = "form" & posi
+		
+		Fila = ""
+		
+		
+		' Encabezados 1
+		
+		'Descripcion
+		
+		sInput = rs(0) & " - " & rs(1)
+		Celda = ofv.gencelda("","TTT COLSPAN=3 ","","","","","",sInput,"si")
+		
+		Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		'Perfil
+		Celda = ofv.gencelda("","tt","","20%","","","","Perfil","si")
+		
+		'  sInput = rs(3)
+		
+		
+		If SESSION("BASE")="K" Then
+			Sql1 = "Select Tipoperfil,DESCRI From Objperfil where TIPOPERFIL LIKE 'FRMPF%' Order By Tipoperfil"
+		Else
+			Sql1 = "Select Tipoperfil,DESCRI From Objperfil where TIPOPERFIL NOT LIKE  'FRMPF%' Order By Tipoperfil"
+		End If
+		
+		' response.write sql1
+		sInput = ofv.GenerarCombo(sForm,rs(3).name,rs(3).value,Sql1,cn,0,1,"")
+		
+		''  sInput = gencomboX(sForm,rs(3),rs(3).name,"0",Sql1,cn,0,1,"")
+		Celda = Celda & ofv.gencelda("","vti","","80%","","","",sInput,"si")
+		
+		Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		'Nivel
+		Celda = ofv.gencelda("","tt","","","","","","Nivel","si")
+		
+		SCOMSEP = ""
+		scomK   = ""
+		
+		For i=0 To 9
+			scomK = scomK & SCOMSEP & nivel(i)
+			SCOMSEP = Chr(9)
+		Next
+		
+		scomD = scomK
+		
+		''  sInput = gencomboX(sForm,rs(4),rs(4).name,"1","N","",scomK,scomD,"")
+		
+		sInput = ofv.gencomboFX(sForm,rs(4).name,rs(4),scomK,scomD,"")
+		
+		Celda = Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+		
+		Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		'Archivo
+		If rs("TIPOCPT") <>"PD" Then
+			Celda = ofv.GenCelda("","tt","","","","","","Orden","si")
+			
+			sInput=ofv.GenerarInput(rs(15).name,rs(15),"text",sForm,"10","dtn","si")
+			'sImagenValor = rs(15)
+			'sInput = ofv.GenerarCombo3(sForm,ofv.Getfiles("Iconos"),sImagenCampo,sImagenValor)
+			
+			''  sInput = gencomboX(sForm,rs(15),rs(15).name,"0","A","Iconos",0,1,"")
+			Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		Else
+			CELDA=""
+		End If
+		
+		'Avisos de Revision
+		'' AGREGADO 10102014 PARA DOCUMENTOS A VENCER
+		
+		Celda = ofv.GenCelda("","tt","","","","","","AVISO REVISION","si")
+		
+		SCOMSEPx = Chr(9)
+		scomKk = "0"
+		scomDd = "NO"
+		scomKk = scomKk & SCOMSEPx & "5"
+		scomDd = scomDd & SCOMSEPx & "ANTES DE LOS 5 DIAS"
+		scomKk = scomKk & SCOMSEPx & "10"
+		scomDd = scomDd & SCOMSEPx & "ANTES DE LOS 10 DIAS"
+		scomKk = scomKk & SCOMSEPx & "20"
+		scomDd = scomDd & SCOMSEPx & "ANTES DE LOS 20 DIAS"
+		scomKk = scomKk & SCOMSEPx & "30"
+		scomDd = scomDd & SCOMSEPx & "ANTES DE LOS 30 DIAS"
+		scomKk = scomKk & SCOMSEPx & "60"
+		scomDd = scomDd & SCOMSEPx & "ANTES DE LOS 60 DIAS"
+		
+		''' ORREVISION  = dFechan
+		''' SORREVISION = "NO"
+		''' sInput = ofv.gencomboFX(sForm,"ORREVISION",SORREVISION,scomKk,scomDd,"")
+		''' sInput = ofv.gencomboFX(sForm,rs(1).name,rs(1),scomKk,scomDd,"")
+		''' Celda = Celda & ofv.GenCelda("","vti","","","","","",sInput,"si")
+		''  StrSql="SELECT * FROM Tipobjeto order by descri "
+		''  set rsx1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+		''
+		''  SCOMSEP = ""
+		''  scomK   = ""
+		''  scomD   = ""
+		''
+		''   svalor1 = rs(24) & ""
+		''  'Response.write svalor1 & " aviso revision " & chr(13) & "<br>"
+		''	  do while not rsx1.eof
+		''
+		''  	 SCOMSEP = chr(9)
+		''     scomK = scomK & SCOMSEP & rsx1(0)
+		''     scomD = scomD & SCOMSEP & rsx1(1)
+		''
+		''  rsx1.movenext
+		''  loop
+		''' sInput = ofv.gencomboFX(sForm,"VALOR1",svalor1,scomK,scomD,"")
+		''' response.write " --> " & sInput & " sInput "
+		'''  Celda = Celda & ofv.gencelda("","vti","","50%","","","",sInput,"si")
+		
+		If bModificar Then
+			sInput = ofv.gencomboFX(sForm,rs(24).name,rs(24),scomKk,scomDd,"")
+		Else
+			sInput = ofv.GenerarInput("",rs(24),"readonly","","50","dt","")
+		End If
+		
+		Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+		
+		Fila = Fila & ofv.genrow("","","","","50","","",Celda,"si")
+		TIPOCPT=rs("TIPOCPT")
+		
+		'' FIN AGREGADO 10102014 PARA DOCUMENTOS A VENCER
+		If rs("TIPOCPT") ="PD" Then
+			SQL=" SELECT DISTINCT SUBTEMA.TIPOBJETO +'-'+  CAST (dbo.PRODSERV.codprodserv AS NVARCHAR) , SUBTEMA.descri + ': ' + TEMA.descri + '/' + PRODSERV.descri, PRODSERV.codtema "
+			SQL= SQL  & "  FROM         dbo.TEMA INNER JOIN "
+			SQL= SQL  & "  PRODSERV ON TEMA.codtema = PRODSERV.codtema INNER JOIN "
+			SQL= SQL  & "  SUBTEMA ON PRODSERV.marcaps = SUBTEMA.tipobjeto"
+			SQL= SQL  & "   WHERE      marcaps='PEDIDO' "
+			
+			
+			Celda = ofv.GenCelda("","tt","","","","","","CARPETA","si")
+			' sImagenP = "&#0232;"
+			' sInput=GENPROCSECUENEX(RS(25)) & ofv.GenerarInput(rs(25).name,rs(25),"HIDDEN",sForm,"30","dtn","si")
+			' sFuncAnc= "onclick=""updformCor('DTTEMAIT','" & sform & "','" &rs(25).name & "','myModal','','DTTEMAINT','','','EM');"""
+			''sFuncAnc = " onmouseover=""this.className='ft1o';"" onmouseout=""this.className='ft1n';"" onclick=""document.DTTEMAIT.submit();document.getElementById('DTTEMAINT').style.display='';"" "
+			' Sinput = sinput & "<a class='ft1n' " & sFuncAnc & " href=# >" & sImagenP & "</a>"
+			
+			
+			'   Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			'   Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+			sInput = ofv.GenerarCombo(sForm,rs(25).name,rs(25).value,Sql,cn,0,1,"")
+			Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+			
+			'response.write sql
+			Celda = ofv.GenCelda("","tt","","","","","","CARPETA DESTINO PEDIDOS","si")
+			sInput = ofv.GenerarCombo(sForm,rs(15).name,rs(15).value,Sql,cn,0,1,"")
+			Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+			
+		Else
+			
+			Celda = ofv.GenCelda("","tt","","","","","","TEXTO DE IMPRESIÓN","si")
+			
+			sInput = "<textarea name=TEXTOIMPRESION onkeypress=" & Chr(34)
+			sInput = sInput & " if (this.value.length > 450) {alert('El texto es demasiado"
+			sInput = sInput & " extenso'); return false;}" & Chr(34)
+			sInput = sInput & " onblur=" & Chr(34) & "document." & sform & ".submit();" & Chr(34)
+			sInput = sInput & " cols=120 rows=3>" & Replace(rs("TEXTOIMPRESION") & "","''","'") & "</textarea>"
+			
+			Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+			'filtro
+			Celda = ofv.GenCelda("","tt","","","","","","ACEPTA COMENTARIOS","si")
+			
+			
+			scomK = "S" & Chr(9) & "N"
+			scomD = "SI" & Chr(9) & "NO"
+			
+			
+			If bModificar Then
+				sInput = ofv.gencomboFX(sForm,rs(26).name,rs(26),scomK,scomD," ")
+			Else
+				sInput = ofv.GenerarInput("",rs(26),"readonly","","10","dt","")
+			End If
+			Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		End If
+		
+		If rs(26)="S"	 Then
+			Celda = ofv.GenCelda("","tt","","","","","","ACEPTA  NIVELES","si")
+			
+			
+			
+			
+			If bModificar  Then
+				sImagenP = "&#0232;"
+				sFuncAnc = " onmouseover=""this.className='ft1o';"" onmouseout=""this.className='ft1n';"" "
+				sinput = "<a class='ft1n' " & sFuncAnc & " href='ESQUEMASdkdet.asp?TIPOBJETO=" &wperfil & "&CantRegMover=" & CantRegMoverx
+				sinput = sinput  & "&CantRegMostrar=" & CantRegMostrarx
+				sinput = sinput  & "' title='Propiedades de " & rs(1) & "' >" & sImagenP & "</a>"
+			Else
+				sInput = "&NBSP;" 'ofv.GenerarInput("",rs(26),"readonly","","10","dt","")
+			End If
+			Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		End If
+		Celda = ofv.GenCelda("","tt","","","","","","Filtro","si")
+		
+		
+		scomK = "S" & Chr(9) & "N"
+		scomD = "SI" & Chr(9) & "NO"
+		
+		
+		If bModificar Then
+			sInput = ofv.gencomboFX(sForm,rs(22).name,rs(22),scomK,scomD," ")
+		Else
+			sInput = ofv.GenerarInput("",rs(22),"readonly","","10","dt","")
+		End If
+		Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+		
+		Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		
+		
+		' Encabezados 2
+		
+		'xxx
+		
+		Celda = ofv.GenCelda(""," ttt colspan=5","","","","","","     CIRCUITOS ","si")
+		
+		Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		' Para Circuitos de Autorizacion y Observacion Default
+		If rs("TIPOCPT") <> "PD" Then
+			Celda = ofv.GenCelda("","tt","","","","",""," CIRCUITO DEFAULT ","si")
+			
+			If bModificar  Then
+				sImagenP = "&#0232;"
+				sFuncAnc = " onmouseover=""this.className='ft1o';"" onmouseout=""this.className='ft1n';"" "
+				sinput = "<a class='ft1n' " & sFuncAnc & " href='ESQUEMAScircdet.asp?TIPOBJETO=" &wperfil & "&CantRegMover=" & CantRegMoverx
+				sinput = sinput & "&CantRegMostrar=" & CantRegMostrarx
+				sinput = sinput & "' title='Circuitos Autorizacion Default' >" & sImagenP & "</a>"
+			Else
+				''sInput = "&NBSP;" 'ofv.GenerarInput("",rs(26),"readonly","","10","dt","")
+			End If
+			
+			Celda = Celda & ofv.GenCelda("","uti","","","","","",sInput,"si")
+			
+			Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+		End If
+		'CIRCUITO
+		Celda = ofv.GenCelda("","tt ","","20%","","","","AUTORIZACION","si")
+		
+		'SEGWHERE = " WHERE INI = 1 AND INICIO = 'A' AND ( (OBJTIPO = 'GEN'  )  OR (OBJTIPO = 'COR')) "
+		SEGWHERE = " WHERE INI = 1 AND INICIO = 'A' AND ( (OBJTIPO = 'COR')) "
+		
+		
+		If bModificar Then
+			
+			StrSql = "Select * From WKFCKTMASTER " & SEGWHERE & " ORDER BY DESCRIPCION "
+			Set rsx1 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+			
+			SCOMSEP = ""
+			scomK   = ""
+			scomD   = ""
+			SCOMSEP = Chr(9)
+			
+			Do While Not rsx1.eof
+				scomK = scomK & SCOMSEP & rsx1(0)
+				scomD = scomD & SCOMSEP & rsx1(1)
+				SCOMSEP = Chr(9)
+				rsx1.movenext
+			Loop
+			
+			''     sInput = ofv.gencomboFX(sForm,"ORCARACTER",SORCARACTER,scomK,scomD,"")
+			sInput = ofv.gencomboFX(sForm,rs(19).name,rs(19),scomK,scomD,"")
+			''     sInput = ofv.GenerarCombo(sForm,rs(19).name,rs(19),strsql,cn3,0,1,"")
+			
+		Else
+			
+			StrSql = "Select * From WKFCKTMASTER WHERE WKFCOD = '" & rs(19) & "' "
+			Set rsniv = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+			If Not rsniv.eof Then sniv = rsniv(1)
+			Call ofv.cerrarconsulta(rsniv)
+			sInput = ofv.GenerarInput("",sniv,"readonly","","40","dt","")
+		End If
+		
+		'sForm1 = sForm
+		'sForm1 = request.form("sForm1") & ""
+		''sInput1  = ofv.GenerarInput("sForm1",sForm1,"hidden","","1","dt","")
+		
+		Celda = Celda & ofv.GenCelda("","uti","","","","","",sInput,"si")
+		
+		Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		'CIRCUITO
+		If rs("TIPOCPT") ="PD" Then
+			Celda = ofv.GenCelda("","tt","","","","","","APROBADOR","si")
+		Else
+			Celda = ofv.GenCelda("","tt","","","","","","OBSERVACION","si")
+		End If
+		'response.write rs("TIPOCPT")
+		SEGWHERE = " WHERE INI = 1 AND INICIO = 'A' AND ( (OBJTIPO = 'COR')) "
+		
+		If bModificar Then
+			StrSql = "Select * From WKFCKTMASTER " & SEGWHERE & " ORDER BY DESCRIPCION "
+			'response.write strsql
+			Set rsx1 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+			
+			SCOMSEP = ""
+			scomK   = "NO"
+			scomD   = "NO"
+			SCOMSEP = Chr(9)
+			
+			Do While Not rsx1.eof
+				scomK = scomK & SCOMSEP & rsx1(0)
+				scomD = scomD & SCOMSEP & rsx1(1)
+				SCOMSEP = Chr(9)
+				rsx1.movenext
+			Loop
+			
+			If rs("TIPOCPT") ="PD" Then
+				xx = getinfouser(rs(20 ))  'ofv.gencomboFX(sForm,rs(20).name,rs(20),scomK,scomD,"")
+				sinput=session("SGU_nombre") & "&nbsp;&nbsp;"& ofv.GenerarInput(rs(20).name,rs(20),"HIDDEN",sForm,"30","dtn","si")
+			Else
+				' sInput = ofv.GenerarCombo(sForm,rs(20).name,rs(20),strsql,cn3,0,1,"")
+				sInput = ofv.gencomboFX(sForm,rs(20).name,rs(20),scomK,scomD,"")
+				
+			End If
+			''    sInput = ofv.GenerarCombo(sForm,rs(20).name,rs(20),strsql,cn3,0,1,"")
+			
+		Else
+			StrSql = "Select * From WKFCKTMASTER WHERE WKFCOD = '" & rs(20) & "' "
+			Set rsniv = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+			If Not rsniv.eof Then sniv = rsniv(1)
+			Call ofv.cerrarconsulta(rsniv)
+			sInput = ofv.GenerarInput("",sniv,"readonly","","40","dt","")
+		End If
+		'sFuncAnc= "onclick=""updformCor('DTCOMBO','" & sform & "','" &rs(20).name & "','myModal','"& ToHexDump(CryptRC4(strsql, session.sessionid)) &"','DTTEMAINT','"&RS(20)&"','WKFCOD','WKF');"""
+		' sFuncAnc= "onclick=""updformCor('DTCOMBO','" & sform & "','" &rs(20).name & "','myModal','"& ToHexDump(CryptRC4("select * from usuarios", session.sessionid)) &"','DTTEMAINT','"&RS(20)&"','id','EM');"""
+		'Sinput = sinput & "<a class='ft1n' " & sFuncAnc & " href=# >" & sImagenP & "</a>"
+		If rs("TIPOCPT") ="PD" Then
+			sImagenP = "&#0232;"
+			sFuncAnc = " onmouseover=""this.className='ft1o';"" onmouseout=""this.className='ft1n';"" "
+			sinput = "<a class='ft1n' " & sFuncAnc & " href='ESQUEMAScircdet.asp?TIPOBJETO=" &wperfil & "&CantRegMover=" & CantRegMoverx
+			sinput = sinput & "&CantRegMostrar=" & CantRegMostrarx
+			sinput = sinput & "' title='Asignar Aprobador' >" & sImagenP & "</a>"
+		End If
+		
+		celda = CELDA & ofv.GenCelda("","vti ","","","","","",sInput,"si")
+		
+		Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		
+		
+		'NIVEL
+		Celda = ofv.gencelda("","tt","","","","","","NIVEL","si")
+		
+		If bModificar Then
+			strsql = "Select * From NivelConfiden Order By NCcod"
+			sInput = ofv.GenerarCombo(sForm,rs(18).name,rs(18),strsql,cn2,0,1,"")
+			'' sInput = gencomboX(sForm,rs(18),rs(18).name,"21",strsql,cn2,0,1,"")
+		Else
+			strsql = "Select * From NivelConfiden where NCcod = " & rs(18)
+			Set rsniv = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+			If Not rsniv.eof Then sniv = rsniv(1)
+			Call ofv.cerrarconsulta(rsniv)
+			sInput = ofv.GenerarInput("",sniv,"readonly","","40","dt","")
+		End If
+		
+		celda = CELDA & ofv.GenCelda("","vti ","","","","","",sInput,"si")
+		
+		
+		
+		
+		Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		
+		
+		
+		
+		
+		' Encabezados 3
+		
+		'xxx
+		Celda = ofv.GenCelda("","ttt colspan=3 ","","","","","","Permiso de impresion","si")
+		
+		Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		'acceso
+		Celda = ofv.GenCelda("","tt","","","","","","acceso","si")
+		
+		
+		scomK = "S" & Chr(9) & "N" & Chr(9) & "L"
+		scomD = "Todos" & Chr(9) & "No" & Chr(9) & "Solo acceso Local"
+		
+		'acceso
+		If bModificar Then
+			'' sInput = gencomboX(sForm,rs(16),rs(16).name,"2","N","",scomK,scomD,"")
+			sInput = ofv.gencomboFX(sForm,rs(16).name,rs(16),scomK,scomD," ")
+		Else
+			sInput = ofv.GenerarInput("",rs(16),"readonly","","90","dt","")
+		End If
+		Celda =  Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+		
+		Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		
+		'resol
+		Celda = ofv.gencelda("","tt","","","","","","resolucion","si")
+		
+		scomK = "S" & Chr(9) & "A"
+		scomD = "Todos" & Chr(9) & "Solo Alta resolucion"
+		
+		If bModificar Then
+			'''   sInput = gencomboX(sForm,rs(17),rs(17).name,"1","N","",scomK,scomD,"")
+			sInput = ofv.gencomboFX(sForm,rs(17).name,rs(17),scomK,scomD," ")
+		Else
+			sInput = ofv.GenerarInput("",rs(17),"readonly","","90","dt","")
+		End If
+		Celda = Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+		
+		
+		Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+		
+		
+		
+		sAccion = ""
+		If bModificar Then
+			sAccion = "asp/actualizar.asp?fname=" & ofv.convertircar(rs(0)," ","*")
+			sAccion = sAccion & "&tabla=Tipobjeto&volver=" & vuelta
+		End If
+		Formulario =  ofv.genform(sForm,"",sAccion,"","post","",Fila,"si")
+		
+		
+		sHTML = sHTML & ofv.GenTabla("","","","80% ","","0","","-1","2","","",Formulario,"si") & "<br>"
+		''sHTML = sHTML & ofv.GenTabla("","","","80% border","","0","","-1","2","","",Formulario,"si") & "<br>"
+		
+		
+		
+		
+		' Encabezados 4
+		If rs("TIPOCPT")  <> "PD" Then
+			
+			
+			
+			
+			
+			
+			'Acepta niveles
+			Celda = ofv.gencelda("","ttt colspan=10","","","","","","Acepta niveles","si")
+			
+			
+			Fila = ofv.genrow("","","","","","","",Celda,"si")
+			
+			
+			
+			
+			
+			Celda =  ""
+			
+			
+			
+			'Acepta linea 1
+			
+			For ii = 0 To 4
+				
+				sinput = "<a  href=TiposdeEsquemaProp.asp?wperfil=" & rs(0) & "&CantRegMover=" & CantRegMoverx
+				sinput = sinput  & "&CantRegMostrar=" & CantRegMostrarx  & "&wNivel=" & nivel(ii) & " ><b>"
+				sinput = sinput  & "<font color=#000080>" & nivel(ii) & "</font></b></a>"
+				
+				Celda = Celda & ofv.gencelda("","cc","center","2%","","","",sinput,"si")
+				
+				sInput = ofv.combosino(sForm & "A",rs(ii + 5),rs(ii + 5).name)
+				
+				
+				Celda = Celda & ofv.gencelda("","vt","","5%","","","",sInput,"si")
+				
+				
+			Next
+			
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+			
+			
+			
+			Celda = ""
+			
+			'Acepta linea 2
+			
+			For ii = 5 To 9
+				
+				sinput = "<a  href=TiposdeEsquemaProp.asp?wperfil=" & rs(0) & "&CantRegMover=" & CantRegMoverx
+				sinput = sinput  & "&CantRegMostrar=" & CantRegMostrarx  & "&wNivel=" & nivel(ii) & " ><b>"
+				sinput = sinput  & "<font color=#000080>" & nivel(ii) & "</font></b></a>"
+				
+				Celda = Celda & ofv.gencelda("","cc","center","2%","","","",sinput,"si")
+				
+				sInput = ofv.combosino(sForm & "A",rs(ii + 5),rs(ii + 5).name)
+				
+				Celda = Celda & ofv.gencelda("","vt","","5%","","","",sInput,"si")
+				
+				
+			Next
+			
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+			
+			Celda = ofv.gencelda("","aaa colspan=11","","","","","","&nbsp;","si")
+			Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+			
+			sAccion = ""
+			If bModificar Then
+				sAccion = "asp/actualizar.asp?fname=" & rs(0)
+				sAccion = sAccion & "&tabla=Tipobjeto&volver=" & vuelta
+			End If
+			Formulario = ofv.genform(sForm & "A","",sAccion,"","post","",Fila,"si")
+			
+			
+			sHTML = sHTML & ofv.GenTabla("","tbp","","30% ","","0","","-1","2","","",Formulario,"si")
+			
+			posi = posi + 1
+		End If
+		
+		
+		
+		If wNivel <> "NO" Then
+			
+			Call ofv.cerrarconsulta(rs)
+			
+			'Tipo
+			Celda = ofv.GenCelda("","ttT colspan=3 ","center","100%","","","","Tipos de esquemas con nivel: " & wNivel,"si")
+			
+			Fila = ofv.genrow("","","","","","","",Celda,"si")
+			
+			'Tipo
+			Celda = ofv.GenCelda("","tt","","10%","","","","Tipo","si")
+			
+			'Descripcion
+			Celda = Celda & ofv.gencelda("","tt","","90%","","","","Descripcion","si")
+			
+			Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+			
+			Strsql = "Select * From Tipobjeto where nivel = '" & wNivel & "' order by descri "
+			'''response.write strsql
+			Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+			
+			If Not rs.eof Then
+				
+				Do Until rs.eof
+					'Tipo
+					sInput = rs(0)
+					Celda =  ofv.gencelda("","cc","","","","","",sInput,"si")
+					
+					'Descripcion
+					sInput = rs(1)
+					Celda = Celda & ofv.gencelda("","cc","","","","","",sInput,"si")
+					Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+					
+					rs.movenext
+				Loop
+				
+			Else
+				
+				sInput = "No hay esquemas para este nivel."
+				Celda = ofv.gencelda("","cc colspan=3 ","","","","","",sInput,"si")
+				Fila = Fila & ofv.genrow("","","","","","","",Celda,"si")
+				
+			End If
+			
+			
+			
+			sHTML = sHTML & ofv.GenTabla("","","","80% ","","0","","0","2","","",Fila,"si") & "<br>"
+			
+			
+			
+		End If
+	End If
+	
+	
+	
+	Agregar = ""
+	Buscar  = ""
+	
+	sAccion = "TiposdeEsquema.asp?CantRegMover=" & CantRegMoverx
+	Celda = ofv.BotonVolver(sAccion)
+	
+	
+	'smodal=smodal & "</div>"
+	If TIPOCPT ="PD" Then
+		header="<H6>SELECCION DE CARPETA DESTINO REPOSITORIO</H6>"
+		' tabla1 =  armContenedor("myModal","DTTEMAINT",header,"<h3></h3>")
+		WSPFRMN = "DTTEMAIT"
+		
+		WSPFRMA = "OBJtreeTema.asp?FORMATO=ABR&Tipo=Consulta&Nombre=TEMAS&Menu=Consulta&Tipot=PEDIDO"
+		
+		WSPFORME = "<FORM ID='" & WSPFRMN & "' NAME='" & WSPFRMN & "' ACTION='" & WSPFRMA & "' TARGET='fesquemas' style='display:none;visibility:hidden;' METHOD='POST' ></FORM>"
+		' tabla1 = tabla1 & "</DIV>"
+		tabla1 = tabla1 & "</p></DIV></div>" & WSPFORME & Chr(13)
+		
+		WSPFRMN = "DTCOMBO"
+		
+		WSPFRMA = "sqlejec.asp"
+		
+		WSPFORME = "<FORM ID='" & WSPFRMN & "' NAME='" & WSPFRMN & "' ACTION='" & WSPFRMA & "' TARGET='fesquemas' style='display:none;visibility:hidden;' METHOD='POST' >"
+		WSPFORME = WSPFORME & "<input type=hidden name=sqleject id=sqleject value=''>"
+		WSPFORME = WSPFORME &  "<input type=hidden name=parentw id=parentw value=''>"
+		WSPFORME = WSPFORME & "<input type=hidden name=idsel id=idsel value=''>"
+		WSPFORME = WSPFORME & "<input type=hidden name=aplic id=aplic value=''>"
+		WSPFORME = WSPFORME & "<input type=hidden name=idColsel id=idColsel value=''></FORM>"
+		' tabla1 = tabla1  & WSPFORME & tabla1 & ParamEnvio() & armaformupd("CorFrmenvio") &  Chr(13)
+	Else
+		tabla1=""
+	End If
+	
+	
+	
+	sHTML = sHTML & ofv.botoneraESSX("0","","","","","","","","","","","",celda)
+	
+	Call ofv.cerrarconsulta(rs)
+	Call ofv.cerrarconn(cn)
+	
+	sHTML = sHTML & tabla1  & "</body></html>"
+End If
+
+Response.Write sHTML
+'strTemp = EnDeCrypt("22222", session.sessionid)
+'response.write strTemp & "   " &  EnDeCrypt(strTemp,  session.sessionid)
+
+
+Function GENPROCSECUENEX(xxcodobj)
+	
+	GENPROCSECUENEX = ""
+	xxcodobj=Split(xxcodobj,"-")
+	
+	If IsArray(xxcodobj) And UBound(xxcodobj)=1 Then
+		codobj=xxcodobj(1)
+		Select Case xxcodobj(0) & ""
+			
+			
+			Case "C"
+			Strsql = "Select * From CSRELPATHDESCRIEX  where COBJ = " & codobj
+			'' response.write strsql & "<br>"
+			Set Wrs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+			If Not Wrs.eof Then
+				
+				WKITOPE = 8
+				
+				For WKI=0 To 7
+					
+					WKIPROC = WRS(WKI) & ""
+					
+					If WKIPROC <> "" Then
+						WKITOPE = WKI
+						Exit For
+					End If
+					
+					
+				Next
+				
+				WKICCOL = 7 - WKITOPE
+				
+				WKINCOL = 0
+				
+				FilaW = ""
+				
+				CeldaCC = ""
+				Celda2CC = ""
+				
+				For WKI=WKITOPE To 7
+					
+					
+					
+					
+					CeldaCC = CeldaCC & Celda2CC & WRS(WKI)
+					
+					Celda2CC = " - "
+					
+					
+					
+				Next
+				
+				
+				If WKITOPE < 8 Then
+					
+					GENPROCSECUENEX = Wrs("TEMADESCRI")& "/" &  Wrs("STEMADESCRI") & "/ " & CeldaCC
+					
+				End If
+				
+				
+				
+			End If
+			
+			
+			Case Else
+			StrSql="   SELECT  b.codprodserv , '<b>'+ a.descri + '</b> / ' + b.descri as descri2 FROM  tema a "
+			StrSql=StrSql & "        inner join     PRODSERV b on(a.codtema=b.codtema)"
+			StrSql=StrSql & "  WHERE CODPRODSERV=0" & codobj
+			StrSql= StrSql & " order by a.descri,b.descri"
+			Set Wrs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+			If Not Wrs.eof Then
+				GENPROCSECUENEX = Wrs(1)
+			Else
+				GENPROCSECUENEX=""
+			End If
+			
+		End Select
+		Call OFV.CERRARCONSULTA(Wrs)
+		
+	Else
+		GENPROCSECUENEX=""
+	End If
+	
+End Function
+
+%>

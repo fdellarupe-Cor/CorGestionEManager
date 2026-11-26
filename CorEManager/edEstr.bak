@@ -1,0 +1,190 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  XXXX = GENLOGEXT("EDIDET")
+
+  ofv.ObtenerAtributos Session("Form2"),""
+  bModificar = ofv.AModificar
+  if session("Nomodificar") = "S" then bModificar = False
+
+  nCodigo = request.querystring("Codobjeto")
+  sTipo = request.querystring("Tipobjeto")
+
+  sHTML = ofv.FormHeader(session("FormN"))
+
+'----------------------------------------------
+
+  shtml = shtml & CorPnlFnc("N","")
+
+  sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' >"
+
+'-------------------------------------------------
+
+  vuelta = ofv.vueltaasp2("../")
+
+  sImageobs = "&nbsp;<font face='corflaticon' color='#990000' size=3 >&#095;</font>"
+
+  'Encabezados
+  fila = ofv.Encabezados("Orden","Titulo del Indice","DETALLE"," ")
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+  strsql = "Select Version, estado From Objprty Where Objprty.codobjeto = " & nCodigo
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  bVersion = "NO"
+  if not rs.eof then
+    if rs(0) = "V" then bVersion = "SI"
+    nestado = rs(1)
+  end if
+  call ofv.cerrarconsulta(rs)
+
+  Strsql = "Select Objestr.*, b.codinx1 From Objestr "
+ ' strsql = strsql & " left join (select distinct codinx1 from OBJOBSCMT where actpend is null and codsol = " & session("codSol") & ") b on (Objestr.objid = b.codinx1) "
+ '  strsql = strsql & " left join (select distinct codinx1 from OBJOBSCMT where  codsol = " & session("codSol") & ") b on (Objestr.objid = b.codinx1) "
+  strsql = strsql & " left join (select distinct codinx1 from OBJOBSCMT where  codsol = " & session("codSol") & " and codobjeto=" & nCodigo & ") b on (cast (Objestr.objid as nvarchar) = b.codinx1) "
+  strsql = strsql & " Where codobjeto=" & nCodigo & " Order By consecuen"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  do until rs.eof
+    sForm = "edTablas" & rs(0)
+
+    'Eliminar
+    sHref = ""
+    if bModificar then
+      sHref = "asp/EliminarEN.asp?ID=" & rs(0) & "&Tabla=Objestr&volver=" & vuelta
+      sHref = sHref & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Eliminar=NSNC"
+    end if
+    if sHref <> "" then
+      Celda = ofv.BotonEliminar("Eliminacion",sHref)
+       Celda = replace(Celda,"<TD ","<TD title='Eliminacion' ")
+    else
+      Celda = ofv.GenCelda("","","","","","","","","si")
+    end if
+
+    'Secuencia
+    if bModificar then
+      sInput = ofv.GenerarInput(rs(4).name,rs(4),"text",sForm,"3","dtn","SI")
+    else
+      sInput = rs(4)
+    end if
+    Celda = Celda & ofv.GenCelda("","VTI","","","","","",sInput,"si")
+
+    'Descripcion
+    if bModificar then
+      sInput = ofv.GenerarInput(rs(3).name,rs(3),"text",sForm,"80","dt","")
+    else
+      sInput = rs(3)
+    end if
+    Celda = Celda & ofv.GenCelda("","VTI","","","","","",sInput,"si")
+
+    'DETALLE
+
+    sImagenP =  "<b><font face=CorFlaticon size=3 color=#F7AA22>&#57421;</font></b>"
+
+
+    sinput = "<a class=nt href='edestrdet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&ID=" & rs(0)
+    sinput = sinput  & "' title='Propiedades de " & rs(3) & "' >" & sImagenP & "</a>"
+    Celda = Celda & ofv.gencelda("","vt ","center","","15%","","",sInput,"si")
+
+     ' estado observacion
+
+      Celdaobs  = ofv.GenCelda("","vt","","2","","","","&nbsp;","si")
+
+
+      if (Nestado=5  or Nestado=6) and (rs(11) & "") <> "" and bModificar then
+
+               stitle = "Hay observaciones para este grupo."
+      	       sInput  = "<div style='border-style:solid;border-color:#993333;border-width:1;' >" & sImageobs & "</div>"
+      	       Celdaobs  = ofv.GenCelda("","ut title='" & stitle & "'  valign=top ","","","1","","",sInput,"si")
+      end if
+
+
+      Celda = Celda & Celdaobs
+
+
+
+    if bModificar then
+      sAccion = "asp/ActualizarEN.asp?ID=" & rs(0) & "&Tabla=Objestr&volver=" & vuelta
+      sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+      Formulario = ofv.GenForm(sForm,"",sAccion,"","post","",Celda,"si")
+    else
+      Formulario = ofv.GenForm("","","","","post","",Celda,"si")
+    end if
+
+    Fila = fila & ofv.GenRow("","","","","","","",Formulario,"si")
+
+    rs.movenext
+  loop
+
+  sHTML = sHTML & ""
+  sHTML = sHTML & ofv.GenTabla("","","","80%","","0","","0","0","","",fila,"si")
+
+    Agregar = ""
+
+  'Botonera
+  if bModificar then
+    sAccion = "Agregarestr.asp?Tabla=Objestr&volver=" & vuelta & "&Codobjeto=" & nCodigo
+    sAccion = sAccion & "&Tipobjeto=" & sTipo
+    Agregar = ofv.BotonAgregar(sAccion)
+
+  end if
+
+
+  'cambios
+   Listar = ""
+
+
+   if bVersion = "SI" then
+      if SESSION("SHWMOD") <> "N" then
+
+      elseif SESSION("VIEWMOD") <> "N" then
+
+        ' xxxx    = CorGenBotonXp(3, "NO", "&#0113;","NO", "NO", "Lista de cambios", "NO", "Cambios")
+         Listar  = genbotoncambios("") 'ofv.GenBoton(3, "cambBot", "BT", "N", " onclick='AbrirCambios();' ", "N", "S", "N", "", "")
+
+         sasp = "CoGenCambios.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+         sHTML = sHTML & ConsCambios(sasp)
+
+         Celda = Listar
+
+
+      end if
+
+
+   end if
+
+
+
+
+
+'--------------------------------------------------------------------------------
+  sHTML = sHTML & "</div>"
+
+  Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+  Fila = ofv.GenRow("","","","","","","",Celda,"si")
+  sHTML = sHTML &  ofv.GenTabla("TCEX1","aaa onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+
+  'Estructura del Indice
+
+  sHTML = sHTML & CorPnlIndx("N","")
+
+'--------------------------------------------------------------------------------
+
+  sHTML = sHTML & ofv.botoneraESSX("0",rs,CantRegAMover,CantRegAMostrar,"no","no",posi,"","","no",Agregar,Listar,"")
+
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & " </body></html>"
+end if
+
+response.write sHTML
+
+%>

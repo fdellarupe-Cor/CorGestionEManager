@@ -1,0 +1,194 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  XXXX = GENLOGEXT("EDIDET")
+
+  ofv.ObtenerAtributos Session("Form2"),""
+  bModificar = ofv.AModificar
+  if session("Nomodificar") = "S" then bModificar = False
+
+  nCodigo = request.querystring("Codobjeto")
+  sTipo = request.querystring("Tipobjeto")
+  vuelta = ofv.vueltaasp2("../")
+
+  sHTML = ofv.FormHeader(session("FormN"))
+
+'----------------------------------------------
+
+  shtml = shtml & CorPnlFnc("N","")
+
+  sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' ><span id=111>"
+
+'-------------------------------------------------
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+  Strsql = "SELECT * FROM OBJDSCABR  "
+  Strsql = Strsql & " Where codobjeto=" & nCodigo
+  Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if rs.eof then
+
+     strsql = "Insert into OBJDSCABR (codobjeto, tipobjeto, descri, titulo, muestra "
+     strsql = strsql & ") Values (" & nCodigo & ",'" & sTipo & "'"
+     if session("APLMDCLI")="GP" THEN
+      strsql = strsql & ",'Descripcion','INTRODUCCION','SI'"
+     ELSE
+      strsql = strsql & ",'Descripcion','INTRODUCCION','NO'"
+     END IF
+
+     strsql = strsql & ")"
+
+     call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+     Strsql = "SELECT * FROM OBJDSCABR  "
+     Strsql = Strsql & " Where codobjeto=" & nCodigo
+     Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+     set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+  end if
+
+    Fila = ""
+
+
+  if not rs.eof then
+
+    Celda = ofv.gencelda("","tt","","20%","","","","Titulo: ","si")
+
+    if bModificar then
+      sInput = ofv.GenerarInput(rs(4).name,rs(4),"text","edGeneral","80","dt","")
+    else
+      sInput = ofv.GenerarInput("",rs(4),"readonly","","90","dt","")
+    end if
+
+    Celda = Celda & ofv.gencelda("","ut","","50%","","","",sinput,"si")
+
+    Celda = Celda & ofv.gencelda("","tt","","20%","","","","Muestra: ","si")
+
+    sform = "edGeneral"
+
+    scomK = "SI" & chr(9) & "NO"
+    scomD = "SI" & chr(9) & "NO"
+
+    'muestra
+    if bModificar then
+        sInput = ofv.gencomboFX(sForm,rs(5).name,rs(5),scomK,scomD," ")
+    else
+        sInput = ofv.gencomboFX(sForm,rs(5).name,rs(5),scomK,scomD,"no")
+    end if
+
+
+
+
+    Celda = Celda & ofv.gencelda("","ut ","","10%","","","",sInput,"si")
+    Fila = fila & ofv.GenRow("","","","","25","","",Celda,"si")
+
+
+
+    esttxt = " STYLE={font-family:tahoma;color:#225588;font-size:9pt;background-color:#f7eedd;} "
+    'Encabezado Referencia
+
+    Celda = ofv.GenCelda("","ttr colspan=4","","100%","","","",rs(4),"si") & chr(13)
+    Fila =  fila & ofv.GenRow("","","","","25","","",Celda,"si")
+
+
+
+
+    t3b = "<font class=at><textarea class=dt "
+    t3b = t3b & "name=" & rs(3).name & " cols=90 rows=18 "
+    if bModificar then
+      t3b = t3b & " onblur=edGeneral.submit() "
+      t3b = t3b & " onkeypress=" & chr(34)
+      t3b = t3b & " if (this.value.length > 2450) {alert('El texto es demasiado"
+      t3b = t3b & " extenso'); return false;}" & chr(34) & " >"
+    else
+      t3b = t3b & " readonly >"
+    end if
+
+    if len(rs(3)) > 0 then
+       t3b = t3b & rs(3).value & "</textarea></font>"
+    else
+       t3b = t3b & "Descripcion" & "</textarea></font>"
+    end if
+
+
+    Celda = ofv.GenCelda("","ut colspan=4","center","100%","","","",t3b,"si") & chr(13)
+    Fila =  fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+
+
+    sAccion = ""
+    if bModificar then
+      sAccion = "asp/ActualizarEN.asp?ID=" & rs(0) & "&Tabla=ObjDSCABR&volver=" & vuelta
+      sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+    end if
+
+
+
+ else
+    sHTML = sHTML & "&nbsp;"
+
+ end if
+
+  sHTML = sHTML & "<br><br><center>"
+  Formulario = ofv.GenTabla("","aaa","","80%","","0","0","1","0","","",Fila,"si")
+  sHTML = sHTML & ofv.GenForm("edGeneral","",sAccion,"","post","",Formulario,"si")
+  sHTML = sHTML & "</center>"
+
+  'cambios
+   Listar = ""
+
+
+   if bVersion = "SI" then
+      if SESSION("SHWMOD") <> "N" then
+
+      elseif SESSION("VIEWMOD") <> "N" then
+
+      '   xxxx    = CorGenBotonXp(3, "NO", "&#0113;","NO", "NO", "Lista de cambios", "NO", "Cambios")
+         Listar  = genbotoncambios("") 'ofv.GenBoton(3, "cambBot", "BT", "N", " onclick='AbrirCambios();' ", "N", "S", "N", "", "")
+
+         sasp = "CoGenCambios.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+         sHTML = sHTML & ConsCambios(sasp)
+
+         Celda = Listar
+
+
+      end if
+
+
+   end if
+
+
+
+'--------------------------------------------------------------------------------
+  sHTML = sHTML & "</span></div>"
+
+  Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+  Fila = ofv.GenRow("","","","","","","",Celda,"si")
+  sHTML = sHTML &  ofv.GenTabla("TCEX1"," onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+
+  'Estructura del Indice
+
+  sHTML = sHTML & CorPnlIndx("N","")
+
+'--------------------------------------------------------------------------------
+sHTML = sHTML & ofv.botoneraESSX("0","","","","","","","","","","","",Listar)
+
+  call ofv.cerrarconsulta(rs)
+
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & "</center></body></html>"
+end if
+
+response.write sHTML
+
+%>

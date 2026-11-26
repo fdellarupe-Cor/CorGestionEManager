@@ -1,0 +1,217 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+	'  response.buffer = true
+	
+	sTitulo = request.querystring("Titulo")
+	sTitulo = ofv.convertircar(sTitulo,"_"," ")
+	
+	nCodigo = request.querystring("Codobjeto")
+	sTipo   = request.querystring("Tipobjeto")
+	ID      = request.querystring("mensaje")
+	IDZ      = request.querystring("mensaje")
+	
+	'' vuelta = ofv.vueltaasp("../",CantRegMostrar,CantRegMover) & "_mensaje=" & ID
+	
+	vuelta = "../CoObjRecomendar.asp?mensaje=" & ID
+	
+	sHTML = ofv.FormHeader(session("FormN"))
+	
+	
+	
+	shtml = shtml & CorPnlFnc("N","")
+	
+	'----------------------------------------------
+	
+	aplcheck()
+	
+	sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' >"
+	
+	
+	sHTML = sHTML & "<center><br>"
+	
+	''''''''''''-----------------------------------------------------------------------
+	
+	Set cn = ofv.conectar(ofv.strconn2)
+	
+	
+	If  session("APLMDCLI")="RIVA" Then
+		wwwGenBuscaUsr =  GenBuscaUsr("N","N","S","S",Chr(9),Chr(9),"GRP-","USR-")
+		' IF session("APLMDCLI")<> "BC" THEN
+		'wwwGenBuscaUsr =  replace(wwwGenBuscaUsr,"VALUE='GRUPO'","VALUE='GRUPO' style='display:none;' ")
+		'  END IF
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='SECTOR'","VALUE='SECTOR' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='LETRA'","VALUE='LETRA' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='USUARIOS'","VALUE='USUARIOS' style='display:none;' ")
+		' wwwGenBuscaUsr =  replace(wwwGenBuscaUsr,"VALUE='USUARIOS'","VALUE='USUARIOS' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='GRUPOS'","VALUE='GRUPOS' style='display:none;' ")
+	ElseIf session("APLMDCLI")="BPN" Then
+		WwwGenBuscaUsr= GenBuscaUsrEx("S","N","N","S","N","N","N","N","N","S","","","","","","","","","","")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='GRUPO'","VALUE='GRUPO' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='SECTOR'","VALUE='SECTOR' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='LETRA'","VALUE='LETRA' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='USUARIOS'","VALUE='USUARIOS' style='display:none;' ")
+		'wwwGenBuscaUsr =  replace(wwwGenBuscaUsr,"VALUE='TEXTO'","VALUE='SELECCION PERSONAS'  style='display:none;'  ")
+		
+		
+	Else
+		
+		If session("APLMDCLI")="BGAL" Then
+			
+			wwwGenBuscaUsr =  GenBuscaUsr("N","N","N","S",Chr(9),Chr(9),"GRP-","USR-")
+		Else
+			wwwGenBuscaUsr =  GenBuscaUsr("N","N","N","N",Chr(9),Chr(9),"GRP-","USR-")
+		End If
+		
+		' wwwGenBuscaUsr =  GenBuscaUsr("N","N","N","N",CHR(9),CHR(9),"GRP-","USR-")
+		' IF session("APLMDCLI")<> "BC" THEN
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='GRUPO'","VALUE='GRUPO' style='display:none;' ")
+		'  END IF
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='SECTOR'","VALUE='SECTOR' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='LETRA'","VALUE='LETRA' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='USUARIOS'","VALUE='USUARIOS' style='display:none;' ")
+		wwwGenBuscaUsr =  Replace(wwwGenBuscaUsr,"VALUE='TEXTO'","VALUE='SELECCION PERSONAS'  style='display:none;'  ")
+	End If
+	
+	SHTML = SHTML & wwwGenBuscaUsr
+	
+	
+	
+	
+	
+	If SESSION("FBUSR") <> "NO" Then
+		
+		Set cn = ofv.conectar(ofv.strconn2)
+		
+		WKSPTABLA = "NOVEGENPARDIST"
+		
+		strsql = "Select * From novegenpardist "
+		Set rs = ofv.crearconsultaEx(StrSql,cn,1,volver)
+		
+		f1a = "asp/AgregarEN.asp?Tabla=" & WKSPTABLA
+		f1a = f1a & "&volver=" & vuelta & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		
+		
+		sHTML = sHTML & ofv.GenForm("AgreArchb","",f1a,"","post","","","no")
+		
+		''''  sHTML = sHTML & "XXXXXX"
+		
+		'  SELECT CASE SESSION ("XGUMASTER")
+		'   CASE "U"
+		sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & idz & "' NAME='CODIGO' >"
+		sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & Replace(SESSION("FBUSR"),"USR-","")  & "' NAME='" & RS(2).NAME & "' >"
+		
+		
+		sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='0' NAME='" & RS(3).NAME & "' >"
+		
+		sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='0' NAME='" & RS(4).NAME & "' >"
+		
+		'  CASE "S"
+		'    sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & id & "' NAME='CODIGO' >"
+		'    sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='" & SESSION("FBUSR")  & "' NAME='" & RS(3).NAME & "' >"
+		'		  sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='SECT-' NAME='" & RS(2).NAME & "' >"
+		'		  sHTML = sHTML & "<INPUT TYPE='HIDDEN' VALUE='0' NAME='" & RS(4).NAME & "' >"
+		'       END SELECT
+		
+	Else
+		
+		''  sAccion = "ADnovedADESDist.asp?id=" & id
+		
+		sAccion = "CoObjRecomendar.asp?Tipobjeto=" & sTipo & "&Codobjeto=" & NCodigo
+		
+		sHTML = sHTML & ofv.GenForm("AgreArchb","",sAccion,"","post","","","no")
+		
+		'''  sHTML = sHTML & "ZZZZ"
+		
+	End If
+	
+	
+	'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
+	
+	'''  sHTML = sHTML & "yyyyy"
+	
+	
+	
+	'Botones Aceptar y Cancelar
+	'' sAccion = "ADnovedADESDist.asp?id=" & id
+	
+	sAccion = "CoObjRecomendar.asp?Tipobjeto=" & sTipo & "&Codobjeto=" & NCodigo
+	sHTML = sHTML & ofv.AgregarBoton("AgreArchb",sAccion,"_self")
+	
+	Call ofv.cerrarconsulta(rs)
+	Call ofv.cerrarconn(cn)
+	
+	
+	''''''''''''-----------------------------------------------------------------------
+	
+	sHTML = sHTML & "</center><br>"
+	
+	'''''''''''''''''''''''''''''
+	'''''''
+	sHTML = sHTML & "</div>"
+	
+	
+	
+	Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+	Fila = ofv.GenRow("","","","","","","",Celda,"si")
+	
+	sHTML = sHTML &  ofv.GenTabla("TCEX1","aaa onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+	
+	
+	'Estructura del Indice
+	
+	sHTML = sHTML & CorPnlIndx("N","")
+	
+	'RESPONSE.WRITE  request.form("XGUFILTRO")
+	
+	
+	If (request.form("XGUFILTRO") = "T" Or request.form("XGUFILTRO") = "G" ) Then
+		
+		sHTML = sHTML & "<script language='javascript' > "
+		sHTML = sHTML & " document.all.XGUBTEXTO.select(); "
+		sHTML = sHTML & " document.all.XGUBTEXTO.focus(); "
+		sHTML = sHTML & "</script> "
+		
+	Else
+		
+		sHTML = sHTML & "<script language='javascript' > "
+		If session("APLMDCLI")="BC" Or session("APLMDCLI")="RIVA" Then
+			sHTML = sHTML & " clactfrm('U','G','','NOMBRE','NO');document.XGUFRM.submit(); "
+		ElseIf session("APLMDCLI")="BGAL"  Then
+			sHTML = sHTML & " clactfrm('U','T','NOMBRE','NO','NO');document.XGUFRM.submit(); "
+		Else
+			sHTML = sHTML & " clactfrm('U','T','','NOMBRE','NO');document.XGUFRM.submit(); "
+			
+		End If
+		sHTML = sHTML & "</script> "
+		
+	End If
+	
+	
+	sHTML = sHTML & "</body></html>"
+End If
+
+Response.Write sHTML
+
+Function Fechador(wkfecha)
+	
+	
+	wkfecha=CLng(wkfecha)
+	fec = CDate(wkfecha + CLng(CDate("01-01-1900")))
+	ndia = ofv.cdia(Weekday(fec))
+	nMes = ofv.cmes(Month(fec))
+	
+	Fechador = "  " & ndia & ", " & Day(fec) & " de " & nMes & " de " & Year(fec)
+	
+	
+End Function
+
+%>

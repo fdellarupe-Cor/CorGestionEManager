@@ -1,0 +1,391 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+aplcheck()
+
+XXXX = NEWEMPRE("NO")
+
+      session("ASP")="SUBCONSULTA.ASP"
+
+      sUN = request.querystring("EMPRE")
+    'response.write "sEMPRE: " & sEMPRE
+       IF sUN = ""  AND SESSION("UN") = "" THEN
+
+         sUN = ATREMP(0, 0)
+         SESSION("UN") = sUN & ""
+         If (SESSION("UN") & "") = "" Then SESSION("UN") = 1
+       elseIF sUN <> "" THEN
+        XXXX = NEWEMPRE(sUN)
+        SESSION("UN")=sUN
+       ELSE
+        XXXX = NEWEMPRE(SESSION("UN"))
+        sUN=SESSION("UN")
+   end if
+
+  sHTML = ofv.FormHeader(session("FormN"))
+  shtml = shtml & "<script languaje=javascript src='incfile/tooltip.js'></script>"
+
+
+
+  ofv.ObtenerAtributos Session("Form"),""
+  bAgregar = ofv.AAgregar
+  bModificar = ofv.AModificar
+  bSuprimir = ofv.AEliminar
+  bConsultar = ofv.AConsultar
+  APLCHECK()
+  sPath =session ("DirUpload")
+  'response.write sPath
+  'Xruta = Request.ServerVariables("SERVER_NAME") & ":" & Request.ServerVariables("SERVER_PORT") & left(sPath,instrRev(sPath,"/",-1))
+   Xruta =  left(sPath,instrRev(sPath,"\",-1))
+
+  Xfer =  ""
+
+   TablaH = ofv.GenTabla("","","","20%","","0","0","0","25","","",selecEmpre(),"si")
+
+
+shtml = shtml & tablah & "<br>"
+
+' response.write  Session("EMPMUN")
+if Session("EMPMUN")  = "S" then
+  XferTarget1 = "Emp" & cint(session("UN")) & "\" & mid(Xfer,1,instrrev(Xfer,"\",-1)) & "componentes"
+  nomdir1 = "Emp" & cint(session("UN")) & "\Imagenes&nbsp;de&nbsp;Componentes"
+  XferTarget2 = "Emp" & cint(session("UN")) & "\" & mid(Xfer,1,instrrev(Xfer,"\",-1)) & "estructura"
+  nomdir2 = "Emp" & cint(session("UN")) & "\Imagenes&nbsp;de&nbsp;Contenidos"
+  XferTarget3 = "Emp" & cint(session("UN")) & "\" & mid(Xfer,1,instrrev(Xfer,"\",-1)) & "archivos"
+  nomdir3 = "Emp" & cint(session("UN")) & "\Documentos&nbsp;Asociados"
+  XferTarget4 = "Emp" & cint(session("UN")) & "\" & mid(Xfer,1,instrrev(Xfer,"\",-1)) & "arccomponentes"
+  nomdir4 = "Emp" & cint(session("UN")) & "\Archivos&nbsp;de&nbsp;Componentes"
+  XferTarget5 = "Emp" & cint(session("UN")) & "\" & mid(Xfer,1,instrrev(Xfer,"\",-1)) & "ARCHIVOSLEGALES"
+  nomdir5 = "Emp" & cint(session("UN")) & "\Archivos&nbsp;de&nbsp;Portada"
+   XferTarget6 = "Emp" & cint(session("UN")) & "\" & mid(Xfer,1,instrrev(Xfer,"\",-1)) & "ICONOSCURSOGRAMA"
+  nomdir6 = "Emp" & cint(session("UN")) & "\ICONOS&nbsp;de&nbsp;CURSOGRAMA"
+  XferTarget7 = "Emp" & cint(session("UN")) &  "\IMGNOVEDADES"
+  nomdir7 =  "Emp" & cint(session("UN")) & "\IMAGENES&nbsp;de&nbsp;NOVEDADES"
+else
+
+  XferTarget1 =   "\componentes"
+  nomdir1 = "\Imagenes&nbsp;de&nbsp;Componentes"
+  XferTarget2 =   "\estructura"
+  nomdir2 =  "\Imagenes&nbsp;de&nbsp;Contenidos"
+  XferTarget3 = "\archivos"
+  nomdir3 =  "\Documentos&nbsp;Asociados"
+  XferTarget4 ="\arccomponentes"
+  nomdir4 =  "\Archivos&nbsp;de&nbsp;Componentes"
+  XferTarget5 = "\ARCHIVOSLEGALES"
+  nomdir5 =  "\Archivos&nbsp;de&nbsp;Portada"
+  XferTarget6 =  "\ICONOSCURSOGRAMA"
+  nomdir6 =  "\I&nbsp;de&nbsp;CURSOGRAMA"
+  XferTarget7 =  "\IMGNOVEDADES"
+  nomdir7 =  "\IMAGENES&nbsp;de&nbsp;NOVEDADES"
+end if
+
+
+'response.write xfertarget1 & "<br>" & nomdir1
+   sicK = "<font face='CorFlatIcon' size=4 color='" & session("cmfmenu") & "' >&#0158;</font>"
+
+
+
+
+'   select case session("UN")
+'
+'   		case 1
+'
+'   			dirComp = "Emp1\componentes"
+''   			dirArcComp = "Emp1\arccomponentes"
+'   			dirEst = "Emp1\estructura"
+'   			dirArch = "Emp1\archivos"
+'   			dirIcon = "Emp1\ICONOSCURSOGRAMA"
+'
+'   		case 4
+'
+'		   	dirComp = "Emp4\componentes"
+'		    dirArcComp = "Emp4\arccomponentes"
+''		   	dirEst = "Emp4\estructura"
+'		   	dirArch = "Emp4\archivos"
+'   			dirIcon = "Emp4\ICONOSCURSOGRAMA"
+'
+'   		case 5
+'
+'		   	dirComp = "Emp5\componentes"
+'		   	dirArcComp = "Emp5\arccomponentes"
+'		   	dirEst = "Emp5\estructura"
+'		   	dirArch = "Emp5\archivos"
+'   			dirIcon = "Emp5\ICONOSCURSOGRAMA"
+'
+'   		case 7
+'
+'			dirComp = "Emp7\componentes"
+'			dirArcComp = "Emp7\arccomponentes"
+'			dirEst = "Emp7\estructura"
+'			dirArch = "Emp7\archivos"
+'   			dirIcon = "Emp7\ICONOSCURSOGRAMA"
+'
+'   		case 8
+'
+'		   	dirComp = "Emp8\componentes"
+'		   	dirArcComp = "Emp8\arccomponentes"
+'		   	dirEst = "Emp8\estructura"
+'		   	dirArch = "Emp8\archivos"
+'   			dirIcon = "Emp8\ICONOSCURSOGRAMA"
+'
+'   	End select
+
+if Session("EMPMUN")  = "S" then
+            dirComp = "Emp" & session("UN") &"\componentes"
+			dirArcComp = "Emp" & session("UN") & "\arccomponentes"
+			dirEst = "Emp" & session("UN") &"\estructura"
+			dirArch = "Emp" & session("UN") &"\archivos"
+   			dirIcon = "Emp" & session("UN") & "\ICONOSCURSOGRAMA"
+   			dirMenu = "Emp" & session("UN") & "\IMGNOVEDADES"
+
+else
+             dirComp = 	"\componentes"
+			dirArcComp = 	"\arccomponentes"
+			dirEst = 		"\estructura"
+			dirArch = 		"\archivos"
+   			dirIcon = 		"\ICONOSCURSOGRAMA"
+   			dirMenu ="\IMGNOVEDADES"
+end if
+
+
+   'Encabezados
+    Celda = ofv.GenCelda("","ttt colspan=3","","","","","","DIRECTORIOS DE IMAGENES Y ARCHIVOS","si")
+    Fila =ofv.genrow("","","","","","","",Celda,"si")
+'response.write nomdir1 & "<br>" & XferTarget1
+    sAccion = ""
+    if bModificar then
+      sAccioni = "<a href=Cordscr2.asp?direct="
+    ''  sAccioni =  sAccioni & "componentes"
+      sAccioni =  sAccioni & ""
+      sAccioni =  sAccioni & "&nomdir=" & nomdir1 & "&rutdir=" & XferTarget1 & "  >" & sicK & "</a>"
+      sAccion  = "<a class=nt href=Cordscr2.asp?direct=" & dirComp & "&nomdir=" & nomdir1 & "&rutdir=" & XferTarget1 & "  ><big>Imagenes de Componentes</big></a>"
+    end if
+
+    Celda = ofv.GenCelda("","uts rowspan=2","center","25%","","","","COMPONENTES","si")
+    Celda = Celda & ofv.GenCelda("","uti ","","65%","","","",saccioni &  "-" & saccion,"si")
+   ' Celda = Celda & ofv.GenCelda("","uti","","95%","","","",saccion,"si")
+    sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/COMPONENTES: aquí se guardan las imágenes que se utilizarán en el armado de componentes. Ruta: Administracion/Estructura/Componentes/Imagenes',270,'#fff')"";"" ","")
+    Celda = Celda & ofv.GenCelda("","","center","10%","","","",sInput,"si")
+    Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+
+    sAccion = ""
+	    if bModificar then
+	      sAccioni = "<a href=Cordscr2.asp?direct=" & "arccomponentes" & "&nomdir=" & nomdir4 & "&rutdir=" & XferTarget4 & " >" & sicK & "</a>"
+	      sAccion  = "<a class=nt href=Cordscr2.asp?direct=" & dirArcComp & "&nomdir=" & nomdir4 & "&rutdir=" & XferTarget4 & " ><big>Archivos de Componentes</big></a>"
+	    end if
+''''''''
+    Celda = ofv.GenCelda("","uts","center","25%","","","","","si")
+	Celda = ofv.GenCelda("","uti","xcenter","65%","","","",saccioni &  "-" & saccion,"si")
+	'Celda = Celda & ofv.GenCelda("","uti","","95%","","","",saccion,"si")
+     if session("CORMODUSOLABM")="S" then
+       sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/ARCCOMPONENTES: aquí se guardan los archivos que se utilizarán en el armado de <b>formularios</b>. Ruta: Formularios administracion/Estructura de formularios/Formularios/Documentos',270,'#fff')"";"" ","")
+     else
+
+     sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/ARCCOMPONENTES: aquí se guardan los archivos que se utilizarán en el armado de componentes. Ruta: Administracion/Estructura/Componentes/Archivos',270,'#fff')"";"" ","")
+    end if
+    Celda = Celda & ofv.GenCelda("","","center","10%","","","",sInput,"si")
+    Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+
+    sAccion = ""
+    if bModificar then
+      sAccioni = "<a href=Cordscr2.asp?direct=" & "estructura" & "&nomdir=" & nomdir2 & "&rutdir=" & XferTarget2 & " >" & sicK & "</a>"
+      sAccion  = "<a class=nt href=Cordscr2.asp?direct=" & dirEst & "&nomdir=" & nomdir2 & "&rutdir=" & XferTarget2 & " ><big>Imagenes de Contenidos</big></a>"
+    end if
+
+	Celda = ofv.GenCelda("","uts rowspan=2","center","25%","","","","ESQUEMAS","si")
+    Celda = Celda & ofv.GenCelda("","uti","xcenter","65%","","","",saccioni &  "-" & saccion,"si")
+ '   Celda = Celda & ofv.GenCelda("","uti","","95%","","","",saccion,"si")
+    sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/ESTRUCTURA: aquí se guardan las imágenes que se utilizarán en el armado de los contenidos de los esquemas. Ruta: Administracion/Estructura/Esquemas/Contenido',270,'#fff')"";"" ","")
+    Celda = Celda & ofv.GenCelda("","","center","10%","","","",sInput,"si")
+    Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+
+    sAccion = ""
+    if bModificar then
+      sAccioni = "<a href=Cordscr2.asp?direct=" & "archivos" & "&nomdir=" & nomdir3 & "&rutdir=" & XferTarget3 & " >" & sicK & "</a>"
+      sAccion  = "<a class=nt href=Cordscr2.asp?direct=" & dirArch & "&nomdir=" & nomdir3 & "&rutdir=" & XferTarget3 & " ><big>Documentos Asociados</big></a>"
+    end if
+    Celda = ofv.GenCelda("","uts","center","25%","","","","","si")
+    Celda = ofv.GenCelda("","uti","xcenter","65%","","","",saccioni &  "-" & saccion,"si")
+ '   Celda = Celda & ofv.GenCelda("","uti","","95%","","","",saccion,"si")
+    sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/ARCHIVOS: aquí se guardan los archivos que se utilizarán en el armado de los contenidos de los esquemas. Ruta: Administracion/Estructura/Esquemas/Contenido',270,'#fff')"";"" ","")
+    Celda = Celda & ofv.GenCelda("","","center","10%","","","",sInput,"si")
+    Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+
+
+   sAccion = ""
+   if bModificar  then
+	 sAccioni = "<a href=Cordscr2.asp?direct=" & "ICONOSCURSOGRAMA" & "&nomdir=" & nomdir6 & "&rutdir=" & XferTarget6 & " >" & sicK & "</a>"
+	 sAccion  = "<a class=nt href=Cordscr2.asp?direct=" & dirIcon & "&nomdir=" & nomdir6 & "&rutdir=" & XferTarget6 & " ><big>Iconos Cursograma</big></a>"
+	  Celda = ofv.GenCelda("","uti","center","25%","","","","OTROS","si")
+	  Celda = ofv.GenCelda("","uti rowspan=2","center","25%","","","","OTROS","si")
+	  Celda =  Celda & ofv.GenCelda("","uti","xcenter","65%","","","",saccioni &  "-" & saccion,"si")
+	sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/ICONOSCURSOGRAMA: aquí se guardan las imágenes que se utilizarán en el armado de los tipos de acción. Ruta: Configuracion/Tipos de accion',250,'#fff')"";"" ","")
+	 Celda = Celda & ofv.GenCelda("","","center","10%","","","",sInput,"si")
+	 Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+    end if
+
+    if bModificar then
+         sAccioni = "<a href=Cordscr2.asp?direct=" & "archivos" & "&nomdir=" & nomdir7 & "&rutdir=" & XferTarget7 & " >" & sicK & "</a>"
+         sAccion  = "<a class=nt href=Cordscr2.asp?direct=" & dirmenu & "&nomdir=" & nomdir7 & "&rutdir=" & XferTarget7 & " ><big>Imagenes&nbsp;Pantalla&nbsp;Principal</big></a>"
+       end if
+       Celda = ofv.GenCelda("","uts","center","25%","","","","","si")
+       Celda = ofv.GenCelda("","uti","xcenter","65%","","","",saccioni &  "-" & saccion,"si")
+    '   Celda = Celda & ofv.GenCelda("","uti","","95%","","","",saccion,"si")
+       sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/IMGNOVEDADES: aquí se guardan las imagenes de la pantalla principal',270,'#fff')"";"" ","")
+       Celda = Celda & ofv.GenCelda("","","center","10%","","","",sInput,"si")
+    Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+
+
+
+     sAccion = ""
+	        if bModificar and session("APLMDCLI") ="BC" then
+	          sAccioni = "<a href=Cordscr2.asp?direct=" & "ARCHIVOSLEGALES" & "&nomdir=" & nomdir5 & "&rutdir=" & XferTarget5 & " >" & sicK & "</a>"
+	          sAccion  = "<a class=nt href=Cordscr2.asp?direct=" & "ARCHIVOSLEGALES" & "&nomdir=" & nomdir5 & "&rutdir=" & XferTarget5 & " ><big>Archivos legales</big></a>"
+			   sInput  = ofv.GenerarInput("bot","?","button","","1","bt onMouseout=""hideddrivetip()"" onMouseover=""ddrivetip('Directorio/ARCHIVOSLEGALES: aquí se guardaran archivos legales',250,'#fff')"";"" ","")
+	     Celda = ofv.GenCelda("","uti","","65%","","","",saccioni &  "-" & saccion,"si")
+	      Celda = celda & ofv.GenCelda("","","center","10%","","","",sInput,"si")
+	          Fila = fila & ofv.genrow("","","","","","","",Celda,"si")
+    end if
+
+  sHTML = sHTML & "<br><br><center>" & ofv.GenTabla("b border=2","","","50%","","0","","1","5","","",Fila,"si")
+
+sHTML = sHTML & "<div id=db1 style='position:absolute;top:245px;left:1000px;display:none;border-style:solid;border-width:4;border-color:grey;width:330;height:75' >Directorio\COMPONENTES: aquí se guardan las imágenes que se utilizarán en el armado de componentes. Ruta: Administracion/Estructura/Componentes/Imagenes</div>"
+sHTML = sHTML & "<div id=db2 style='position:absolute;top:280px;left:1000px;display:none;border-style:solid;border-width:4;border-color:grey;width:330;height:75' >Directorio/ARCCOMPONENTES: aquí se guardan los archivos que se utilizarán en el armado de componentes. Ruta: Administracion/Estructura/Componentes/Archivos</div>"
+sHTML = sHTML & "<div id=db3 style='position:absolute;top:315px;left:1000px;display:none;border-style:solid;border-width:4;border-color:grey;width:330;height:75' >Directorio/ESTRUCTURA: aquí se guardan las imágenes que se utilizarán en el armado de los contenidos de los esquemas. Ruta: Administracion/Estructura/Esquemas/Contenido</div>"
+sHTML = sHTML & "<div id=db4 style='position:absolute;top:355px;left:1000px;display:none;border-style:solid;border-width:4;border-color:grey;width:330;height:75' >Directorio\ARCHIVOS: aquí se guardan los archivos que se utilizarán en el armado de los contenidos de los esquemas. Ruta: Administracion/Estructura/Esquemas/Contenido</div>"
+sHTML = sHTML & "<div id=db5 style='position:absolute;top:390px;left:1000px;display:none;border-style:solid;border-width:4;border-color:grey;width:330;height:40' >Directorio/ARCHIVOSLEGALES: aquí se guardaran archivos legales.</div>"
+sHTML = sHTML & "<div id=db6 style='position:absolute;top:425px;left:1000px;display:none;border-style:solid;border-width:4;border-color:grey;width:330;height:75' >Directorio\ICONOSCURSOGRAMA: aquí se guardan las imágenes que se utilizarán en el armado de los tipos de acción. Ruta: Configuracion/Tipos de accion</div>"
+
+
+sHTML = sHTML & "<script language='javascript' >function abrecierra(dive) {"
+sHTML = sHTML & "document.getElementById('db1').style.display='none'; "
+sHTML = sHTML & "document.getElementById('db2').style.display='none'; "
+sHTML = sHTML & "document.getElementById('db3').style.display='none'; "
+sHTML = sHTML & "document.getElementById('db4').style.display='none'; "
+sHTML = sHTML & "document.getElementById('db5').style.display='none'; "
+sHTML = sHTML & "document.getElementById('db6').style.display='none'; "
+sHTML = sHTML & "document.getElementById(dive).style.display='block'; }</script>"
+
+
+
+  Agregar = ""
+  Buscar  = ""
+  Celda   = ""
+
+  sHTML = sHTML & ofv.botoneraESSX("0",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","","no","",Buscar,celda)
+
+
+
+  sHTML = sHTML & "</center></body></html>"
+end if
+
+function selecEmpre()
+
+sImagenx = "<B><FONT FACE=CorFlatIcon COLOR=#aa0000 SIZE=4>x</FONT></B>"
+
+   IF  Session("EMPMUN") = "S" THEN
+
+   Fila    = ""
+
+   SINPUT3 = "&nbsp;<A class=tt style='color:#000000;' title='SELECCIONE EMPRESA' HREF='javascript:void(0);' onclick='shwDem();' >EMPRESA:&nbsp;&nbsp;</a>"
+
+   Fila    = ""
+   Celda   = ""
+   sHref   = ""
+
+   sImage  = ofv.GenImage("","","","","..\CORESS20\EMPRESA\" & ATREMP(0,5),"0","")
+   sLink   = ofv.GenLink("","ttt",sHref,"ftemas","","",sImage,"si")
+   Celda   = Celda & ofv.GenCelda("","tt ","","8%","","","",SINPUT3,"si")
+   Celda   = Celda & ofv.GenCelda("","ttt ","center","5%","","","",sLink,"si")
+   Celda   = Celda & ofv.GenCelda("","ttt  ","","","","","","&nbsp;<BIG>" & ATREMP(0,4) & "</BIG>","si")
+
+   Fila    = fila & ofv.GenRow("","","top","","","","",Celda,"si")
+
+   Tabla   = ofv.GenTabla("","aaa style='"  & Session("CBRDABL") & "' ","","100% ","","0","","-1","-2","","",Fila,"si")
+
+
+
+
+
+   shtml=shtml & "<script language=javascript>" & chr(13)
+   shtml=shtml & "function shwDem(){" & chr(13)
+   shtml=shtml & "document.all.DEM1.style.display='block';" & chr(13)
+   shtml=shtml & "}" & chr(13)
+   shtml=shtml & "</script>" & chr(13)
+ '----------------------------------------------
+   sinput2 = "<a  style='text-decoration:none;' onmouseover='this.style.textDecoration=" & chr(34)
+   sinput2 = sinput2  & "underline" & chr(34) & ";' onmouseout='this.style.textDecoration=" & chr(34)
+   sinput2 = sinput2  & "none" & chr(34) & ";' href='javascript:void(0);' ONCLICK=" & chr(34) & "document.all.DEM1.style.display='none';" & chr(34)
+   sinput2 = sinput2  & " TITLE='OCULTAR' ><b>" & sImagenx & "</b></a>"
+   TABLA = Tabla & "<DIV id='DEM1' STYLE='display:none;z-index:1;margin-top:1;margin-left:1;background-color:#ffffff;position:absolute;left:1px;top:240px;left:20px;height:250px;width:350px;border-style:inset;border-color:#f7aa22;border-width:2;overflow:auto;'>"
+
+
+   TABLAX = TablaX & OFV.gentabla("", "aaa style='filter:shadow(color=#dddddd,direction=125);' ", "", "100%", "", "0", "", "-2", "-1", "", "", "", "no")
+   TABLAX = TablaX & "<tr><td  "
+   TABLAX = TablaX & "class=vT align=left colspan=3 STYLE='border-style:outset;border-width:2;background-color:#eeeeee;' >" & sinput2 & "&nbsp;SELECCIONE EMPRESA</td></tr>"
+   TABLAX = TablaX & "<tr><td colspan=3 "
+   TABLAX = TablaX & " >&nbsp;</td></tr>"
+
+   FOR IAEMP=1 TO TAEMP
+
+    '''  RESPONSE.WRITE  ATREMP(IAEMP,2)
+
+      IF ATREMP(IAEMP,2) = 1 THEN
+
+       IF ATREMP(IAEMP,0) = ATREMP(0,0) THEN
+          TABLAX = TablaX & "<tr BGCOLOR=#EEEEEE >"
+       ELSE
+          TABLAX = TablaX & "<tr>"
+       END IF
+
+       TABLAX = TablaX & "<td width=5 "
+       IF ATREMP(IAEMP,0) = ATREMP(0,0) THEN
+          TABLAX = TablaX & "class=vt  >" & sImagen4si & "</td>"
+       ELSE
+          TABLAX = TablaX & "class=vt  >" & sImagenI3 & "</td>"
+       END IF
+
+       sImage = ofv.GenImage("","","","","..\CORESS20\EMPRESA\" & ATREMP(IAEMP,5),"0","")
+       TABLAX = TablaX & "<td width=5 "
+       TABLAX = TablaX & "class=vt  >" & sImage & "</td>"
+
+       TABLAX = TablaX & "<td class=vt  >"
+
+       'sHref = "subconsulta.asp?Menu=" & sMenu & "&Nombre=" & sNombren & "&CantRegMostrar=10&CantRegMover=0&EMPRE=" & ATREMP(IAEMP,0)
+ 		sHref = "ImgFiles.asp?EMPRE=" & ATREMP(IAEMP,0)
+     '''  sHref = "OBJtreeTema.asp?Tipo=" & sTipo & "&Nombre=" & LNombre & "&Menu=" & SESSION("MENU") & "&EMPRE=" & ATREMP(IAEMP,0)
+       sLink = ofv.GenLink("","cc",sHref,"","","","<b>" & ATREMP(IAEMP,4) & "</b>","si")
+       TABLAX = TablaX & sLink
+       TABLAX = TablaX & "</td>"
+       TABLAX = TablaX & "</tr>"
+      END IF
+
+   NEXT
+
+   TABLAX = TablaX & OFV.genFtabla()
+
+   TABLA = Tabla & TABLAX
+
+   TABLA = Tabla & "</DIV>"
+
+   sHTML = sHTML & TABLA
+
+  end if
+
+end function
+
+Response.Write sHTML
+
+'Celda = ofv.GenCelda("","uti","xcenter","65%","","","",saccioni &  "-" & saccion,"si")
+ 			'Celda = Celda & ofv.GenCelda("","uti","","95%","","","",saccion,"si")
+             'Celda = Celda & ofv.GenCelda("","uti","","5%","","","","","si")
+
+%>

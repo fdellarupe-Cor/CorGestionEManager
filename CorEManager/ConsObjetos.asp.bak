@@ -1,0 +1,712 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires = 0
+  server.scripttimeout = 600
+  response.buffer = true
+
+
+
+''''''''''''''
+
+
+  XXXX = NEWEMPRE("NO")
+
+    volver = OFV.vueltaasp2("../")
+    volver2 = OFV.vueltaasp2("")
+
+    sNombre = "Tema - Subtema"
+
+    sID = Request.querystring("ID")
+    TIPOVISTA    = Request.querystring("TIPOVISTA")
+    sitem = OFV.convertircar(Request.querystring("sitem"), "_", " ")
+    stitem = OFV.convertircar(Request.querystring("stitem"), "_", " ")
+    Stnivel = Request.querystring("stnivel")
+    If Request.querystring("stesq") = "" Then
+        stesq = "TEMA"
+    Else
+        stesq = Request.querystring("stesq")
+    End If
+
+    volver2 = volver2 & "?ID=" & sID
+    volver2 = volver2 & "&sitem=" & OFV.convertircar(sitem, " ", "_")
+    volver2 = volver2 & "&stitem=" & OFV.convertircar(stitem, " ", "_")
+    volver2 = volver2 & "&stnivel=" & Stnivel & "&stesq=" & stesq
+    volver2 = OFV.convertircar(volver2, "&", "*")
+
+    ReDim Preserve bConsultar(4)
+    OFV.ObtenerAtributosNOdo Session("Form"), "", "ESTADO", "4"
+    bConsultar(4) = OFV.AConsultar
+    OFV.ObtenerAtributosNOdo Session("Form"), "", "ESTADO", "2"
+    bConsultar(2) = OFV.AConsultar
+    OFV.ObtenerAtributosNOdo Session("Form"), "", "ESTADO", "1"
+    bConsultar(1) = OFV.AConsultar
+    OFV.ObtenerAtributosNOdo Session("Form"), "", "ESTADO", "3"
+    bConsultar(3) = OFV.AConsultar
+
+    sVerEstado = "  and Objetos.objnivel >= " & Session("SegNivel") & " "
+
+
+
+  ' response.write session("FormN")
+
+    IF TIPOVISTA="CONS" THEN
+     sverestado = sverestado & " and Objprty.Estado In (3)"
+    ELSE
+    sverestado = sverestado & " and Objprty.Estado In (9,"
+   ' sverestado = sverestado & " and Objprty.Estado In (3)"
+    For i = 1 To 4
+        If bConsultar(i) Then
+           sVerEstado = sVerEstado & i & ","
+           if i = 1 then sVerEstado = sVerEstado & "6,"
+           if i = 2 then sVerEstado = sVerEstado & "5,"
+        end if
+    Next
+    sVerEstado = Left(sVerEstado, Len(sVerEstado) - 1) & ") "
+    END IF
+
+  sHTML      = ofv.FormHeader(session("FormN"))
+
+
+         '     sActcon  = "Consultar.asp?Codigo=" & rs(0) & "&Tipo="
+         '     sActcon  = sActcon & stitem & "&Perfil=" & sPerfil
+         '     sActcon  = sActcon & "&Datos=" & "&Volver=" & volver2
+
+
+    xs = "<script language=JavaScript>" & Chr(13)
+    xs = xs & "function AbrirCons(Datos) {" & Chr(13)
+     xs = xs & " var h=570;w=790 ;"
+		if  session("APLMDCLI")="BC" THEN
+	      xs = xs &  "if (window.screen) {w = window.screen.availWidth;h = window.screen.availHeight-60;} "
+		END IF
+
+    xs = xs & " myWin= open(Datos"
+    xs = xs & "," & Chr(34) & "Cons" & Chr(34) & "," '& Chr(34)
+    'xs = xs & "menubar=no,toolbar=no,status=yes,height=570,width=790,resizable=yes" & Chr(34)
+    xs = xs &"  'menubar=no,toolbar=no,width='+w+',height='+h+',top=0,left=0,resizable=yes,status=yes'" '& CHR(34
+    xs = xs & " ); " & Chr(13) & " } " & Chr(13)
+
+    xs = xs & "function Axn(c1,c2,c3) {" & Chr(13)
+
+    xs = xs & " var mydat= 'Consultar.asp?Codigo=' + c1 + '&Tipo=' + c2 + '&Perfil=' + c3 + '&Datos=&Volver=" & volver2 & "'; "
+     xs = xs & " var h=570;w=790 ;"
+		if  session("APLMDCLI")="BC" THEN
+		      xs = xs &  "if (window.screen) {w = window.screen.availWidth;h = window.screen.availHeight-60;} "
+		END IF
+    xs = xs & " myWin= open(mydat"
+    xs = xs & "," & Chr(34) & "Cons" & Chr(34) & "," '& Chr(34)
+    'xs = xs & "menubar=no,toolbar=no,status=yes,height=570,width=790,resizable=yes" & Chr(34)
+     xs = xs &"  'menubar=no,toolbar=no,width='+w+',height='+h+',top=0,left=0,resizable=yes,status=yes'" '& CHR(34
+    xs = xs & " ); " & Chr(13) & " } " & Chr(13)
+
+
+    xs = xs & "</script>" & Chr(13)
+
+    sHTML = sHTML & xs
+
+  sImagenM   = "<B><FONT FACE=""corflaticon"" COLOR=#005500 SIZE=3>2</FONT></B>"
+  sImagenI2  = "<B><FONT FACE=""corflaticon"" COLOR=#f7aa22 SIZE=3>&#0128;</FONT></B>"
+  sImagenI   = "<B><FONT FACE=""corflaticon"" COLOR=#f7aa22 SIZE=2>u</FONT></B>"
+  sImagenI3  = "<B><FONT FACE=""corflaticon"" COLOR=#6699CC SIZE=2>=</FONT></B>"
+  sImagenEM  = "<B><FONT FACE=corflaticon COLOR=#F7AA22 SIZE=3>&#0252;</FONT></B>"
+  sImagen4si = "<B><FONT FACE=corflaticon COLOR=#993333 SIZE=3>4</FONT></B>"
+  sImagenx   = "<B><FONT FACE=corflaticon COLOR=#aa0000 SIZE=4>x</FONT></B>"
+
+
+  Fila    = ""
+  Celda   = ""
+  sHref   = ""
+
+  IF  Session("EMPMUN") = "S" THEN
+
+  sLink   = ofv.GenImage("","","","","..\CORESS20\EMPRESA\" & ATREMP(0,5),"0","")
+  Celda   = Celda & ofv.GenCelda("","tt ","","8%","","","","EMPRESA:&nbsp;&nbsp;","si")
+  Celda   = Celda & ofv.GenCelda("","ttt ","center","5%","","","",sLink,"si")
+  Celda   = Celda & ofv.GenCelda("","ttt  ","","","","","","&nbsp;<BIG>" & ATREMP(0,4) & "</BIG>","si")
+
+  Fila    = fila & ofv.GenRow("","","top","","","","",Celda,"si")
+
+  Tabla   = ofv.GenTabla("","aaa  ","","100% ","","0","","-1","-2","","",Fila,"si")
+  sHTML   = sHTML & Tabla
+
+  end if
+
+  Fila = ""
+
+
+   sHTML = sHTML & "<br><center>"
+
+
+    Response.write sHTML
+    sHTML = ""
+    Response.flush
+
+    Set cn = OFV.conectar(OFV.strconn2)
+
+    xTrColor = "#FFFFFF"
+
+    If Session("EMPMUN") = "S" Then
+
+       sxlink2 = ""
+       sxlink2 = sxlink2 & "<A class=nt "
+       sxlink2 = sxlink2 & " HREF="
+       sxlink2 = sxlink2 & "OBJtreeTema.asp?Tipo=Consulta&Nombre=TEMAS&Menu=Consulta&UN=" & aempre0
+       sxlink2 = sxlink2 & " >"
+
+    End If
+
+
+
+    If Stnivel = 1 Then
+
+        Session("XstemaSid")     = sID
+        Session("XstemaSitem")   = sitem
+        Session("XstemaStitem")  = stitem
+        Session("XstemaStnivel") = Stnivel
+        Session("XstemaStesq")   = stesq
+
+    Else
+
+        sesn                      = "X" & Stnivel
+        Session(sesn & "Sid")     = sID
+        Session(sesn & "Sitem")   = sitem
+        Session(sesn & "Stitem")  = stitem
+        Session(sesn & "Stnivel") = Stnivel
+        Session(sesn & "Stesq")   = stesq
+
+    End If
+
+
+
+        stitemt     = "Tema"
+        sIconot     = "ICorTema.jpg"
+        sNuevoTipot = "SUBTEMAS"
+        nNivelt     = 0
+
+        StrSql = "Select codtema from prodserv where codprodserv = 0" & Session("XstemaSid")
+        Set rsx = OFV.crearconsultaEx(StrSql, cn, 1, "")
+        If Not rsx.EOF Then
+             Strsql = "Select descri, codtema From Tema where codtema = " & rsx(0)
+             Set rsx = OFV.crearconsultaEx(StrSql, cn, 1, "")
+             If Not rsx.EOF Then
+                stemaid   = rsx(1)
+                stemades  = rsx(0)
+             End If
+        End If
+        Call OFV.cerrarconsulta(rsx)
+
+
+
+        sHref = "ObjTreeSubTemaCons.asp?Tipo=" & sNuevoTipot & "&ID=" & stemaid & "&sitem=TEMA:_"
+        sHref = sHref & ofv.convertircar(stemades," ","_") & "&stitem="
+        sHref = sHref & ofv.convertircar(stitemt," ","_") & "&sticono=" & sIconot
+        sHref = sHref & "&stnivel=" & nNivelt &"&TIPOVISTA="&TIPOVISTA
+
+
+        sHref2 = "ConsObjetos.asp?ID=" & Session("XstemaSid")
+        sHref2 = sHref2 & "&sitem=" & OFV.convertircar(Session("XstemaSitem"), " ", "_") & "&stitem="
+        sHref2 = sHref2 & OFV.convertircar(Session("XstemaStitem"), " ", "_")
+        sHref2 = sHref2 & "&stnivel=" & Session("XstemaStnivel") & "&stesq=" & Session("XstemaStesq")&"&TIPOVISTA="&TIPOVISTA
+
+
+
+      TABLA   = ofv.GenTabla("","aaa  style='border-style=solid;border-width:1;border-color:#eeeeee;' ","","90% ","","0","","-1","3","","","","no")
+      sHTML   = sHTML & Tabla
+'''''''''''''''''''''''''''''
+
+''''''''''''''''' TEMA ''''''''''''
+      Celda   = ""
+      sxicon  = "ICorAbierto.jpg"
+
+   ''   sImage  = ofv.GenImage("","","","","Iconos\" & sxicon,"0","")
+
+      sImage  = "<font face='corflaticon' size=3 color='#f7aa22'>4</font>"
+      sLink   = ofv.GenLink("","ut",sHref,"","","",sImage,"si")
+      Celda   = Celda & ofv.GenCelda("","uts","center","2%","","","",sLink,"si")
+
+      sLink   = ofv.GenLink("","ut",sHref,"","","","TEMA:&nbsp;" & stemades,"si")
+      Celda   = Celda & ofv.GenCelda("","ut bgcolor='" & xTrColor & "' ","","90%","","","",sLink,"si")
+
+      Fila    = Fila & ofv.GenRow("","aaa  ","","","22","","",Celda,"si")
+
+      sHTML   = sHTML & Fila
+      sHTML   = sHTML & "<tr>"
+
+      sLink   = "&nbsp;"
+      sHTML   = sHTML & ofv.GenCelda("","ut","center","2%","","","",sLink,"si")
+      sHTML   = sHTML & ofv.GenCelda("","ut","","2%","","","","","no")
+
+      Fila    = ""
+      sHTML   = sHTML & "<table cellpadding=2 cellspacing=0 width=98%   >"
+
+
+''''''''''''''''''''''''''''''
+
+
+''''''''''''''''' SUBTEMA ''''''''''''
+      Celda   = ""
+      sHref   = sHref2
+
+     '' sImage  = ofv.GenImage("","","","","Iconos\" & sxicon,"0","")
+
+      sImage  = "<font face='corflaticon' size=3 color='#f7aa22'>4</font>"
+      sLink   = ofv.GenLink("","ut",sHref,"","","",sImage,"si")
+      Celda   = Celda & ofv.GenCelda("","uts","center","2%","","","",sLink,"si")
+
+      sLink   = ofv.GenLink("","ut",sHref,"","","",Session("XstemaSitem"),"si")
+      Celda   = Celda & ofv.GenCelda("","ut bgcolor='" & xTrColor & "' ","","90%","","","",sLink,"si")
+
+      Fila    = Fila & ofv.GenRow("","aaa  ","","","22","","",Celda,"si")
+
+      sHTML   = sHTML & Fila
+      sHTML   = sHTML & "<tr>"
+
+      sLink   = "&nbsp;"
+      sHTML   = sHTML & ofv.GenCelda("","ut","center","2%","","","",sLink,"si")
+      sHTML   = sHTML & ofv.GenCelda("","ut","","2%","","","","","no")
+''''''''''''''''''''''''''''''
+
+
+
+
+
+    If Stnivel > 1 Then
+        For xxin = 2 To Stnivel
+
+            sesn    = "X" & xxin
+            sxlink  = ""
+            sxlink  = sxlink & "<A class=nt HREF=ConsObjetos.asp?ID="
+            sxlink  = sxlink & Session(sesn & "Sid") & "&sitem="
+            sxlink  = sxlink & OFV.convertircar(Session(sesn & "Sitem"), " ", "_") & "&stitem="
+            sxlink  = sxlink & OFV.convertircar(Session(sesn & "Stitem"), " ", "_")
+            sxlink  = sxlink & "&stnivel=" & Session(sesn & "Stnivel") & "&stesq=" & Session(sesn & "Stesq")  &"&TIPOVISTA="&TIPOVISTA
+            sxlink  = sxlink & "  >"
+
+            sxlink  = ""
+            sxlink  = sxlink & "ConsObjetos.asp?ID="
+            sxlink  = sxlink & Session(sesn & "Sid") & "&sitem="
+            sxlink  = sxlink & OFV.convertircar(Session(sesn & "Sitem"), " ", "_") & "&stitem="
+            sxlink  = sxlink & OFV.convertircar(Session(sesn & "Stitem"), " ", "_")
+            sxlink  = sxlink & "&stnivel=" & Session(sesn & "Stnivel") & "&stesq=" & Session(sesn & "Stesq") &"&TIPOVISTA="&TIPOVISTA
+
+
+            Fila    = ""
+            sHTML   = sHTML & "<table cellpadding=2 cellspacing=2 width=98%   >"
+
+            If Session("USRES") <> "B" Then
+        ''        sHTML = sHTML & "<img border=0 src=Iconos\ICorAbierto.jpg>"
+            Else
+        ''        sHTML = sHTML & "<b><font face=corflaticon size=4 color=#993333>1</font></b>"
+            End If
+
+
+''''''''''''''''' ESQUEMAS SUPERIORES ''''''''''''
+            Celda   = ""
+            sHref   = sxlink
+
+         ''   sImage  = ofv.GenImage("","","","","Iconos\" & sxicon,"0","")
+
+            sImage  = "<font face='corflaticon' size=3 color='#f7aa22'>4</font>"
+            sLink   = ofv.GenLink("","ut",sHref,"","","",sImage,"si")
+            Celda   = Celda & ofv.GenCelda("","uts","center","2%","","","",sLink,"si")
+
+            sLink   = ofv.GenLink("","ut",sHref,"","","",Session(sesn & "Sitem"),"si")
+            Celda   = Celda & ofv.GenCelda("","ut bgcolor='" & xTrColor & "' ","","90%","","","",sLink,"si")
+
+            Fila    = Fila & ofv.GenRow("","aaa  ","","","22","","",Celda,"si")
+
+            sHTML   = sHTML & Fila
+            sHTML   = sHTML & "<tr>"
+
+            sLink   = "&nbsp;"
+            sHTML   = sHTML & ofv.GenCelda("","ut","center","2%","","","",sLink,"si")
+            sHTML   = sHTML & ofv.GenCelda("","ut","","2%","","","","","no")
+''''''''''''''''''''''''''''''
+
+        Next
+    End If
+
+
+
+      Fila    = ""
+      sHTML   = sHTML & "<table cellpadding=3 cellspacing=0 width=95%   >"
+
+
+
+    StrSql = "SELECT DISTINCT OBJETOS.codobjeto, OBJETOS.descri, OBJETOS.tipobjeto, Estados.estado, "
+    StrSql = StrSql & "Relaobj.tipobjasoc, OBJPRTY.fecemis, OBJPRTY.fecvigen, OBJPRTY.fecbaja,"
+    StrSql = StrSql & " OBJPRTY.autor,OBJPRTY.aprobo, OBJPRTY.elimino, OBJPRTY.fecvto, OBJETOS.OBJUN, objetos.indobj"
+    StrSql = StrSql & " FROM RELAOBJ, OBJETOS, OBJPRTY, Estados "
+    StrSql = StrSql & " where "
+    StrSql = StrSql & " RELAOBJ.codojasoc = OBJETOS.codobjeto and "
+    StrSql = StrSql & " OBJPRTY.estado    = Estados.objid and "
+    StrSql = StrSql & " OBJETOS.codobjeto = OBJPRTY.codobjeto  and "
+    StrSql = StrSql & " (objetos.objun =  " & session("UN") & " or "
+    StrSql = StrSql & "  objetos.objun =  1 )  and "
+    StrSql = StrSql & " RELAOBJ.codobjmaster = " & sID
+    StrSql = StrSql & " and relaobj.tipobjmaster = '" & stitem & "' " & sVerEstado
+    StrSql = StrSql & " order by objetos.indobj, OBJETOS.tipobjeto, OBJETOS.descri, Estados.estado "
+
+    sNuevoTipo = "ESQUEMAS"
+    nNivel = Stnivel + 1
+    Session("sID2") = sID
+   ' response.write strsql & "<br>"
+    sVino = "N"
+    Set rs = OFV.crearconsultaEx(StrSql, cn, 1, "")
+    If rs.EOF Then
+
+       sVino = "N"
+
+
+    Else
+
+        sVino = "N"
+
+        nlinea = 0
+        Do Until rs.EOF
+             sVinook = "N"
+             if  cstr(rs(12) & "") = cstr(session("UN") & "") then
+   '' response.write "<br><br>entro"
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+
+          if SESSION("EMPMUN") = "S" THEN
+             StrSql = "Select OBJMEMPALC.CODEMPRE  from OBJMEMPALC "
+             StrSql = StrSql & " where "
+             StrSql = StrSql & " OBJMEMPALC.codobjeto = " & rs(0) & " and "
+             StrSql = StrSql & " OBJMEMPALC.CODEMPRE = " & Session("UN") & " "
+             Set rsmas2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+             If  Not rsmas2.EOF Then
+                 sVino   = "S"
+                 sVinook = "S"
+             end if
+          end if
+
+          sNIVE   = "D"
+
+          if  sVinook = "S" then
+
+            stitem = rs(4)
+            StrSql = "Select archivo, descri, perfil, TIPOCPT From Tipobjeto "
+            StrSql = StrSql & "Where Tipobjeto.tipobjeto = '" & rs(4) & "'"
+            Set rsIcono = OFV.crearconsultaEx(StrSql, cn, 1, "")
+            If Not rsIcono.EOF Then
+                sIcono  = rsIcono(0)
+                sTipoE  = rsIcono(1)
+                sPerfil = rsIcono(2)
+                sNIVE   = rsIcono(3)
+             '''   sitem   = sTipoE & ": " & rs(1) & " - (" & rs(3) & ")"
+
+                sitem = sTipoE & ": " & rs(1)
+
+                IF sNIVE = "D" THEN  sitem = sitem & " - (" & rs(3) & ")"
+
+
+            End If
+            Call OFV.cerrarconsulta(rsIcono)
+
+
+
+            IF sNIVE = "C" then
+
+
+               Strsql = "Select * From OBJSDK Where tipobjeto='" & rs(4) & "' and codobjeto = " & rs(0)
+               set rsIcono = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+               if not rsIcono.eof then
+
+
+                  if Session("Usuario") <> rsIcono(7) and rsIcono(5) then
+
+
+                     call ofv.cerrarconsulta(rsIcono)
+
+
+                     Strsql = "Select * From OBJSDKDET Where tipobjeto='" & rs(4)
+                     Strsql = Strsql & "' and codobjeto = "  & rs(0)
+                     Strsql = Strsql & " and ("
+                     Strsql = Strsql & "(grpusr = 'USR-" & Session("Usuario") & "') "
+
+'''''''''''''''''''''''''''''''''''''''''''
+                     if  Session("DELLOG") = "S" then
+
+                         XMFTGRP = split(session("SegGrpLst"),chr(9))
+                         xcount  = ubound(XMFTGRP) + 1
+                         XMFSEP  = ""
+                         StrSql = StrSql & " or ( grpusr in ("
+
+                         for XMFI = 0 to ubound(XMFTGRP)
+                             StrSql = StrSql  & XMFSEP & "'GRP-" & XMFTGRP(XMFI) & "'"
+                             XMFSEP  = ","
+                         next
+
+                         StrSql = StrSql & ")) "
+
+                      else
+                         Strsql = Strsql & " or (grpusr = 'GRP-" & Session("Seggrp") & "')"
+                      end if
+
+
+''''''''''''''''''''''''''''''''''''''''''
+
+
+                      Strsql = Strsql & ") "
+
+'response.write strsql & "<br>"
+                      set rsIcono = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+                      if rsIcono.eof then sVinook = "N"
+
+                  end if
+                end if
+               call ofv.cerrarconsulta(rsIcono)
+
+
+
+            end if
+
+      if  sVinook = "S" then
+
+
+
+      smas = "&nbsp;"
+
+      StrSql = "Select relaobj.codojasoc, objetos.objun  from relaobj, OBJPRTY, Estados, objetos "
+
+      StrSql = StrSql & " where "
+
+      StrSql = StrSql & " relaobj.codojasoc = OBJPRTY.codobjeto and "
+      StrSql = StrSql & " objetos.codobjeto = relaobj.codojasoc and "
+      StrSql = StrSql & " (objetos.objun =  " & session("UN") & " or "
+      StrSql = StrSql & "  objetos.objun =  1 ) and "
+      StrSql = StrSql & " OBJPRTY.estado = Estados.objid and "
+      StrSql = StrSql & " relaobj.tipobjmaster = '" & rs(2) & "'"
+      StrSql = StrSql & " and relaobj.codobjmaster = " & rs(0) & sVerEstado
+  '  response.write "<br><br><br><br>" & strsql & "<br>"
+      Set rsmas = OFV.crearconsultaEx(StrSql, cn, 1, "")
+      If  Not rsmas.EOF Then
+   '' response.write "<br><br>entro " & session("UN")
+          do until rsmas.eof
+   '' response.write "<br><br>entro 2 -" & session("UN") & " " & rsmas(1) & "<br>"
+             if  cstr(rsmas(1) & "") = cstr(session("UN") & "") then
+   '' response.write "<br><br>entro"
+                 smas = "<font color=#993333 size=1>(+)</font>"
+                 exit do
+             end if
+
+          if SESSION("EMPMUN") = "S" THEN
+             StrSql = "Select OBJMEMPALC.CODEMPRE  from OBJMEMPALC "
+             StrSql = StrSql & " where "
+             StrSql = StrSql & " OBJMEMPALC.codobjeto = " & rsmas(0) & " and "
+             StrSql = StrSql & " OBJMEMPALC.CODEMPRE = " & Session("UN") & " "
+             Set rsmas2 = OFV.crearconsultaEx(StrSql, cn, 1, "")
+             If  Not rsmas2.EOF Then
+                 smas = "<font color=#993333 size=1>(+)</font>"
+                 exit do
+             end if
+          end if
+
+             rsmas.movenext
+          loop
+
+      End If
+      Call OFV.cerrarconsulta(rsmas)
+
+          sxlink = ""
+          sxlink  = sxlink & "ConsObjetos.asp?TIPOVISTA=" & TIPOVISTA &"&"
+          sxlink  = sxlink & "ID=" & rs(0) & "&sitem="
+          sxlink  = sxlink & OFV.convertircar(sitem, " ", "_") & "&stitem="
+          sxlink  = sxlink & OFV.convertircar(stitem, " ", "_") & "&stnivel="
+          sxlink  = sxlink & nNivel
+          sxlink  = sxlink & "&stesq=" & OFV.convertircar(rs(2), " ", "_")
+
+          sHref   = sxlink
+
+
+          if sNIVE   = "D" then
+
+
+            if  smas <> "&nbsp;" then
+
+
+               IF session("APLMDCLI")="BaC" then
+                sFuncion = " onclick=" & Chr(34) & " Axn('" & rs(0) & "','" & stitem & "','" & sPerfil & "'); return false;" & Chr(34)
+                sHref="'javacript:void(0);'	 "
+                scon     = "<A class=nt href=" & sHref & sFuncion  & "' title='Ver...'  >"
+               ELSE
+                scon     = "<A class=nt href=" & sHref   & "' title='Expandir Estructura...'  >"
+               END IF
+              '  scon     = "<A class=nt href='" & sHrefw & "' title='ver...'  >"
+                scon     = scon & "<font face='corflaticon' size=2 color='#aa0000' style='border-style=solid;"
+                scon     = scon & "border-width:1;border-color:#f9f9f9;' >2</font>"
+                scon     = scon & "</a>"
+
+            else
+                scon     = "&nbsp;"
+            end if
+
+          else
+            scon     = "&nbsp;"
+          end if
+
+
+
+            If clng("0" & rs(12)) = 1 and  SESSION("UN") <> 1 and  SESSION("EMPMUN") = "S" Then
+                smasc = "&nbsp;&nbsp;&nbsp;<font color=#993333 ><font class=btic title='Corporativo' >G</font></font>"
+            Else
+                smasc = "&nbsp;"
+            End If
+
+
+            Celda   = ""
+            Celda   = Celda & ofv.GenCelda("","ut","center","1%","","","",smasxxx,"si")
+            Celda   = Celda & ofv.GenCelda("","uts","center","2%","","","",scon,"si")
+
+
+
+          if  sNIVE   = "D" then
+
+              sImage  = "<font face='corflaticon' size=4 color='#005500' >&#0157;</font>"
+              sHref    = "&nbsp;"
+              sFuncion = " onclick=" & Chr(34) & " Axn('" & rs(0) & "','" & stitem & "','" & sPerfil & "'); return false;" & Chr(34)
+
+              scon     = "<A class=nt href='" & sHref & "' " & sFuncion & " title='ver...'  >"
+              scon     = scon & sImage
+              scon     = scon & "</a>"
+
+              sLink    = scon
+              Celda   = Celda & ofv.GenCelda("","uts","center","2%","","","",sLink,"si")
+
+'aca
+
+              scon     = "<A class=nt href='" & shref & "' " & sFuncion & " title='Ver...'  >"
+              scon     = scon & sitem '& smasc & "&nbsp;&nbsp;&nbsp;&nbsp" & smas
+              scon     = scon & "</a>"
+
+              scon     = scon & "<A class=nt href='" & sxlink & "' " & wsFuncion & " title='Expandir Estructura...'  >"
+			  scon     =  scon & masc & "&nbsp;&nbsp;&nbsp;&nbsp" & smas
+              scon     = scon & "</a>"
+
+
+              sLink    = scon
+              Celda   = Celda & ofv.GenCelda("","ut bgcolor='" & xTrColor & "' ","","95%","","","",sLink,"si")
+
+
+          else
+              sImage   = "<font face='corflaticon' size=4 color='#336699' >&#0204;</font>"
+              sLink    = ofv.GenLink("","ut",sHref,"","","",sImage,"si")
+
+              Celda   = Celda & ofv.GenCelda("","uts","center","2%","","","",sLink,"si")
+
+              sLink   = ofv.GenLink("","ut",sHref,"","","",sitem & smasc & "&nbsp;&nbsp;&nbsp;&nbsp;" & smas,"si")
+              Celda   = Celda & ofv.GenCelda("","ut bgcolor='" & xTrColor & "' ","","95%","","","",sLink,"si")
+
+
+          end if
+
+
+
+
+            Fila    = Fila & ofv.GenRow("","aaa  ","","","25","","",Celda,"si")
+
+            if  xTrColor = "#FFFFFF" then
+                xTrColor = "#F9F9F9"
+            ELSE
+                xTrColor = "#FFFFFF"
+            END IF
+
+          end if
+
+         end if
+
+
+            rs.movenext
+            nlinea = nlinea + 1
+            Response.write sHTML
+            sHTML = ""
+            If nlinea > 20 Then
+                nlinea = 0
+                Response.flush
+            End If
+        Loop
+    End If
+
+    if  sVino = "N" then
+
+        Celda   = ""
+
+        sLink   = "&nbsp;"
+        Celda   = Celda & ofv.GenCelda("","ut","center","2%","","","",sLink,"si")
+
+        sLink   = "&nbsp;"
+        Celda   = Celda & ofv.GenCelda("","ut","center","2%","","","",sLink,"si")
+
+        sLink   = "No hay Esquemas asociados"
+        Celda   = Celda & ofv.GenCelda("","ttt","","90%","","","",sLink,"si")
+
+        Fila    = Fila & ofv.GenRow("","aaa bgcolor='" & xTrColor & "' ","","","25","","",Celda,"si")
+
+    end if
+
+    sHTML = sHTML & Fila
+    sHTML = sHTML & "</table>"
+
+    If  Stnivel > 1 Then
+        For xxin = 2 To Stnivel
+
+            sHTML = sHTML & "</td>"
+            sHTML = sHTML & "</tr>"
+            sHTML = sHTML & "</table>"
+
+        NEXT
+    END IF
+
+    sHTML = sHTML & "</td>"
+    sHTML = sHTML & "</tr>"
+    sHTML = sHTML & "</table>"
+
+    sHTML = sHTML & "</td>"
+    sHTML = sHTML & "</tr>"
+    sHTML = sHTML & "</table>"
+
+
+    Call OFV.cerrarconsulta(rs)
+    Call OFV.cerrarconn(cn)
+
+
+  'Botonera
+  Agregar = ""
+  Buscar  = ""
+  Celda   = ""
+
+  if session("SMPLMENU") = "S" then
+     sAccion = "novedmenu.asp"
+     xxxx    = CorGenBotonXp(16, "NO", "home", "tahoma", "NO", "Home", "_self", "Home")
+     Celda   = ofv.GenBoton(16, "esp1Bot", "BT", "S", "", "S", "A", "N", "esp1Frm", sAccion & "")
+  end if
+
+  sHTML = sHTML & ofv.botoneraESSX("0","","","","","","","","","no",Agregar,Buscar,celda)
+
+
+    sHTML = sHTML & "</body></html>"
+
+
+
+
+
+'''''''''''''
+
+end if
+
+response.write sHTML
+
+if ok <> "Y" then response.flush
+
+
+
+%>

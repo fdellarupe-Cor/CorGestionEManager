@@ -1,0 +1,242 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  sestado = 1
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  XXXX = GENLOGEXT("EDIDET")
+
+  ofv.ObtenerAtributos Session("Form2"),""
+  bModificar = ofv.AModificar
+  bModificaresp = ofv.AModificar
+   if session("Nomodificar") = "S" then
+
+    ' if LEFT(Session("Form2"),4) <> "DESA" then    bModificar = False
+        bModificar = False
+    ELSE
+     if session("Nomodificar") = "N" AND LEFT(Session("Form2"),4) ="TEMA"   THEN bModificar = False
+  end if
+
+  nCodigo = request.querystring("Codobjeto")
+  sTipo   = request.querystring("Tipobjeto")
+  sVolver = request.querystring("volver")
+  sCod    = request.querystring("cod")
+  vuelta  = ofv.vueltaasp2("../")
+  vuelta2 = ofv.vueltaasp2("")
+
+  sHTML = ofv.FormHeader(session("FormN"))
+
+'----------------------------------------------
+
+  shtml = shtml & CorPnlFnc("N","")
+
+  sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' >"
+
+'-------------------------------------------------
+
+  set cn  = ofv.conectar(ofv.strconn2)
+
+  sImagenU = "<FONT FACE=corflaticon COLOR=#AA0000 SIZE=3 >&#0128;</FONT>"
+  sImagenS = "<FONT FACE=corflaticon COLOR=#f7aa22 SIZE=3 >G</FONT>"
+  sImagenE = "<FONT FACE=corflaticon COLOR=#005500 SIZE=3 >C</FONT>"
+  sImagenGM = "<FONT FACE=corflaticon COLOR=#005500 SIZE=5 >&#0148;</FONT>"
+
+
+  sHTML = sHTML & "<center>"
+
+  Celda = ofv.gencelda("","ttt colspan=4","","","","","","<big>Lista&nbsp;de&nbsp;distribuci&oacute;n</big>","si")
+  Fila = ofv.GenRow("","","","","25","","",Celda,"si")
+
+  Celda = ofv.gencelda("","ttr","","1%","","","","&nbsp;","si")
+  Celda = Celda & ofv.gencelda("","ttr colspan=3","","98%","","","","Destinatario","si")
+  Fila = fila & ofv.GenRow("","","","","20","","",Celda,"si")
+
+
+  Strsql = "SELECT * FROM OBJdist  "
+  Strsql = Strsql & " Where codobjeto=" & nCodigo
+  Strsql = Strsql & " And tipobjeto = '" & stipo & "' AND GRPUSR LIKE '%XXXTODOS%' "
+'response.write strsql
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+  if not rs.eof then
+
+  '   RESPONSE.WRITE "ENCONTRO<br>"
+
+
+     WKFGRPTEMP = REPLACE(RS("GRPUSR") & "","XXXTODOSXXX","")
+
+     Strsql = "DELETE FROM OBJdist WHERE OBJID = 0" & RS(0)
+
+     CALL ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+  '             RESPONSE.WRITE WKFGRPTEMP & "<br>"
+               CALL getUsrIngroup(WKFGRPTEMP)
+
+               XGUTABKEY = SPLIT(session("SGU_UIGuserid"), CHR(9))
+
+               FOR WKFINX = 0 TO UBOUND(XGUTABKEY)
+
+                   WKFUSRGRP = XGUTABKEY(WKFINX) & ""
+
+                   Strsql = "INSERT INTO OBJDIST (CODOBJETO,TIPOBJETO,GRPUSR) "
+                   Strsql = Strsql & " VALUES ('" & nCodigo & "','" & stipo & "','" & WKFUSRGRP & "') "
+ '                  response.write Strsql & "<br>"
+                   CALL ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+               NEXT
+
+
+
+  END IF
+
+
+
+  Strsql = "SELECT * FROM OBJdist  "
+  Strsql = Strsql & " Where codobjeto=" & nCodigo
+  Strsql = Strsql & " And tipobjeto = '" & stipo & "' "
+
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+  if not rs.eof then
+
+  do until rs.eof
+
+    sForm = "dist" & rs(0)
+
+   if bModificar  then
+      sHref = "asp/EliminarEN.asp?ID=" & rs(0) & "&Tabla=Objdist&volver="
+      sHref = sHref  & vuelta & "?Cod=" & sCod
+      sHref = sHref & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Eliminar=NSNC"
+    end if
+    if sHref <> "" then
+      Celda = ofv.BotonEliminar("Usuario",sHref)
+    else
+      Celda = ofv.GenCelda("","","","","","","","&nbsp;","si")
+    end if
+
+    'destinatario
+
+    sTabla = "Usuario"
+
+    sBusca = rs(4)
+
+    if Ucase(sBusca) = "SECT-" then
+
+       sGrpUsr = "S/D"
+
+
+       Strsql = "SELECT * FROM eco"
+       Strsql = Strsql & " Where eco = 0" & rs(5)
+
+       set rx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+       if not rx.eof then sGrpUsr = sImagenS & "&nbsp;&nbsp;" & rx(1)
+       call ofv.cerrarconsulta(rx)
+
+
+       sinput = ofv.gencelda("","uti  colspan=3 ","","100%","","","",sGrpUsr,"si")
+
+
+    elseif Ucase(sBusca) = "TODOS" then
+
+       sGrpUsr = "S/D"
+
+
+       Strsql = "SELECT * FROM CLIENTEPLAN "
+       Strsql = Strsql & " Where ID = 0" & rs(5)
+
+       set rx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+       if not rx.eof then sGrpUsr = sImagenE & "&nbsp;&nbsp;" & rx(1)
+       call ofv.cerrarconsulta(rx)
+
+
+       sinput = ofv.gencelda("","uti  ","","100%","","","",sGrpUsr,"si")
+
+
+    else
+
+       sGrpUsr = "S/D"
+        IF mid(sBusca,1,4)="GRM-" THEN
+          sgrupoM=mid( sBusca  ,5,len(sBusca)  )
+          xxx=ucase(getMailDelGrupo(sgrupoM))
+         sGrpUsr = sImagenGM & "&nbsp;&nbsp;<B>GRUPO DE CORREO:</B> " & sBusca & "  &nbsp;&nbsp;--  &nbsp;&nbsp;<B>MAIL : </B>" & xxx
+        ELSE
+
+        xxxx     = getInfoUser(sBusca)
+        sGrpUsr = session("SGU_nombre")
+
+        sGrpUsr = sImagenU & "&nbsp;&nbsp;" & sBusca & " - " & sGrpUsr
+        END IF
+
+
+       sinput = ofv.gencelda("","uti  colspan=3 ","","100%","","","",sGrpUsr,"si")
+
+    end if
+
+    Celda = Celda & sinput
+
+    Fila = fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+   rs.movenext
+   loop
+    else
+
+
+       Celda  = ofv.gencelda("","vt  colspan=4  ","","100%","","","","&nbsp;","si")
+       Fila = fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+    end if
+
+    Celda = ofv.gencelda("","vt","","2%","","","","&nbsp;","si")
+    celda = celda & ofv.gencelda("","vt","","80%","","","","&nbsp;","si")
+    celda = celda & ofv.gencelda("","vt","","4%","","","","&nbsp;","si")
+    celda = celda & ofv.gencelda("","vt","","4%","","","","&nbsp;","si")
+
+    Fila = fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+
+  sHTML = sHTML & ofv.GenTabla("","","","80%","","0","0","-2","-1","","",fila,"si")
+
+  sHTML = sHTML & "</center>"
+
+  call ofv.cerrarconsulta(rs)
+
+  call ofv.cerrarconn(cn)
+
+   if bModificar  then
+     sAccion = "Agregardist.asp?Codobjeto=" & nCodigo
+     sAccion = sAccion & "&Tipobjeto=" & sTipo & "&Cod=" & sCod & "&volver=" & vuelta
+     Agregar = ofv.BotonAgregar(sAccion)
+  end if
+
+
+  sAccion  = "edObjDist.asp?" & request.querystring
+  Retornar = ofv.BotonVolver(sAccion)
+
+
+
+'--------------------------------------------------------------------------------
+  sHTML = sHTML & "</div>"
+
+  Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+  Fila = ofv.GenRow("","","","","","","",Celda,"si")
+  sHTML = sHTML &  ofv.GenTabla("TCEX1","aaa onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+
+  'Estructura del Indice
+
+  sHTML = sHTML & CorPnlIndx("N","")
+
+'--------------------------------------------------------------------------------
+ sHTML = sHTML & ofv.botoneraESSX("0","","","","","","","","","no",Agregar,Retornar,"")
+
+  sHTML = sHTML & "</body></html>"
+end if
+
+response.write sHTML
+%>

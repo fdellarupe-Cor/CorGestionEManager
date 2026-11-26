@@ -1,0 +1,348 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<!-- #INCLUDE FILE="IncFile/reportes.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  CantRegMostrarx = 11
+  CantRegMoverx = cdbl(request.querystring("CantRegMover"))
+  vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx)
+  CODIGO=REQUEST.QUERYSTRING("CODIGO")
+  TIPO=REQUEST.QUERYSTRING("TIPO")
+  ACC=REQUEST.QUERYSTRING("ACC")
+  pend=REQUEST.QUERYSTRING("pend")
+  objid=request.querystring("objid")
+  set cn = ofv.conectar(ofv.strconn2)
+'response.write CODIGO
+ sHTML = ofv.FormHeader(session("FormN"))
+  IF ACC="UPD" THEN
+    vFECHAHOY = clng(DATE) - clng(cdate("01-01-1900"))
+	xxxx      = GETFECH()
+    vHORAHOY  = XLHORDAT
+
+    STRSQL= "UPDATE OBJOBSCMT "
+    STRSQL= STRSQL & " SET OWNER='" & SESSION("USUARIO") & "',"
+    STRSQL= STRSQL & "  FECHAF=" & vFECHAHOY & ","
+    STRSQL= STRSQL & "  HORAF=" & vHORAHOY & ","
+    STRSQL= STRSQL & "  ACTPEND=1"
+    STRSQL= STRSQL & " WHERE FECHAF  is null and OBJID=" & objid & " AND CODOBJETO=" & CODIGO  & " AND TIPOBJETO='" & TIPO& "'"
+    CALL ofv.crearconsultaEx(StrSql,cn,1,parametros)
+    'RESPONSE.WRITE STRSQL
+    pend="N"
+
+  END IF
+
+''INC 1373
+''se agrega funcionalidad para que puedan confirmar desde el inicio el owner y los autorizantes
+'INC 1376
+'Se agrega filtro por tipo de seguridad = 9 (tiposeg=9) para que traiga de la tabla de detalle de seguridad (objsdkdet)
+'sólo los usuarios autorizados para comentarios. Esto es para visualizar el botón "Confirmar" en el inicio.
+
+sql = "select distinct autor,grpusr,objprty.codobjeto from objprty left join  objsdkdet on (objsdkdet.tipobjeto=objprty.tipobjeto and  objsdkdet.codobjeto=0  and objsdkdet.tipoSEG = 9)"
+
+sql = sql & "where objprty.codobjeto='" & CODIGO & "' and (autor='" & SESSION("USUARIO") & "' or  grpusr='USR-" & SESSION("USUARIO") & "')"
+
+set rf = ofv.crearconsultaex(sql,cn,1,parametros)
+
+if not rf.eof then
+PEND = "S"
+else
+PEND = "N"
+end if
+call ofv.cerrarconsulta(rf)
+
+sImageSH = "<font face='corflaticon' size=3 color='green'>a</font>"
+sImageSHR = "<font face='corflaticon' size=3 color='red'>=</font>"
+
+
+sql = "select * from objsdkdet where codobjeto='0' and tipobjeto='" & tipo & "' and tiposeg='9' and grpusr='USR-" & session("usuario") & "'"
+'response.write sql
+set usr = ofv.crearconsultaex(sql,cn,1,parametros)
+sql1= "select autor from objprty where codobjeto=" & codigo & " and autor='" & session("usuario") & "'"
+'response.write sql1
+set aut = ofv.crearconsultaex(sql1,cn,1,parametros)
+
+
+  if pend <> "N" then
+  STRSQL =" SELECT * FROM OBJOBSCMT A"
+  STRSQL=STRSQL & " INNER JOIN CSRELPATHDESCRIEX B ON(B.COBJ=A.CODOBJETO)"
+  STRSQL=STRSQL & " WHERE  a.CODSOL=9999    and A.TIPO='CMD' AND A.CODOBJETO=" & CODIGO & " AND A.TIPOBJETO ='" & TIPO& "'"
+   STRSQL=STRSQL & " ORDER by A.FECHA,A.HORA"
+  else
+  STRSQL=STRSQL & " WHERE  a.CODSOL=9999  and A.TIPO='CMD' AND A.CODOBJETO=" & CODIGO & " AND A.TIPOBJETO ='" & TIPO& "' and b.tobj='" & TIPO & "'  and codusr='" & SESSION("usuario") & "' "
+  'INC 1372
+  'Se modificó porque se mostraba el comentario solamente si el usuario que se logueaba era el mismo que realizó el comentario. Ahora
+  'con esta modificación el usuario autorizador de comentarios los puede visualizar también.
+                    StrSql = "SELECT distinct b.*,e.*,a.codobjeto,a.tipobjeto FROM OBJPRTY a "
+		            StrSql = StrSql & " INNER JOIN  OBJOBSCMT B ON (b.codsol=9999 and B.tipo='CMD' AND B.ACTPEND is null  AND B.CODOBJETO=a.CODOBJETO AND B.TIPOBJETO=a.TIPOBJETO ) "
+		            StrSql = StrSql & " INNER JOIN  TIPOBJETO C ON (C.COMENTARIOS='S'  AND A.TIPOBJETO=C.TIPOBJETO ) "
+		            StrSql = StrSql & " INNER JOIN  objsdkdet D ON (D.tipoSEG='9' AND D.CODOBJETO=0 AND A.TIPOBJETO=D.TIPOBJETO ) "
+					STRSQL = STRSQL & " INNER JOIN CSRELPATHDESCRIEX e ON(e.COBJ=b.CODOBJETO)"
+					StrSql = StrSql & " WHERE  ( b.CODOBJETO=" & CODIGO & " AND b.TIPOBJETO ='" & TIPO& "' and e.tobj='" & TIPO & "' )"
+					StrSql = StrSql & " And ("
+					StrSql = StrSql & "( b.codusr='" &  SESSION("usuario") & "' ) or (a.autor='"& SESSION("usuario") &"') "
+					StrSql = StrSql & " or "
+					StrSql = StrSql & " (D.GRPUSR='USR-" & SESSION("usuario") & "')"
+					StrSql = StrSql & " or "
+					StrSql = StrSql & " (D.GRPUSR IN ('GRP-" & Session("SegGrp") &"'"
+					  wktgrupos = SPLIT(session("SegGrpLst"), CHR(9))
+
+						       FOR wkti = 0 TO UBOUND(wktgrupos)
+
+
+						     StrSql = StrSql & ",'GRP-" &  wktgrupos(wkti)  &"'"
+
+
+                            NEXT
+
+
+
+                        StrSql = StrSql & ")))"
+						 STRSQL=STRSQL & " ORDER by b.FECHA,b.HORA"
+
+  end if
+
+
+'RESPONSE.WRITE STRSQL
+
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+		set oPrtG = new ClsReportes ' server.createobject("CorGeneratorEXLR3.Reportes")
+		Set oPrtG.Ofv = Ofv
+
+		'INC 1354
+		'Se agregó el TEMA y el SUBTEMA en la pantalla de comentarios al documento del INICIO
+
+		oPrtG.RCliLogo = session("clilogo")
+		if not rs.eof then
+		sql= "SELECT TEMADESCRI, STEMADESCRI FROM csrelpathdescriex where cobj='" & CODIGO & "' and tobj='" & TIPO & "'"
+		set xsr = ofv.crearconsultaex(sql,cn,1,parametros)
+		oPrtG.RCliNomb = "TEMA: " & xsr(0) & "<br>"
+		oPrtG.RCliNomb = oPrtG.RCliNomb & "SUBTEMA: " & xsr(1) & "<br>"
+		oPrtG.RCliNomb = oPrtG.RCliNomb & trim(RS("TOBJDESCRI")&"") & ": " & RS("EXPR7")
+		call ofv.cerrarconsulta(xsr)
+
+		else
+		oPrtG.RCliNomb=""
+		end if
+		response.write  oPrtG.RepHeader2(cstr(""), cstr("100%"))
+		response.write corstyler()
+
+  'Encabezados
+
+  Formulario=chr(13)&" <TR ><TD align=center class=tt width=21% >DESCRIPCIÓN</TD><TD align=center class=tt width=15% >USUARIO</TD><TD align=center class=tt width=15% >FECHA/HORA</TD><TD align=center class=tt width=15% >CONFIRMO</TD><TD align=center class=tt width=15% >FECHA/HORA</TD><TD align=center class=tt width=15% >ESTADO</TD></tr>" & chr(13)
+
+
+  ATIT=titsolapa(Codigo, tipo)
+  posI = 0
+  SOLAPA=""
+  FILA=""
+Do While (Not rs.EOF)
+
+
+     IF SOLAPA & "" <> RS("CODSOL")& "" THEN
+     'celda=ofv.GenCelda("","UT COLSPAN=7","","","","","","&nbsp;","si")
+      'Fila =  FILA & ofv.genrow("","","","","","","",celda,"si")
+
+      Celda =ofv.GenCelda("","tt COLSPAN=7","","","","","",GETSOLAPA(RS("CODSOL"), evt) ,"si")
+      SOLAPA=RS("CODSOL")& ""
+    '  Fila =  FILA & ofv.genrow("","","","","","","",Celda,"si")
+
+    END IF
+
+    'Descripcion
+
+    Celda =  ofv.GenCelda("","ut style='word-wrap:break-word;padding:0px 5px;'","","21%","","","",replace(RS("COMENTARIO")&"" ,chr(13),"<br>"),"si")
+    XXX=GETINFOUSER(RS("CODUSR"))
+    Celda = Celda & ofv.GenCelda("","ut align=center","","15%","","","",SESSION("SGU_nombre"),"si")
+    xtfechavig=CLNG("0" &RS("FECHA"))
+    xtfechavig = GTFechadorsh(xtfechavig)
+   ' Celda = Celda & ofv.GenCelda("","ut","","","","","",xtfechavig,"si")
+    XTIME =  CLNG(RS("HORA"))
+    Celda = Celda & ofv.GenCelda("","ut align=center","","15%","","","", xtfechavig &"&nbsp;&nbsp;" &GETGLBHMS(XTIME),"si")
+    XXX=GETINFOUSER(RS("OWNER"))
+    Celda = Celda & ofv.GenCelda("","ut align=center","","15%","","","",SESSION("SGU_nombre"),"si")
+    xtfechavig=CLNG("0" &RS("FECHAF"))
+    xtfechavig = GTFechadorsh(xtfechavig)
+    'Celda = Celda & ofv.GenCelda("","ut","","","","","",xtfechavig,"si")
+    XTIME =  CLNG("0" & RS("HORAF"))
+    Celda = Celda & ofv.GenCelda("","ut align=center","","15%","","","",xtfechavig &"&nbsp;&nbsp;" &GETGLBHMS(XTIME),"si")
+	if rs(12) <> "" then
+    sInput = "<i>Confirmado</i>" & sImageSH
+	else
+	if (not usr.eof) or (not aut.eof) then
+	sInput = "<a class=nt href='consultarcmd.asp?ACC=UPD&CODIGO=" & CODIGO & "&TIPO=" & TIPO & "&FECHAF=" & vFECHAHOY & "&HORAF=" & vHORAHOY & "&OBJID=" & rs(0) & "'>"
+	sInput = sInput & "<u>Confirmar</u>" & sImageSHR
+	sInput = sInput & "</a>"
+	else
+	sInput = "<i>Sin confirmar</i>" & sImageSHR
+	end if
+	end if
+	Celda = Celda & ofv.GenCelda("","ut align=center","","15%","","","",sInput,"si")
+
+
+
+    'Modo
+
+
+
+    Fila = FILA & ofv.genrow("","","","","","","",Celda,"si")
+
+
+    'Formulario = Formulario & fila
+
+    posi = posi + 1
+    rs.Movenext
+  Loop
+  sHTML = sHTML & ofv.GenTabla("","aaa BORDER '","","100%","","0","0","0","0","","",Formulario & FILA,"si")
+
+
+
+''INCIDENTE 1375
+'sql = "select ACTPEND from OBJOBSCMT where codobjeto='" & CODIGO & "' and tipo='CMD' and ACTPEND is null and tipobjeto='" & TIPO & "'"
+'set rh = ofv.crearconsultaex(sql,cn,1,parametros)
+
+
+'if not rh.eof then
+'IF PEND="S" or rh(0)="" THEN
+     'BT="<input  type=BUTTON  size=2%  value='CERRAR' class=bietx  onclick='self.close();return true;'  >"
+'     titdelete="Actualiza?"
+'     sNombre="CONFIRMAR"
+
+'     sHref="CONSULTARCMD.ASP?ACC=UPD&CODIGO=" & CODIGO & "&TIPO=" & TIPO
+'     CLAVE="UPD"
+'     BT= BotonFORM(titdelete,sNombre, sHref,CLAVE)
+'     Celda = ofv.GenCelda("","ut","","","","","",bt,"si")
+'     Fila = ofv.genrow("","","","","","","", Celda,"si")
+'    sHTML = sHTML & "<br><br>" & ofv.GenTabla("","qqq ","","","","0","0","0","0","","",FILA,"si")
+'END IF
+'end if
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & "</body></html>"
+end if
+
+
+Function titsolapa(sCodigo, stipo)
+
+    strsql = "Select * From Objperfildoc Where codobjeto =" & sCodigo
+    'response.write "sql " & strsql
+    Set rsperfil = OFV.crearconsultaEx(strsql, CN, 1, volver)
+    If rsperfil.EOF Then
+        perfilsp = "N"
+        '  response.write "no "
+
+        ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        '''' VERIFICA EL PERFIL GENERAL DEL OBJETO ''''''
+        ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+        strsql = "Select Objperfil.* From Objperfil, Tipobjeto where "
+        strsql = strsql & "Objperfil.tipoperfil = Tipobjeto.perfil "
+        strsql = strsql & "and Tipobjeto.tipobjeto = '" & stipo & "'"
+        '     response.write "sql 1111" & strsql
+        Set rsperfil = OFV.crearconsultaEx(strsql, CN, 1, volver)
+
+
+    End If
+
+    If Not rsperfil.EOF Then
+        stit = "vacio"
+        delim = "###"
+        For t = 17 To 33
+            stit = stit & delim & rsperfil(t)
+
+        Next
+        '  response.write stit
+        titsolapa = Split(stit, "###")
+    End If
+    Call OFV.cerrarconsulta(rsperfil)
+End Function
+
+
+Function GETSOLAPA(id, evt)
+    ID=CSTR(ID&"")
+
+    Select Case id
+
+    Case "1"
+        TIT = "SOLAPA " & atit(1)    '"Solapa propiedades"
+    Case "2"
+        TIT = "SOLAPA " & atit(2)    '"Solapa consideraciones"
+    Case "3"
+        TIT = "SOLAPA " & atit(3)    '"Solapa sectores"
+    Case "4"
+        TIT = "SOLAPA " & atit(4)    ' "Solapa eventos"
+
+    Case "5"
+        TIT = "SOLAPA " & atit(5)    '"Solapa procedimientos"
+       ' TIT = TIT & "<b>" & bsqevt(evt) & "</b>"
+    Case "6"
+        TIT = "SOLAPA " & atit(6)    '"Solapa descripcion"
+    Case "7"
+        TIT = "SOLAPA " & atit(7)    '"Solapa controles"
+    Case "8"
+        TIT = "SOLAPA " & atit(8)    '"Solapa esquemas"
+    Case "9"
+        TIT = "SOLAPA " & atit(9)    '"Solapa tablas"
+    Case "10"
+        TIT = "SOLAPA " & atit(10)    '"Solapa documentos"
+    Case "11"
+        TIT = "SOLAPA " & atit(11)    '"Solapa contenido"
+    Case "12"
+        TIT = "SOLAPA " & atit(12)    '"Solapa cursograma"
+    Case "13"
+        TIT = "SOLAPA " & atit(13)    '"Solapa contratos"
+    Case "14"
+        TIT = "SOLAPA " & atit(14)    '"Solapa faq"
+    Case "15"
+        TIT = "SOLAPA " & atit(15)    '"Solapa general"
+    Case Else
+        TIT = "Comentarios"
+
+
+
+    End Select
+    GETSOLAPA = "<B>" & TIT & "</B>"
+End Function
+
+ sHTML = sHTML &  "<script type='text/javascript'>"
+      sHTML = sHTML & "function disp_confirm(disp_msg,disp_frm)"
+      sHTML = sHTML & "  {"
+      sHTML = sHTML & "  var r=confirm(disp_msg);"
+      sHTML = sHTML & "  if (r==true)"
+      sHTML = sHTML & "    {"
+      sHTML = sHTML & "  var fr= document.getElementById(disp_frm);"
+      'sHTML = sHTML & "    alert(fr.name);"
+      sHTML = sHTML & "    fr.submit();"
+      sHTML = sHTML & "    }"
+      sHTML = sHTML & "  else"
+      sHTML = sHTML & "    {"
+      sHTML = sHTML & "    alert('Se cancelo la accion!');"
+      sHTML = sHTML & "    }"
+    sHTML = sHTML & "  }</script>"
+
+
+  Function BotonFORM(titdelete,sNombre, sHref,CLAVE)
+
+  	             sImageELs="<input  type=BUTTON  size=2%  value='"&sNombre&"' class=bietx  >"
+  	             sformobj   = "FRMOBJ" & CLAVE
+  	             sAccion    = sHref
+  	             formobj    = ofv.genform(sformobj,"AAA ",sAccion,"","post","","","si")
+  	             sfunobj    = " onclick="" disp_confirm('" & titdelete & "','" & sformobj & "'); "" "
+
+  	            BotonFORM=ofv.GenCelda("",xclass & " style='cursor:pointer;'  title='" & wktitdelete & "' " & sfunobj & " ","","2","","","",sImageELs & formobj ,"si")
+
+
+
+End Function
+Response.Write sHTML
+
+%>

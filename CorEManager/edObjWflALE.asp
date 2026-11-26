@@ -1,0 +1,659 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  sestado = 1
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  XXXX = GENLOGEXT("EDIDET")
+
+  ofv.ObtenerAtributos Session("Form2"),""
+  bModificar = ofv.AModificar
+
+
+  vuelta = ""
+
+
+ ' response.write "modif " & bModificar
+  nCodigo = request.querystring("Codobjeto")
+  sTipo = request.querystring("Tipobjeto")
+
+  WKOPCION = request.querystring("PASO")
+
+ '''' session("PASOOBS") = WKOPCION
+ ''' RESPONSE.WRITE  session("PASOOBS")
+
+  IF NCODIGO <> "" THEN
+     session("NCliente") = NCODIGO
+  ELSE
+     NCODIGO = session("NCliente")
+  END IF
+
+  IF WKOPCION <> "" THEN
+     session("PASOOBS") = WKOPCION
+  ELSE
+     WKOPCION = session("PASOOBS")
+  END IF
+
+  IF sTipo <> "" THEN
+     session("TCliente") = sTipo
+  ELSE
+     sTipo = session("TCliente")
+  END IF
+
+  vuelta = ofv.vueltaasp2("../") & vuelta
+  vuelta2 = ofv.vueltaasp2("")
+  'vuelta2 = ofv.vueltaasp2("../")
+  sestado = 9
+  'response.write vuelta
+  set cn = ofv.conectar(ofv.strconn2)
+
+''response.write WKAPLIC & " WKAPLIC "
+
+ IF WKAPLIC = "OR" OR WKAPLIC = "PL" THEN
+
+  Strsql = "SELECT ESTADO FROM ORRSKCIRCUITO  "
+  Strsql = Strsql & " Where OBJID = 0" & nCodigo
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if not rs.eof then sestado = clng(rs("estado"))
+  call ofv.cerrarconsulta(rs)
+
+ ELSE
+
+
+  Strsql = "SELECT * FROM OBJprty  "
+  Strsql = Strsql & " Where codobjeto=" & nCodigo
+  Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if not rs.eof then sestado = clng(rs("estado"))
+  call ofv.cerrarconsulta(rs)
+
+ END IF
+
+
+
+  if CSTR(sestado) > "2" and CSTR(sestado) < "5" then
+     if session("Nomodificar") = "S" then bModificar = False
+     response.redirect "coobjwfldet.asp?cod=SI&codobjeto=" & nCodigo & "&tipobjeto=" & sTipo
+
+  elseif (CSTR(sestado) = "2" or CSTR(sestado) = "5") and Session("Form2") <> "DESARROLLO" AND WKAPLIC <> "OR" AND WKAPLIC <> "PL" THEN
+     response.redirect "edobjwflconf.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+
+  else
+  if not (session("segct") = "S") then
+     if session("Nomodificar") = "S" then bModificar = False
+  end if
+
+  sHTML = ofv.FormHeader(session("FormN"))
+
+'----------------------------------------------
+
+  shtml = shtml & CorPnlFnc("N","")
+
+  sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' ><span id=ddd>"
+
+'-------------------------------------------------
+
+  Strsql = "SELECT * FROM OBJWFL  "
+  Strsql = Strsql & " Where codobjeto=" & nCodigo
+  Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if  rs.eof then
+
+      strsql = "Insert into OBJWFL (codobjeto, tipobjeto, ordenest) "
+      strsql = strsql & " Values (" & nCodigo & ",'" & sTipo & "','1')"
+      call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+  else
+   ''  response.write "v " & rs(6) & "<br>"
+      if rs(6)  then response.redirect "edObjWflHst.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+
+  end if
+
+  call ofv.cerrarconsulta(rs)
+
+
+  IF WKOPCION = "OBS" or WKOPCION = "APRO" THEN
+     WKOPCION = "APRO"
+     WKOPCIONdsc = "OBSERVACION"
+  ELSE
+     WKOPCION = "AUTO"
+     WKOPCIONdsc = "AUTORIZACION"
+  END IF
+
+
+  session("CKTTYPE") = WKOPCION
+
+
+
+  xActiva = 0
+  xObliga = 0
+
+ IF WKAPLIC = "OR" OR WKAPLIC = "PL" THEN
+
+ ELSE
+
+  Strsql = "SELECT * FROM Defwfl"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+  if not rs.eof then
+
+     xActiva = rs(1)
+     xObliga = rs(2)
+
+  end if
+
+  call ofv.cerrarconsulta(rs)
+
+ END IF
+
+  if not xActiva then xObliga = 0
+
+  if xObliga then
+
+     strsql = "update OBJWFL set esqauto = 1, ordenest = 1, chat = 1  "
+     Strsql = Strsql & " Where codobjeto=" & nCodigo
+     Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+
+     call ofv.crearconsultaEx(StrSql,cn,1,volver)
+
+  end if
+
+    'Estado
+     dim Aest(6)
+     Aest(0) = 0
+     Aest(1) = "Desarrollo"
+     Aest(2) = "Para Aprobar"
+     Aest(3) = "Aprobada"
+     Aest(4) = "Eliminada"
+
+     Strsql = "SELECT * from estados  "
+     set rsx = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+     do until rsx.eof
+        Aest(rsx(0)) = Ucase(rsx(1))
+        rsx.movenext
+     loop
+     call ofv.cerrarconsulta(rsx)
+
+
+
+     Strsql = "SELECT * FROM OBJWFL  "
+     Strsql = Strsql & " Where codobjeto=" & nCodigo
+     Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+     set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+     '' response.write strsql & " Strsql "
+
+    Celda = ofv.gencelda("","ttt colspan=4 aaa ","center","100%","","","","<BIG>CIRCUITO DE " & WKOPCIONdsc & "</BIG>","si")
+    Fila  = ofv.GenRow("","","","","30","","",Celda,"si")
+
+    Celda  = ofv.gencelda("","tt","","20%","","","","ESTADO&nbsp;ACTUAL:","si")
+    sinput = ofv.gencelda("","vti colspan=3","","","","","",Aest(CLNG(sestado)),"si")
+    Celda  = celda & sinput
+    Fila   = FILA & ofv.GenRow("","","","","25","","",Celda,"si")
+
+  if not rs.eof then
+
+    sForm = "wfl"
+    Celda = ofv.gencelda("","tt ","","20%","","","","AUTORIZANTES:","si")
+
+    if bModificar and (Cint(sestado) = 1 or Cint(sestado) = 6) and not xobliga then
+       sInput = ofv.combosino(sForm & "1",rs(3),rs(3).name)
+
+       sAccion = "asp/ActualizarEN.asp?ID=" & rs(0) & "&Tabla=Objwfl&volver=" & vuelta
+       sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+       sInput =  ofv.GenForm(sForm & "1","",sAccion,"","post","",sInput,"si")
+       sInput = ofv.gencelda("","VTi colspan=2","","10%","","","",sInput,"si")
+    else
+       sval = "NO"
+       if rs(3) then sval = "SI"
+       sinput = ofv.gencelda("","VTi colspan=2","","10%","","","",sval,"si")
+    end if
+
+    Celda = Celda & sinput
+
+
+
+    if rs(3) and (Cint(sestado) = 1 or Cint(sestado) = 6)  then
+       sInput = ofv.GenerarInput("boton1","Lista","submit",sForm & "1a","5","bt","")
+
+       sAccion = "edobjwfldet.asp?volver=" & vuelta2
+       sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+       sInput =  ofv.GenForm(sForm & "1a","",sAccion,"","post","",sInput,"si")
+       sInput = ofv.gencelda("","ut","center","10%","","","",sInput,"si")
+    else
+
+       sInput = ofv.gencelda("","ut","","10%","","","","&nbsp;","si")
+
+
+    end if
+
+    Celda = Celda & sinput
+    Fila = fila & ofv.GenRow("","","","","25","","",Celda,"si")
+
+''''
+'''' solo si esta activa la accion de lista de autorizantes '''''''''''''''''''''
+''''
+
+
+    if rs(3) then
+
+       sval    = "NO"
+       svaldsc = "INDISTINTO"
+       if rs(4) then
+          sval = "SI"
+          svaldsc = "ESTRICTO"
+       END IF
+
+    Celda = ofv.gencelda("","tt ","","20%","","","","Orden:","si")
+
+    if bModificar and (Cint(sestado) = 1 or Cint(sestado) = 6) and not xobliga then
+       sInput = ofv.combosino(sForm & "1b",rs(4),rs(4).name)
+       sAccion = "asp/ActualizarEN.asp?ID=" & rs(0) & "&Tabla=Objwfl&volver=" & vuelta
+       sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+       sInput =  ofv.GenForm(sForm & "1b","",sAccion,"","post","",sInput,"si")
+       sInput = ofv.gencelda("","VTi colspan=2","","10%","","","",sInput,"si")
+
+    else
+
+       sinput = ofv.gencelda("","VTi colspan=2","","10%","","","",sval,"si")
+    end if
+
+    Celda = Celda & sinput
+
+    sInput = ofv.gencelda("","TTT","","10%","","","",svaldsc,"si")
+    Celda = Celda & sinput
+    Fila = fila & ofv.GenRow("","","","","25","","",Celda,"si")
+
+
+''''ordenest = 1,
+
+
+    if bModificar  and (Cint(sestado) = 1 or Cint(sestado) = 6)   then
+     strsql = "update OBJWFL set esqauto = 1,  chat = 1  "
+     Strsql = Strsql & " Where codobjeto=" & nCodigo
+     Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+
+     call ofv.crearconsultaEx(StrSql,cn,1,volver)
+    end if
+
+
+
+
+
+    'Texto del Mensaje
+  esttxt = " STYLE={font-family:tahoma;color:#225588;font-size:7pt;background-color:transparent;} "
+
+     XMESAURL   =  left(request.servervariables("SCRIPT_NAME"),instr(RIGHT(request.servervariables("SCRIPT_NAME"),LEN(request.servervariables("SCRIPT_NAME"))-1),"/"))
+
+     XMESAURL   = "http://" & request.servervariables("SERVER_NAME") & ":" & request.servervariables("SERVER_PORT") & XMESAURL
+
+       Celda = ofv.gencelda("","ttr colspan=4","LEFT","","","","",XMESAURL ,"si")
+     '  Fila = fila & ofv.GenRow("","","","","25","","",Celda,"si")
+
+
+
+       Celda = ofv.gencelda("","ttr colspan=4","LEFT","","","","","MENSAJE:","si")
+       Fila = fila & ofv.GenRow("","","","","25","","",Celda,"si")
+
+       if bModificar  and (Cint(sestado) = 1 or Cint(sestado) = 6) then
+
+          wkfmensaje = rs(7) & ""
+
+          if wkfmensaje = "" then
+
+            IF WKAPLIC = "OR" OR WKAPLIC = "PL" THEN
+
+             wkfmensaje = "Se encuentra Disponible en la Aplicación " & Session("CorTitApli") & " un CIRCUITO"
+             wkfmensaje = wkfmensaje & " pendiente de su aprobación."
+             wkfmensaje = wkfmensaje & CHR(13) & CHR(13) & " <APLURL>INGRESAR A LA APLICACION</APLURL>"
+             wkfmensaje = UCASE(wkfmensaje)
+
+            ELSE
+
+             'wkfmensaje = "Se encuentra Disponible en la Aplicación " & Session("CorTitApli") & " un proyecto"
+             'wkfmensaje = wkfmensaje & " normativo pendiente de su aprobación."
+             'wkfmensaje = wkfmensaje & CHR(13) & CHR(13) & " <APLURL>INGRESAR A LA APLICACION</APLURL>"
+             'wkfmensaje = UCASE(wkfmensaje)
+             if WKOPCION = "AUTO" then
+
+			  wkfmensaje = "Se encuentra Disponible en la Aplicación " & Session("CorTitApli") & " un proyecto"
+			  wkfmensaje = wkfmensaje & " normativo pendiente de su aprobación."
+
+			  else
+			   if session("APLMDCLI")="BPN" THEN
+				 sUsuario = getinfouser(session("usuario"))
+				 wkfmensaje = "Se encuentra Disponible en la Aplicación " & Session("CorTitApli") & " un proyecto"
+				 wkfmensaje = wkfmensaje & " normativo pendiente de su observación. De no recibir respuesta en"
+				 wkfmensaje = wkfmensaje & " el plazo de 5 dias hábiles"
+				 wkfmensaje = wkfmensaje & " se entenderá que no existen observaciones por su parte, procediendo a"
+				 wkfmensaje = wkfmensaje & " cancelar el circuito de observación y a publicar el esquema normativo. "
+				 wkfmensaje = wkfmensaje & " Quedamos a disposición. "
+				 wkfmensaje = wkfmensaje &  session("SGU_nombre")
+				 wkfmensaje = wkfmensaje & CHR(13) & CHR(13) & " <APLURL>INGRESAR A LA APLICACION</APLURL>"
+				 wkfmensaje = UCASE(wkfmensaje)
+			  ELSE
+				 wkfmensaje = "Se encuentra Disponible en la Aplicación " & Session("CorTitApli") & " un proyecto"
+				 wkfmensaje = wkfmensaje & " normativo pendiente de su aprobación."
+			  END IF
+             end if
+
+            END IF
+
+
+             strsql = "update OBJWFL set MSGCHAT = '" & wkfmensaje & "'  "
+             Strsql = Strsql & " Where codobjeto=" & nCodigo
+             Strsql = Strsql & " And tipobjeto = '" & stipo & "'"
+
+             call ofv.crearconsultaEx(StrSql,cn,1,volver)
+          end if
+
+          nCol = 80
+
+          t3b = "<font class=at><textarea CLASS=DT "
+          t3b = t3b & "name=" & rs(7).name & " cols=" & nCol & " rows=6 "
+          if bModificar then
+             t3b = t3b & " onblur=" & sForm & "3s" & "3.submit() "
+             t3b = t3b & " onkeypress=" & chr(34)
+             t3b = t3b & " if (this.value.length > 2450) {alert('El texto es demasiado"
+             t3b = t3b & " extenso'); return false;}" & chr(34) & " >"
+          else
+             t3b = t3b & " readonly>"
+          end if
+          t3b = t3b & wkfmensaje & "</textarea></font>"
+
+          sAccion = "asp/ActualizarEN.asp?ID=" & rs(0) & "&Tabla=Objwfl&volver=" & vuelta
+          sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+          sInput =  ofv.GenForm(sForm & "3s3","",sAccion,"","post","",t3b,"si")
+          sInput = ofv.gencelda("","ut colspan=4","center","","","","",sInput,"si")
+       else
+          sinput = ofv.gencelda("","ut colspan=4","center","","","","",rs(7),"si")
+       end if
+       'celda= ofv.gencelda("","ut colspan=4","center","","","","",t3b,"si")
+       'Celda = sinput
+       Fila = fila & ofv.GenRow("","","","","","","",sInput,"si")
+
+
+   end if
+
+
+       WKFSIG = "S"
+
+
+    if rs(3) then
+       WKFSIG2 = "S"
+    ELSE
+       WKFSIG2 = "N"
+    END IF
+
+    if rs(4) then
+       WKFMODAL = "S"
+    ELSE
+       WKFMODAL = "N"
+    END IF
+
+ end if
+
+
+  call ofv.cerrarconsulta(rs)
+
+  sHTML = sHTML & "<br><center>"
+  sHTML = sHTML & ofv.GenTabla("","aaa  ","","70% style='border-style:solid;border-width:1;border-color:#999999;' ","","0","0","-2","1","","",fila,"si")
+  sHTML = sHTML & "</center>"
+
+  FILA = ""
+
+  Celda = ofv.gencelda("","ttt colspan=4","","","","","","&nbsp;estado del circuito","si")
+  Formulario2 = ofv.GenRow("","","","","30","","",Celda,"si")
+
+  if WKFSIG = "S" THEN
+
+     IF (Cint(sestado) = 1 or Cint(sestado) = 6) AND (bModificar   or session("Nomodificarce") <> "S") and Session("Segce") = "S"  then
+
+        Strsql = "SELECT * FROM OBJwfldet  "
+        Strsql = Strsql & " Where codobjeto=" & nCodigo
+        Strsql = Strsql & " And tipobjeto = '" & stipo & "' And CKTTYPE = '" & session("CKTTYPE") & "' order by orden,objid"
+        set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+        IF RS.EOF THEN
+           WKFSIGOK = "N"
+        ELSE
+           WKFSIGOK = "S"
+        END IF
+
+
+        IF WKAPLIC = "OR" OR WKAPLIC = "PL" THEN
+
+           Strsql = "SELECT * FROM ORRSKCONFIG WHERE APLIC = '" & WKAPLIC & "'  "
+           set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+           IF RS.EOF THEN
+              WKFSIGOK = "N2"
+           ELSE
+              IF WKOPCION = "AUTO" THEN
+                 WKFCKT = RS(5)
+              ELSE
+                 WKFCKT = RS(6)
+              END IF
+           END IF
+
+        ELSE
+
+           Strsql = "SELECT * FROM TIPOBJETO  "
+           Strsql = Strsql & " Where "
+           Strsql = Strsql & " tipobjeto = '" & stipo & "' "
+           set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+           IF RS.EOF THEN
+              WKFSIGOK = "N2"
+           ELSE
+              IF WKOPCION = "AUTO" THEN
+                 WKFCKT = RS(19)
+              ELSE
+                 WKFCKT = RS(20)
+              END IF
+           END IF
+
+        end if
+
+
+
+        IF WKFSIGOK = "S" or (WKFSIGOK = "N" and WKFSIG2 = "N" AND WKOPCION = "AUTO" ) THEN
+
+           Celda = ""
+           IF WKFSIGOK = "N" THEN
+              sInput2 = "<b>ATENCION!!</b><BR>EN CASO DE INICIAR, EL CIRCUITO CERRARA CON "
+              SINPUT2 = SINPUT2 & " <u><b>" & SESSION("SEGUSUARIO") & "</b></u>  COMO UNICO AUTORIZANTE.<BR>"
+           ELSE
+              sInput2 = "<b>ATENCION!!</b><BR>EL CIRCUITO ESTA EN CONDICIONES DE SER INICIADO POR "
+              SINPUT2 = SINPUT2 & " <u><b>" & SESSION("SEGUSUARIO") & "</b></u>  COMO ORIGINANTE.<BR>"
+           END IF
+           Celda = ofv.gencelda("","uti colspan=3 style='text-align:justify;' ","","","","","",SINPUT2,"si")
+
+        '' Agregado 20042015
+        '''sInput = ofv.GenerarInput("boton1","INICIAR","submit","edPropiedades2","5","bt","")
+           sInput = ofv.GenerarInput("boton1","INICIAR","submit","edPropiedades2","5","bt onclick=""this.style.cursor='wait';this.style.visibility='hidden';""","")
+        '' Agregado 20042015 FIN
+
+           sAccion = "EDWKFSTART.asp?OPCION=" & WKOPCION & "&MODAL=" & WKFMODAL &  "&Codobjeto=" & ncodigo & "&Tipobjeto=" & stipo
+           sInput = ofv.GenForm("edPropiedades2","",sAccion,"","post","",sInput,"si")
+
+           Celda = celda & ofv.gencelda("","uti","center","10%","","","",sInput,"si")
+
+           Formulario2 = Formulario2 &  ofv.GenRow("","","","","","","",Celda,"si")
+
+
+
+        ELSE
+
+           Celda = ""
+           IF WKFSIGOK = "N" THEN
+              sInput = "<b>ATENCION!!</b><BR>NO PUEDE INICIAR EL CIRCUITO, NO INFORMO LA LISTA DE AUTORIZANTES.<BR>"
+           ELSE
+              sInput = "<b>ATENCION!!</b><BR>NO PUEDE INICIAR EL CIRCUITO, EL TIPO DE DOCUMENTO NO ESTA CONFIGURADO.<BR>"
+           END IF
+           Celda = ofv.gencelda("","uti colspan=3 style='text-align:justify;' ","","","","","",SINPUT,"si")
+
+           sInput = "&nbsp;"
+           Celda = celda & ofv.gencelda("","ut","center","5%","","","",sInput,"si")
+
+           Fila = ofv.GenRow("","","","","","","",Celda,"si")
+
+           Formulario2 = Formulario2 &  Fila
+
+        END IF
+
+    ELSE
+
+           Celda = ""
+
+          IF (Cint(sestado) = 1 or Cint(sestado) = 6)  then
+             sInput = "<b>ATENCION!!</b><BR>NO PUEDE INICIAR EL CIRCUITO DESDE AQUI O NO ESTA AUTORIZADO PARA INICIARLO.<BR>"
+          else
+             sInput = "<FONT COLOR=#005500>EN CURSO.</FONT><BR>"
+          end if
+           Celda = ofv.gencelda("","uti colspan=3 style='text-align:justify;' ","","","","","",SINPUT,"si")
+
+           sInput = "&nbsp;"
+           Celda = celda & ofv.gencelda("","ut","center","5%","","","",sInput,"si")
+
+           Fila = ofv.GenRow("","","","","","","",Celda,"si")
+
+           Formulario2 = Formulario2 &  Fila
+
+
+    END IF
+
+     IF (Cint(sestado) = 2 or Cint(sestado) = 5)  AND  Session("Segce") = "S"  then
+
+           sInput = ofv.GenerarInput("boton1","Consultar historial","submit","edPropiedades3","5","bt","")
+           sAccion = "CoHistWkf.asp"
+           sInput = ofv.GenForm("edPropiedades3","",sAccion,"","post","",sInput,"si")
+           Celda = ofv.gencelda("","Vt colspan=2","center","30%","","","",sInput,"si")
+
+           if (bModificar   or session("Nomodificarce") <> "S") and Session("Segce") = "S" then
+              sInput = ofv.GenerarInput("boton1","Cancelar Circuito","submit","edPropiedades3","5","bt style='background-color:#993333;' ","")
+              sAccion = "EDCANCELWkf.asp?OPCION=CONF"
+              sInput = ofv.GenForm("edPropiedades3","",sAccion,"","post","",sInput,"si")
+           else
+              sInput = "&nbsp;"
+           end if
+
+           Celda = celda & ofv.gencelda("","Vt colspan=2 ","center","30%","","","",sInput,"si")
+
+           Fila = ofv.GenRow("","","","","","","",Celda,"si")
+
+
+           Formulario2 = Formulario2 & Fila
+
+
+     end if
+
+
+  ELSE
+
+   IF WKAPLIC = "OR" OR WKAPLIC = "PL" THEN
+
+   ELSE
+
+
+     Strsql = "SELECT OBJPRTY.*, Estados.estado FROM OBJPRTY, Estados "
+     Strsql = Strsql & "WHERE OBJPRTY.estado = Estados.objid AND codobjeto=" & nCodigo
+     set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+     if not rs.eof then
+        if session("segct") = "S" then
+       Celda = ofv.gencelda("","Vt colspan=2","center","30%","","","","CAMBIO DE ESTADO","si")
+       Celda = celda & ofv.gencelda("","Vt ","","30%","","","","NUEVO ESTADO:","si")
+'xxxxxxxxxxxxx
+
+
+    Select case cstr(rs(9))
+      case "1"
+        if (bModificar   or session("Nomodificarce") <> "S") and Session("Segce") = "S"  then
+          sInput = "<font class=at><select name=" & rs(9).name
+          sInput = sInput & " onchange=document.edPropiedades2.submit(); >"
+          sInput = sInput & "<option selected value=1>" & Aest(1) & "</option>"
+          sInput = sInput & "<option value=2>" & Aest(2) & "</option></select></font>"
+        else
+          sInput = ofv.GenerarInput(rs(9).name,rs(16),"readonly","","20","dt","")
+        end if
+      case "6"
+        if (bModificar   or session("Nomodificarce") <> "S") and Session("Segce") = "S"  then
+          sInput = "<font class=at><select name=" & rs(9).name
+          sInput = sInput & " onchange=document.edPropiedades2.submit(); >"
+          sInput = sInput & "<option selected value=1>" & Aest(1) & "</option>"
+          sInput = sInput & "<option value=2>" & Aest(2) & "</option></select></font>"
+        else
+          sInput = ofv.GenerarInput(rs(9).name,rs(16),"readonly","","20","dt","")
+        end if
+      case "2"
+        if (bModificar   or session("Nomodificarce") <> "S") and Session("Segce") = "S" then
+          sInput = "<font class=at><select name=" & rs(9).name
+          sInput = sInput & " onchange=document.edPropiedades2.submit(); >"
+          sInput = sInput & "<option selected value=2>" & Aest(2) & "</option>"
+          sInput = sInput & "<option value=1>" & Aest(1) & "</option>"
+          sInput = sInput & "</select></font>"
+        else
+          sInput = ofv.GenerarInput(rs(9).name,rs(16),"readonly","","20","dt","")
+        end if
+    end select
+    Celda = Celda & ofv.GenCelda("","VT","","","","","",sInput,"si")
+    Fila = fila & ofv.GenRow("","","","","","","",Celda,"si")
+
+    sAccion = ""
+    if (bModificar   or session("Nomodificarce") <> "S") and Session("Segce") = "S" then
+      sAccion = "asp/ActualizarEN.asp?opc=WFL&ID=" & rs(0) & "&Tabla=Objprty&volver=" & vuelta
+      sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+    end if
+    Formulario2 = ofv.GenForm("edPropiedades2","",sAccion,"","post","",Fila,"si")
+
+   end if
+  end if
+
+ END IF
+
+'xxxxxxxxxx
+
+ END IF
+
+  IF WKAPLIC = "OR" OR WKAPLIC = "PL" THEN
+
+     sAccion = Session("ASPSTR") & "&ACCIONEJEC=ABREESTAD"
+     Retornar = ofv.BotonVolver(sAccion)
+
+
+  END IF
+
+
+  sHTML = sHTML & "<br><center>"
+  sHTML = sHTML & ofv.GenTabla("","aaa style='border-style:solid;border-width:1;border-color:#999999;' ","","70% ","","0","0","1","0","","",Formulario2,"si")
+  sHTML = sHTML & "</center>"
+
+
+
+'--------------------------------------------------------------------------------
+  sHTML = sHTML & "</span></div>"
+
+  Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+  Fila = ofv.GenRow("","","","","","","",Celda,"si")
+  sHTML = sHTML &  ofv.GenTabla("TCEX1","aaa onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+
+  'Estructura del Indice
+
+  sHTML = sHTML & CorPnlIndx("N","")
+
+'--------------------------------------------------------------------------------
+
+sHTML = sHTML & ofv.botoneraESSX("0","","","","","","","","","no",Agregar,Retornar,"")
+
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+  sestado = 1
+  sHTML = sHTML & "</body></html>"    ''& SESSION("WKF")
+ end if
+end if
+
+  if (Cint(sestado) = 1 or Cint(sestado) = 6)  then response.write sHTML
+
+%>

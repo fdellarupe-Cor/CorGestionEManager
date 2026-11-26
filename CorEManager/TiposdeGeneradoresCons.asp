@@ -1,0 +1,71 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+  response.expires=0
+
+  CantRegMostrarx = 10
+  CantRegMoverx = cdbl(request.querystring("CantRegMover"))
+  vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx)
+
+  'sHTML = ofv.FormHeader(session("FormN"))
+
+  'Encabezados
+  'Formulario = ofv.Encabezados("Descripcion")
+  response.write "<table  marginwidth=0  cellspacing=0 cellpadding=0>"
+   response.write "<tr>"
+   response.write "<td width=100% >"
+   response.write ofv.Repbody(request.querystring("mnn")) & ofv.RepHeader2(ofv.convertircar(request.querystring("mnn"),"_"," "),"600")
+   response.write "<table id=margen1 width=600 marginwidth=0  cellspacing=1 cellpadding=2>"
+   response.write "<tr>"
+   response.write "<td width=1% >&nbsp;</td><td width=10% >&nbsp;</td>"
+   response.write "<td width=40% >&nbsp;</td><td width=49% >&nbsp;</td>"
+   response.write "</tr></table>"
+  
+    'Encabezados
+   
+  Formulario=chr(13)&" <TR ><TD  class=tt width=30% >Descripcion</TD></tr>" & chr(13)
+  
+
+
+ 
+
+  set cn = ofv.conectar(ofv.strconn2)
+
+  Strsql = "Select * From Tipogen Order By tipogen"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+  posi = 0
+  Do While (Not rs.EOF) 
+   Celda =""
+  
+
+    'Descripcion
+    sInput = rs(0)
+    Celda = Celda & ofv.gencelda("","vt","","80%","","","",sInput,"si")
+
+  
+    Fila = ofv.genrow("","","","","","","",Celda,"si")
+
+   
+    Formulario = Formulario & fila
+    posi = posi + 1
+    rs.Movenext
+  Loop
+  sHTML = sHTML & ofv.GenTabla("","","","80%","","0","","0","0","","",Formulario,"si")
+
+ 
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+  sHTML = sHTML & "</body></html>"
+end if
+
+Response.Write sHTML
+
+%>

@@ -1,0 +1,583 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+xfecLCID=Session.LCID
+Session.LCID=2057
+
+ok=ofv.CheckUsuario()
+if ok <> "Y" then
+  uv = ofv.uv
+  if uv = "NO" then ok = ofv.ValidarUsuario
+  sHTML = ok
+else
+
+'response.write request.querystring & "<br>" & request.form
+
+    Dim bconsultar()
+
+    APLCHECK()
+
+    Generar = ""
+
+    Addqry = ""
+    Response.expires = 0
+
+    Server.scripttimeout = 600
+    Response.buffer = True
+    smenu = Request.querystring("Menu")
+    stipoC = Request.querystring("tipoC")
+    SEXPORT=REQUEST.FORM("EXPORT")
+	empre = request.querystring("empre")
+    SHTMLEXPORT="<TABLE>"
+
+    if stipoC <> "" then
+       SESSION("TIPOC") = stipoC
+    end if
+
+    sorden = Request.querystring("sorden")
+
+    If Len(sorden) = 0 Then
+      sorden = "N"
+    End If
+
+    Sfiltro = Request.querystring("sfiltro")
+
+    If Len(Sfiltro) = 0 Then
+      Sfiltro = "TODOS"
+    End If
+
+    Sfiltro = Replace(Sfiltro, "_", " ")
+
+    strsql = ""
+
+
+
+If Request.Form.Count > 0 Then
+
+           sID = Request.Form("Desde3") + clng(cdate("01-01-1900"))
+           sID2 = Request.Form("Hasta3") + clng(cdate("01-01-1900"))
+           sID3 = Request.Form("Fecha")
+           Addqry = "&Desde=" & sID & "&Hasta=" & sID2 & "&Fecha=" & sID3
+        Else
+           sID = Request.querystring("Desde") + clng(cdate("01-01-1900"))
+           sID2 = Request.querystring("Hasta") + clng(cdate("01-01-1900"))
+           sID3 = Request.querystring("Fecha")
+           Addqry = "&Desde=" & sID & "&Hasta=" & sID2 & "&Fecha=" & sID3
+        End If
+
+    SELECT CASE SESSION("TIPOC")
+
+
+           CASE  "ACCXESQ"
+
+                 XFDES = REQUEST.FORM("DESDE3")  + clng(cdate("01-01-1900"))
+                 XFHAS = REQUEST.FORM("HASTA3")  + clng(cdate("01-01-1900"))
+
+                 XFSEL = REQUEST.FORM("ESEL")
+
+
+                 SELECT CASE XFSEL
+
+                        CASE "MAS"
+
+
+                              XORDER = " ORDER BY CANTF DESC, FULTACC DESC, A.USUARIO "
+
+
+                        CASE "MEN"
+
+                              XORDER = " ORDER BY CANTF , FULTACC DESC, A.USUARIO"
+
+                        CASE "NOL"
+
+
+                              XORDER = " ORDER BY FULTACC DESC, A.USUARIO"
+
+                 END SELECT
+
+
+
+                IF XFSEL="NOL" THEN
+
+                                 STRSQL = "select z.usuario, z.usuario AS USERACC, max(z.FINICIO) as FULTACC ,0, 0 AS PROMF,0 AS CANTF from objalogdet Z "
+                                 STRSQL = STRSQL & "where z.tipobjeto='SKRLOG' AND "
+
+                                 STRSQL = STRSQL & " (z.FINICIO > "&(XFDES - 1) &"  AND z.FINICIO < "&(XFHAS + 1)&") "
+                                 STRSQL = STRSQL & " and z.usuario not IN("
+                                 strsql = strsql & "SELECT A.USUARIO"
+				 strsql = strsql & " FROM  "
+				 strsql = strsql & "       (select codobjeto,tipobjeto,usuario, max(fultacc) as fultacc, sum(acon) as acon "
+				 strsql = strsql & "            from OBJALOG where codemp=" & session("UN")
+				 strsql = strsql & "            GROUP BY codobjeto,tipobjeto,USUARIO "
+				 strsql = strsql & "            ) A "
+				 strsql = strsql & " LEFT JOIN (select CODOBJETO, TIPOBJETO, FINICIO, (HFINAL - HINICIO) AS PROM, "
+				 strsql = strsql & "            1 AS CANT, USUARIO "
+				 strsql = strsql & "            from objalogdet "
+				 strsql = strsql & "            where tacc = 'CONSEN' "
+				 strsql = strsql & "           ) B "
+				 strsql = strsql & "    ON A.USUARIO = B.USUARIO "
+
+				 strsql = strsql & " WHERE A.CODOBJETO = 0 AND A.TIPOBJETO = 'SKRLOG' AND (FINICIO > " & (XFDES - 1) & " "
+				 strsql = strsql & " AND FINICIO < " & (XFHAS + 1) & ") "
+				 strsql = strsql & " GROUP BY A.USUARIO ) group by z.usuario"
+
+				 '' response.write strsql & " strsql linea 114 " & "<br>"
+
+
+
+
+                                 STRSQL = "select z.ID, z.ID AS USERACC, 0 as FULTACC ,0, 0 AS PROMF,0 AS CANTF from USUARIOS Z "
+                                 STRSQL = STRSQL & "where  "
+                                 STRSQL = STRSQL & "  z.ID not IN("
+                                 STRSQL = STRSQL & " select DISTINCT W.usuario from objalogdet W "
+                                 STRSQL = STRSQL & " where W.tipobjeto='SKRLOG' AND "
+                                 STRSQL = STRSQL & " (W.FINICIO > "&(XFDES - 1) &"  AND W.FINICIO < "&(XFHAS + 1)&") "
+                                 STRSQL = STRSQL & " ) order by z.descripcion "
+
+                                 'response.write strsql & " strsql linea 127 " & "<br>"
+
+
+                ELSE
+'response.write "HOLA" & "<br>"
+                 strsql = strsql & "SELECT A.USUARIO, A.USUARIO AS USERACC, MAX(A.FULTACC) AS FULTACC, SUM(A.ACON), "
+                 strsql = strsql & " AVG(ISNULL(PROM,0)) AS PROMF, SUM(ISNULL(CANT,0)) AS CANTF,c.cliente "
+                 strsql = strsql & " FROM  "
+                 strsql = strsql & "       (select codobjeto,tipobjeto,usuario, max(fultacc) as fultacc, sum(acon) as acon,codemp "
+
+                 if session("UN") <> 1 then
+                 strsql = strsql & "            from OBJALOG where codemp=" & session("UN")
+                 else
+                 strsql = strsql & "            from OBJALOG "
+                 end if
+
+                 strsql = strsql & "            GROUP BY codobjeto,tipobjeto,USUARIO,codemp "
+                 strsql = strsql & "            ) A "
+                 strsql = strsql & " LEFT JOIN (select CODOBJETO, TIPOBJETO.TIPOBJETO, FINICIO, (HFINAL - HINICIO) AS PROM, "
+                 strsql = strsql & "            1 AS CANT, USUARIO "
+                 strsql = strsql & "            from objalogdet "
+                   if session("base")="K" then
+
+                 strsql=strsql & " inner join TIPOBJETO on tipobjeto.tipobjeto=objalogdet.tipobjeto and tipobjeto.TIPOCPT ='K'  "
+                 else
+                 strsql=strsql & " inner join TIPOBJETO on tipobjeto.tipobjeto=objalogdet.tipobjeto and tipobjeto.TIPOCPT <>'K'  "
+                 end if
+                 strsql = strsql & "            where tacc = 'CONSEN' "
+                 strsql = strsql & "           ) B "
+                 strsql = strsql & "    ON A.USUARIO = B.USUARIO "
+                 strsql = strsql & " inner join clienteplan c on (a.codemp=c.id) "
+                 strsql = strsql & " WHERE A.CODOBJETO = 0 AND A.TIPOBJETO = 'SKRLOG' AND (FINICIO > " & (sID - 1) & " "
+                 strsql = strsql & " AND FINICIO < " & (sID2 + 1) & ") "
+                 strsql = strsql & " GROUP BY A.USUARIO,a.codemp,c.cliente "
+                 strsql = strsql & XORDER
+
+                 'response.write strsql & " strsql linea 151 " & "<br>"
+
+
+                 END IF
+
+        ' RESPONSE.WRITE STRSQL & "<BR>"
+
+           CASE  "ACCXESQDEP"
+
+                 XFDES = REQUEST.FORM("DESDE3")  + clng(cdate("01-01-1900"))
+                 XFHAS = REQUEST.FORM("HASTA3")  + clng(cdate("01-01-1900"))
+
+
+
+                 XFSEL = REQUEST.FORM("ESEL")
+                 XFDEP = "0" & REQUEST.FORM("LISTA")
+
+                 call getUsrInSect(XFDEP,"")
+
+                 TABUSRXSECT = SPLIT(session("SGU_UIGuserid"),CHR(9))
+
+                 WKFUSRXSECT = " AND A.USUARIO IN ('USUARIOS'"
+
+                 FOR IIUSR=0 TO UBOUND(TABUSRXSECT)
+                     WKFUSRXSECT = WKFUSRXSECT & ",'" & TABUSRXSECT(IIUSR) & "'"
+
+                 NEXT
+
+                 WKFUSRXSECT = WKFUSRXSECT & ") "
+
+
+
+                 SELECT CASE XFSEL
+
+                        CASE "MAS"
+
+
+                              XORDER = " ORDER BY CANTF DESC, FULTACC DESC, A.USUARIO "
+
+
+                        CASE "MEN"
+
+                              XORDER = " ORDER BY CANTF , FULTACC DESC, A.USUARIO"
+
+                        CASE "NOL"
+
+
+                              XORDER = " ORDER BY FULTACC DESC, A.USUARIO"
+
+                 END SELECT
+
+
+
+
+
+                 strsql = strsql & "SELECT A.USUARIO, A.USUARIO AS USERACC, MAX(A.FULTACC) AS FULTACC, SUM(A.ACON), "
+                 strsql = strsql & " AVG(ISNULL(PROM,0)) AS PROMF, SUM(ISNULL(CANT,0)) AS CANTF "
+                 strsql = strsql & " FROM  "
+                 strsql = strsql & "       (select codobjeto,tipobjeto,usuario, max(fultacc) as fultacc, sum(acon) as acon "
+                 strsql = strsql & "            from OBJALOG where codemp=" & session("UN")
+                 strsql = strsql & "            GROUP BY codobjeto,tipobjeto,USUARIO "
+                 strsql = strsql & "            ) A "
+                 strsql = strsql & " LEFT JOIN (select CODOBJETO, TIPOBJETO.TIPOBJETO, FINICIO, (HFINAL - HINICIO) AS PROM, "
+                 strsql = strsql & "            1 AS CANT, USUARIO "
+                 strsql = strsql & "            from objalogdet "
+                 if session("base")="K" then
+
+                 strsql=strsql & " inner join TIPOBJETO on tipobjeto.tipobjeto=objalogdet.tipobjeto and tipobjeto.TIPOCPT ='K'  "
+                 else
+                 strsql=strsql & " inner join TIPOBJETO on tipobjeto.tipobjeto=objalogdet.tipobjeto and tipobjeto.TIPOCPT <>'K'  "
+                 end if
+                 strsql = strsql & "            where tacc = 'CONSEN' "
+                 strsql = strsql & "           ) B "
+                 strsql = strsql & "    ON A.USUARIO = B.USUARIO "
+              ''''   strsql = strsql & " INNER JOIN USUARIOS E ON E.ID = A.USUARIO "
+                 strsql = strsql & " WHERE A.CODOBJETO = 0 AND A.TIPOBJETO = 'SKRLOG' AND (FINICIO > " & (XFDES - 1) & " "
+                 strsql = strsql & " AND FINICIO < " & (XFHAS + 1) & ") " & WKFUSRXSECT
+
+
+
+
+                 strsql = strsql & " GROUP BY A.USUARIO "
+                 strsql = strsql & XORDER
+
+
+
+              'RESPONSE.WRITE STRSQL & " strsql linea 231 " & "<BR>"
+
+
+
+
+           CASE  "ACCXUSR"
+
+
+
+
+    END SELECT
+
+
+    CantRegMostrar = CDbl(Request.querystring("CantRegMostrar"))
+    CantRegMover = CDbl(Request.querystring("CantRegMover"))
+
+
+
+
+
+        sverestado = " and objnivel >= " & Session("SegNivel") & " And Estcod In (9,3)"
+
+      'response.write "STRSQL: " & strsql
+
+
+
+        sMenuAdd = ""
+        sMenuMas = "&smenu=" & smenu & "&Desde=" & sID & "&Hasta="
+        sMenuMas = sMenuMas & sID2 & "&Fecha=" & sID3
+
+
+        xsid = OFV.convertircar(sID, "/", "")
+        xsid = OFV.convertircar(xsid, "-", "")
+        If (Not IsNumeric(xsid)) Or (sID = "") Then sID = "1-1-1950"
+        xsid = OFV.convertircar(sID2, "/", "")
+        xsid = OFV.convertircar(xsid, "-", "")
+        If (Not IsNumeric(xsid)) Or (sID2 = "") Then sID2 = "31-12-2100"
+
+
+    Addqry = "&Menu=" & smenu & Addqry
+    starget = "estactalis.asp?cantregmover=0&cantregmostrar=" & CantRegMostrar & Addqry  &"&perfil="&replace(sperfil," ","_")
+    sVolver = "estactalis.asp?Menu=" & smenu & sMenuAdd &"&perfil="&replace(sperfil," ","_")
+    Addqry = Addqry & "&sorden=" & sorden & "&sfiltro=" & Replace(Sfiltro, " ", "_")
+    Set cn = OFV.conectar(OFV.strconn2)
+
+    sql = "select cliente from clienteplan where id=" & session("UN")
+    set rx = ofv.crearconsultaEx(sql,cn,1,parametros)
+	empresa = ""
+	if not rx.eof then empresa = rx(0)
+	Call OFV.cerrarconsulta(rx)
+
+    SELECT CASE SESSION("TIPOC")
+
+
+           CASE  "ACCXESQ"
+'response.write "SID: " & sID & "<br>" & "SID2: " & Sid2
+                  sTitulo = "ACCESO&nbsp;DE&nbsp;USUARIOS &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Desde:&nbsp;" & Fechador(sID) & "&nbsp;|&nbsp;&nbsp;&nbsp;Hasta:&nbsp;" & Fechador(sID2) & "&nbsp;|&nbsp;&nbsp;&nbsp;Empresa:&nbsp;" & empresa
+
+           CASE  "ACCXESQDEP"
+
+                 sUsrSECDSC = "----"
+
+                 Strsql2 = "     select DESCrI FROM ECO  "
+                 Strsql2 = Strsql2 & " WHERE ECO = '" & XFDEP & "' "
+'''      response.write strsql & "<br>"
+                 set rs1 = ofv.crearconsultaEx(StrSql2,cn,1,parametros)
+                 if not rs1.eof then
+                    sUsrSECDSC = rs1(0)
+                 END IF
+
+
+                  sTitulo = "ACCESO&nbsp;POR&nbsp;DEPARTAMENTO:&nbsp;" & sUsrSECDSC & " &nbsp;&nbsp;&nbsp;|&nbsp;Desde:&nbsp;" & Fechador(sID) & "&nbsp;|&nbsp;Hasta:&nbsp;" & Fechador(sID2) & "&nbsp;|&nbsp;&nbsp;&nbsp;Empresa:&nbsp;" & empresa
+
+           CASE  ELSE
+
+                  sTitulo = "ACCESO&nbsp;DE&nbsp;USUARIOS &nbsp;&nbsp;&nbsp;|&nbsp;Desde:&nbsp;" & Fechador(sID) & "&nbsp;|&nbsp;Hasta:&nbsp;" & Fechador(sID2) & "&nbsp;|&nbsp;&nbsp;&nbsp;Empresa:&nbsp;" & empresa
+
+    end select
+
+
+
+    'response.write "sql: " & strsql & "<br>"
+    Set rs = OFV.crearconsultaEx(strsql, cn, 1, "")
+
+    sHTML = OFV.FormHeader(sTitulo)
+
+    xs = "<script language=JavaScript>" & Chr(13)
+    xs = xs & "function AbrirCons(Datos) {" & Chr(13)
+    xs = xs & " myWin= open(Datos"
+    xs = xs & "," & Chr(34) & "Cons" & Chr(34) & "," & Chr(34)
+    xs = xs & "scrollbars=yes,menubar=no,toolbar=no,height=570,width=790" & Chr(34)
+    xs = xs & " ); " & Chr(13) & " } " & Chr(13) & "</script>" & Chr(13)
+
+    sHTML = sHTML & xs
+
+    sHTML = sHTML & "<center>"
+
+    Celda = OFV.GenCelda("", "ttt colspan=8", "", "", "", "", "", sTitulo, "si")
+
+    Fila = OFV.GenRow("", "", "", "", "25", "", "", Celda, "si")
+
+
+    Celda = OFV.GenCelda("", "ttr", "center", "5%", "", "", "", "*", "si")
+    Celda = Celda & OFV.GenCelda("", "ttr ", "", "30%", "", "", "", "USUARIO", "si")
+     IF session("UN") = 1 and SESSION("TIPOC") = "ACCXESQ" then
+    Celda = Celda & OFV.GenCelda("", "ttr ", "", "30%", "", "", "", "EMPRESA", "si")
+     END IF
+     IF session("APLMDCLI") <> "BGAL" THEN
+      Celda = Celda & OFV.GenCelda("", "ttr", "", "15%", "", "", "", "DEPARTAMENTO", "si")
+     end if
+    Celda = Celda & OFV.GenCelda("", "ttr", "", "10%", "", "", "", "ULTIMO ACCESO", "si")
+    Celda = Celda & OFV.GenCelda("", "ttr", "", "5%", "", "", "", "CANTIDAD", "si")
+    Celda = Celda & OFV.GenCelda("", "Ttr", "", "5%", "", "", "", "PROMEDIO", "si")
+
+    Fila = fila & OFV.GenRow("", "", "", "", "25", "", "", Celda, "si")
+
+    if SEXPORT <> "XLS" THEN
+     Response.write sHTML
+     sHTML = ""
+     Response.flush
+    END IF
+
+    IF SEXPORT = "XLS" THEN
+   	  SHTMLEXPORT=SHTMLEXPORT & "<TR><TD>" & "*" & "</TD>"
+   	  SHTMLEXPORT=SHTMLEXPORT & "<TD><U>" & "USUARIO" & "</U></TD>"
+   	  IF session("APLMDCLI") <> "BGAL" THEN
+   	     SHTMLEXPORT=SHTMLEXPORT & "<TD><U>" & "DEPARTAMENTO" & "</U></TD>"
+   	  end if
+   	  SHTMLEXPORT=SHTMLEXPORT & "<TD><U>" & "ULTIMO ACCESO" & "</U></TD>"
+   	  SHTMLEXPORT=SHTMLEXPORT & "<TD><U>" & "CANTIDAD" & "</U></TD>"
+   	  SHTMLEXPORT=SHTMLEXPORT & "<TD><U>" & "PROMEDIO" & "</U></TD>"
+   	  'mauro 09/05/17
+   	  SHTMLEXPORT=SHTMLEXPORT & "<TD><U>" & "FECHA DESDE" & "</U></TD>"
+   	  SHTMLEXPORT=SHTMLEXPORT & "<TD><U>" & "FECHA HASTA" & "</U></TD></TR>"
+   	END IF
+
+
+    nLinea = 0
+   ' response.write
+    fi = CLng(CDate("01-01-1900"))
+     PosReg = 0
+
+     Do While (Not rs.EOF)
+
+         sImagen = "<font face=corflaticon size=3 color=#993333>&#0128;</font>&nbsp;"
+
+         dVigencia = "SD"
+         If Not IsNull(rs(2)) Then dVigencia = CDate(CLng(rs(2)))
+         dVign = InStr(dVigencia, "1900")
+         If dVign > 0 Then dVigencia = "SD"
+
+
+          IF XFSEL="NOL" THEN
+             dVigencia = "-----"
+          END IF
+
+          xxxx    = getInfoUserEX(RS(1),session("UN"))
+          sGrpUsr = session("SGU_nombre")
+          sUsrSEC = "0" & session("SGU_idcostcenter")
+          sUsrSECDSC = "----"
+
+          Strsql = "     select DESCrI FROM ECO  "
+          Strsql = Strsql & " WHERE ECO = '" & sUsrSEC & "' "
+        ''response.write strsql & "<br>"
+          set rs1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+          if not rs1.eof then
+             sUsrSECDSC = rs1(0)
+          END IF
+
+
+          sobjeto = sGrpUsr
+
+        sActcon = "CoESTDLISUSRDET.asp?USR=" & rs(0) & "&COD=NO"
+        sActcon = sActcon & "&FDES=" & sID & "&FHAS=" & sID2
+        sHref = "&nbsp;"
+
+        sFuncion = " onclick=" & Chr(34) & " AbrirCons('" & sActcon & "'); return false;" & Chr(34)
+
+
+
+
+        Celda = ""
+        IF  session("APLMDCLI")="CFA" THEN
+          sLink=sImagen
+        else
+          sLink = OFV.GenLink("", "UT", sHref, "", "", sFuncion, sImagen, "si")
+        end if
+
+        IF SEXPORT = "XLS" THEN
+         SHTMLEXPORT=SHTMLEXPORT & "<TR><TD>" & POSREG+1 & "</TD>"
+         SHTMLEXPORT=SHTMLEXPORT & "<TD>" & sobjeto & "</TD>"
+          IF session("APLMDCLI") <> "BGAL" THEN
+         SHTMLEXPORT=SHTMLEXPORT & "<TD>" & sUsrSECDSC & "</TD>"
+         end if
+         SHTMLEXPORT=SHTMLEXPORT & "<TD>" & FechadorcOR(dVigencia,0) & "</TD>"
+         SHTMLEXPORT=SHTMLEXPORT & "<TD>" & RS(5) & "</TD>"
+         SHTMLEXPORT=SHTMLEXPORT & "<TD>" & GETGLBHMS(RS(4)) & "</TD>"
+        'SHTMLEXPORT=SHTMLEXPORT & "<TD>" & RS(5) & "</TD>"
+        'SHTMLEXPORT=SHTMLEXPORT & "<TD>" & RS(5) & "</TD>"
+         SHTMLEXPORT=SHTMLEXPORT &  "<TD>" & fechadorcor(CDATE(XFDES),"") & "</TD>"
+		 SHTMLEXPORT=SHTMLEXPORT &  "<TD>" & fechadorcor(CDATE(XFHAS),"") & "</TD></TR>"
+        END IF
+        Celda = Celda & OFV.GenCelda("", "UTS", "center", "", "", "", "",sLink, "si")
+
+
+        IF  session("APLMDCLI")="CFA" THEN
+          sLink=sobjeto
+        else
+          sLink = OFV.GenLink("", "UT", sHref, "", "", sFuncion, sobjeto, "si")
+        end if
+
+        Celda = Celda & OFV.GenCelda("", "UT ", "", "30%", "", "", "", sLink, "si")
+
+        IF session("UN") = 1 and SESSION("TIPOC") = "ACCXESQ" then
+        Celda = Celda & OFV.GenCelda("", "UT ", "", "30%", "", "", "", rs(6), "si")
+        END IF
+
+       IF session("APLMDCLI") <> "BGAL" THEN
+        Celda = Celda & OFV.GenCelda("", "UT  ", "", "15%", "", "", "", sUsrSECDSC, "si")
+       end if
+
+        Celda = Celda & OFV.GenCelda("", "UT ", "", "10%", "", "", "", FechadorcOR(dVigencia,0), "si")
+        Celda = Celda & OFV.GenCelda("", "UT ", "center", "5%", "", "", "", RS(5) & "&nbsp;&nbsp;&nbsp;", "si")
+
+        Celda = Celda & OFV.GenCelda("", "UT ", "center", "5%", "", "", "", GETGLBHMS(RS(4)) & "&nbsp;", "si")
+
+        Fila = Fila & OFV.GenRow("", "", "", "", "25", "", "", Celda, "si")
+
+        PosReg = PosReg + 1
+        rs.movenext
+        nLinea = nLinea + 1
+       IF SEXPORT <> "XLS"  THEN
+
+        sHTML = ""
+        If nLinea > 20 Then
+            nLinea = 0
+            Response.flush
+        End If
+       END IF
+
+    Loop
+
+    if PosReg > 0 then
+
+
+       Celda = ofv.GenCelda("","ttt  colspan=7 ","","","","",""," TOTAL: " & posreg & " USUARIOS             " & sInput,"si")
+
+    else
+
+
+       Celda = ofv.GenCelda("","ttt  colspan=7 ","","","","",""," NO HAY USUARIOS PARA LA PRESENTE SELECCION ","si")
+    end if
+
+    Fila = Fila & ofv.GenRow("","","","","30","","",Celda,"si")
+
+    XTABLA = OFV.GenTabla("", "", "", "95%", "", "0", "", "-1", "0", "", "", Fila, "si")
+
+
+    Formulario = XTABLA
+
+    sHTML = sHTML & Formulario
+
+    SELECT CASE SESSION("TIPOC")
+
+
+           CASE  "ACCXESQ"
+
+                  sAccion = "COESTDXUSR.asp"
+
+           CASE  "ACCXESQDEP"
+
+                  sAccion = "COESTDXDEP.asp"
+
+           CASE  ELSE
+
+                  sAccion = "COESTDXUSR.asp"
+
+    end select
+
+
+    Celda   = ofv.BotonVolver(sAccion)
+
+    sHTML = sHTML & OFV.botoneraESSX("0", "", "", "", "", "", "", "", "", "", "", "", Celda)
+
+    sHTML = sHTML & "</body></html>"
+
+     session("sperfil")=""
+
+
+    Call OFV.cerrarconsulta(rs)
+    Call OFV.cerrarconn(cn)
+
+''     Generar = sHTML
+
+
+IF SEXPORT ="XLS" THEN
+ Response.ContentType = "application/vnd.ms-excel"
+ Response.AddHeader "content-disposition", " filename=CoEstUlis.xls"
+ response.write SHTMLEXPORT & "</TABLE>"
+ELSE
+ response.write sHTML
+ response.flush
+END IF
+
+
+ Session.LCID=xfecLCID
+end if
+
+
+
+
+Function Fechador(wkfecha)
+
+
+
+      fec = cdate(wkfecha) ' + clng(cdate("01-01-1900")))
+      ndia = ofv.cdia(Weekday(fec))
+      nMes = ofv.cmes(Month(fec))
+
+      Fechador = "  " & ndia & ", " & Day(fec) & " de " & nMes & " de " & Year(fec)
+
+
+End Function
+
+%>

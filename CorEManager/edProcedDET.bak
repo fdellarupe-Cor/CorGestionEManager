@@ -1,0 +1,1657 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+If ok <> "Y" Then
+	uv = ofv.uv
+	If uv = "NO" Then ok = ofv.ValidarUsuario
+	sHTML = ok
+Else
+	response.expires=0
+	response.buffer=True
+	APLCHECK()
+	Dim wstipo(6)
+	ofv.ObtenerAtributos "acciones",""
+	bagregarbtn=ofv.aagregar
+	
+	ofv.ObtenerAtributos Session("Form2"),""
+	bModificar = ofv.AModificar
+	If session("Nomodificar") = "S" Then bModificar = False
+	
+	If request.querystring("XEVEN") <> "" Then
+		Session("XEVEN") = request.querystring("XEVEN")
+		XEVEN = request.querystring("XEVEN")
+	Else
+		XEVEN = Session("XEVEN")
+	End If
+	
+	If request.querystring("Opcion") <> "" Then
+		OpcAgregar = request.querystring("Opcion")
+		Fltipo = request.form("Fltipo")
+	Else
+		OpcAgregar = "no"
+	End If
+	If request.querystring("Opcion2") <> "" Then
+		OpcCopiar = request.querystring("Opcion2")
+	Else
+		OpcCopiar = "no"
+	End If
+	If request.querystring("Opcion3") <> "" Then
+		OpcCopiar2 = request.querystring("Opcion3")
+	Else
+		OpcCopiar2 = "no"
+	End If
+	
+	nCodigo = request.querystring("Codobjeto")
+	sTipo = request.querystring("Tipobjeto")
+	
+	sTest = request.querystring("Test")
+	
+	CantRegAMover = 0
+	
+	CantRegAMover2 = "0" & request.querystring("CantRegAMover2")
+	
+	If CantRegAMover2 = "0" Then
+		CantRegAMover2 = "0" & request.querystring("CantRegMover")
+		' else
+		'    CantRegAMover2 = "0"
+	End If
+	
+	CantRegAMover2 = CDbl(CantRegAMover2)
+	
+	CantRegAMostrar = 1
+	
+	If BrowserName() = "IE" Or BrowserName() = "CHROME" Then
+		CantRegAMostrar2= 8
+	Else
+		CantRegAMostrar2= 8
+	End If
+	
+	vuelta = ofv.vueltaaspEx("../",CantRegAMostrar,CantRegAMover)
+	vueltax = ofv.vueltaaspEx("",CantRegAMostrar,CantRegAMover)
+	vuelta2 = ofv.vueltaaspEx("../",CantRegAMostrar2,CantRegAMover2)
+	vueltaC = ofv.vueltaaspExC("../",CantRegAMover,CantRegAMover2)
+	
+	sHTML = ofv.FormHeader(session("FormN"))
+	
+	'----------------------------------------------
+	
+	shtml = shtml & CorPnlFnc("N","")
+	
+	sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' ><span id=ddd>"
+	
+	'-------------------------------------------------
+	
+	
+	Set cn = ofv.conectar(ofv.strconn2)
+	
+	strsql = "Select Version,estado From Objprty Where Objprty.codobjeto = " & nCodigo
+	'response.write strsql & " strsql " & "<br>"
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	bVersion = "NO"
+	If Not rs.eof Then
+		If rs(0) = "V" Then bVersion = "SI"
+		Nestado=rs(1)
+	End If
+	Call ofv.cerrarconsulta(rs)
+	
+	
+	Strsql = "SELECT * from csprocmaster "
+	Strsql = Strsql & "Where codobjeto = " & nCodigo & " and codproced = '" & XEVEN & "' "
+	Set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	If Not rs.eof Then
+		nID = rs(0)
+		nID2 = rs(9)
+		sEven = rs(2)
+		
+		If Not IsNull(seven) Then sEven = ofv.convertircar(sEven," ","_")
+		
+		
+		
+		If wkaplic <> "PL" Then
+			
+			'Encabezados
+			Formulario1 = ofv.Encabezados("Sec","Evento","Sector","Perfil","Frecuencia","Referencia")
+			formulario = ""
+			
+			
+			
+			
+			'Secuencia evento
+			Celda =  ofv.GenCelda("","ttt","","1%","","","",rs(8) & ".","si")
+			
+			'Secuencia procedimiento
+			If bModificar Then
+				sInput = ofv.GenerarInput(rs(7).name,rs(7),"text","edProcedimientos","2","dtn","SI")
+			Else
+				'       sInput = ofv.GenerarInput("",rs(7),"readonly","","2","","SI")
+				sInput = rs(7)
+			End If
+			Celda = Celda & ofv.GenCelda("","vti","","1%","","","",sInput,"si")
+			
+			'Evento
+			
+			sEvento = ""
+			If rs(4) <> "" Then
+				Strsql = "Select descri From Objeven Where objid = " & rs(4)
+				Set rsEvento = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				If Not rsEvento.eof Then sEvento = rsEvento(0)
+				Call ofv.cerrarconsulta(rsEvento)
+			End If
+			'     sInput = ofv.GenerarInput("",sEvento,"readonly","","40","","")
+			sInput = sEvento
+			'   end if
+			Celda = Celda & ofv.GenCelda("","ttt","","15%","","","",sInput,"si")
+			
+			'Sector
+			If bModificar Then
+				
+				If session("EMPMUN") = "S" Then
+					
+					'strsql = "SELECT a.*, c.descri,b.cliente FROM  OBJSECTOR a "
+					'strsql = strsql & " inner join ECO c on (a.codsector=c.eco) "
+					'strsql = strsql & " inner join clienteplan b on (b.ID=c.ecoUN) "
+					'strsql = strsql & " where a.codsector = c.eco "
+					'strsql = strsql & " and c.estado=3 and a.codobjeto=18035 "
+					'strsql = strsql & " And (calificador = 'O' or calificador = 'C') "
+					
+					Strsql = "Select objsector.*,Eco.descri,a.cliente From Objsector, Eco  "
+					strsql = strsql & " inner join clienteplan a on (eco.ecoUN=a.id) "
+					strsql = strsql & " where eco.estado=3 and "
+					Strsql = Strsql & "Objsector.codsector = Eco.eco and codobjeto = " & nCodigo
+					
+				Else
+					
+					Strsql = "SELECT OBJSECTOR.*, ECO.descri FROM OBJSECTOR, ECO "
+					Strsql = Strsql & "where OBJSECTOR.codsector = ECO.eco and codobjeto=" & nCodigo
+					Strsql = Strsql & " And (calificador = '" & sCalificador & "' or calificador = 'C' or calificador = 'O') "
+					
+				End If
+				'response.write strsql
+				Set rsSectorn = ofv.crearconsultaEx(strsql, cn, 1, parametros)
+				'sInput = ofv.GenerarCombo("edProcedimientos",rs(6).name,rs(6).value,Strsql,cn,0,1,"sb")
+				
+				scomK = ""'"null" & Chr(9)
+				scomD = "" '"" & Chr(9)
+				SCOMSEP =""
+				Do While Not rsSectorn.eof
+					scomK=scomK & SCOMSEP & rsSectorn(0)
+					If session("EMPMUN") = "S" Then
+						scomd=scomd & SCOMSEP & rsSectorn(14) & "&nbsp;-&nbsp;" & rsSectorn(13)
+					Else
+						scomd=scomd & SCOMSEP  & rsSectorn(13)
+					End If
+					SCOMSEP = Chr(9)
+					rsSectorn.movenext
+				Loop
+				sInput = ofv.gencomboFX("edProcedimientos",RS(5).Name,RS(5),scomK,scomD,"")
+			Else
+				sSector = ""
+				If rs(5) <> "" Then
+					
+					Strsql = "Select descri From Eco, Objsector where "
+					Strsql = Strsql & "Eco.eco = Objsector.codsector and Objsector.objid = " & rs(5)
+					Set rsSector = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					If Not rsSector.eof Then sSector = rsSector(0)
+					Call ofv.cerrarconsulta(rsSector)
+				End If
+				'      sInput = ofv.GenerarInput("",sSector,"readonly","","40","","")
+				sInput = sSector
+			End If
+			Celda = Celda & ofv.GenCelda("","tu","","20%","","","",sInput,"si")
+			
+			'Perfil
+			If bModificar Then
+				
+				Strsql = "SELECT TIPOPERFIL.tipoperfil,TIPOPERFIL.descri "
+				Strsql = Strsql & "FROM Objsector, ECO, ECOPERFIL, TIPOPERFIL "
+				Strsql = Strsql & " where Eco.eco = Objsector.codsector and "
+				Strsql = Strsql & " ECO.eco = ECOPERFIL.codsector and TIPOPERFIL.estado=3 and"
+				Strsql = Strsql & " ECOPERFIL.codperfil = TIPOPERFIL.tipoperfil "
+				Strsql = Strsql & " and objsector.objid = " & rs(5).value
+				Set rsPerfil = ofv.crearconsultaEx(strsql, cn, 1, parametros)
+				'sInput = ofv.GenerarCombo("edProcedimientos",rs(6).name,rs(6).value,Strsql,cn,0,1,"sb")
+				scomK = ""'"null" & Chr(9)
+				
+				scomD = "" '"" & Chr(9)
+				SCOMSEP =""
+				Do While Not rsperfil.eof
+					scomK=scomK & SCOMSEP & rsperfil(0)
+					scomd=scomd & SCOMSEP & rsperfil(1)
+					SCOMSEP = Chr(9)
+					rsPerfil.movenext
+				Loop
+				sInput = ofv.gencomboFX("edProcedimientos", RS(6).Name, RS(6), scomK, scomD, "")
+			Else
+				sPerfil = ""
+				If rs(6) <> "" Then
+					Strsql = "Select descri From Tipoperfil Where tipoperfil = '" & rs(6) & "'"
+					Set rsPerfil = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					If Not rsPerfil.eof Then sPerfil = rsPerfil(0)
+					Call ofv.cerrarconsulta(rsPerfil)
+				End If
+				'     sInput = ofv.GenerarInput("",sPerfil,"readonly","","40","","")
+				sInput = sPerfil
+			End If
+			Celda = Celda & ofv.GenCelda("","tu","","20%","","","",sInput,"si")
+			
+			'FRECUENCIA
+			If bModificar Then
+				Strsql = "Select * From frecuencia where estado=3  Order By descri"
+				''sInput = ofv.GenerarCombo("edProcedimientos",rs(11).name,rs(11).value,Strsql,cn,0,1,"sb")
+				
+				Set rsfrecx = ofv.crearconsultaEx(strsql,cn,1,parametros)
+				
+				scomK = ""'"null" & Chr(9)
+				scomD = "" '"" & Chr(9)
+				SCOMSEP =""
+				Do While Not rsfrecx.eof
+					scomK=scomK & SCOMSEP & rsfrecx(0)
+					scomd=scomd & SCOMSEP & rsfrecx(1)
+					SCOMSEP = Chr(9)
+					rsfrecx.movenext
+				Loop
+				
+				sInput = ofv.gencomboFX("edProcedimientos",rs(11).name,rs(11).value,scomK,scomD, "")
+			Else
+				sfrec = ""
+				If Not IsNull(rs(11))  Then
+					Strsql = "Select descri From frecuencia Where codfrec = '" & rs(11) & "' "
+					Set rsfrec = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					If Not rsfrec.eof Then sfrec = rsfrec(0)
+					Call ofv.cerrarconsulta(rsfrec)
+				End If
+				'    sInput = ofv.GenerarInput("",sfrec,"readonly","","40","","")
+				sInput = sfrec
+			End If
+			
+			Celda = Celda & ofv.GenCelda("","tu","","20%","","","",sInput,"si")
+			
+			
+			'Texto de Referencia
+			sID = "edProcedRef.asp?"
+			sID = sID & "ID=" & rs(0) & "&Tabla=Objproced&volver=" & vuelta
+			sID = sID & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+			sHref = sID
+			
+			If rs(12) <> "" Then
+				xclas  = "btbs"
+				'  if BrowserName()="IE" OR BrowserName()="CHROME" THEN
+				'  sInput = "<font class='btic' >4&#0157;</font>"
+				'  ELSE
+				sInput = "<font class='btic' >4&#0157;</font>"
+				'   END IF
+			Else
+				xclas  = "btbn"
+				'      if BrowserName()="IE" OR BrowserName()="CHROME" THEN
+				'   sInput = "<font class='btic' >4&#0157;</font>"
+				'    ELSE
+				sInput = "<font class='btic' >4&#0157;</font>"
+				'  END IF
+			End If
+			
+			xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+			
+			sInput = "<div class=" & xclas & " >" & sinput & "</div>"
+			
+			stitle = "Actualizar referencia del circuito."
+			XXX= ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+			Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","center","5%","","","",XXX,"si")
+			
+			fila = ofv.GenRow("","","","","","","",celda,"si")
+			
+			If bModificar Then
+				sAccion = "asp/ActualizarEN.asp?ID=" & nID2 & "&Tabla=Objproced&volver=" & vuelta
+				sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+				tabla= ofv.GenTabla("","","","100%","","0","","-1","2","","",formulario1 & fila,"si")
+				Formulario =   ofv.GenForm("edProcedimientos","",sAccion,"","post","",tabla,"si")
+				'Formulario = Formulario & ofv.GenForm("edProcedimientos","",sAccion,"","post","",Celda,"si")
+			Else
+				tabla= ofv.GenTabla("","","","100%","","0","","-1","2","","",formulario1 & fila,"si")
+				Formulario =  ofv.GenForm("edProcedimientos","",sAccion,"","post","",tabla,"si")
+				'Formulario = Formulario & ofv.GenForm("edProcedimientos","","","","post","",Celda,"si")
+			End If
+			
+			'fila = ofv.GenRow("","","","","","","",celda,"si")
+			'Formulario = ofv.GenRow("","","","","","","",Formulario,"si")
+			
+		Else
+			
+			wksecuencia = rs(8) & "." & rs(7)
+			
+			
+			'Evento
+			
+			sEvento = ""
+			If rs(4) <> "" Then
+				Strsql = "Select descri From Objeven Where objid = " & rs(4)
+				Set rsEvento = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				If Not rsEvento.eof Then sEvento = rsEvento(0)
+				Call ofv.cerrarconsulta(rsEvento)
+			End If
+			
+			'Sector
+			
+			sSector = ""
+			If rs(5) <> "" Then
+				
+				Strsql = "Select descri From Eco, Objsector where "
+				Strsql = Strsql & "Eco.eco = Objsector.codsector and Objsector.objid = " & rs(5)
+				Set rsSector = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				If Not rsSector.eof Then sSector = rsSector(0)
+				Call ofv.cerrarconsulta(rsSector)
+			End If
+			
+			
+			'Perfil
+			
+			sPerfil = ""
+			If rs(6) <> "" Then
+				Strsql = "Select descri From Tipoperfil Where tipoperfil = '" & rs(6) & "'"
+				Set rsPerfil = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				If Not rsPerfil.eof Then sPerfil = rsPerfil(0)
+				Call ofv.cerrarconsulta(rsPerfil)
+			End If
+			
+			wkprocdesc = wksecuencia & "." & sEvento & "-"  & sSector & "-"  & sPerfil
+			
+			Formulario1 = ""
+			Celda = ""
+			Celda = Celda & ofv.GenCelda("","ttr","","15%","","","","Proceso: ","si")
+			Celda = Celda & ofv.GenCelda("","ttt","","85%","","","",wkprocdesc,"si")
+			Formulario = ofv.GenRow("","","","","","","",Celda,"si")
+			
+			
+			
+		End If
+		
+		
+		
+		rs.movenext
+		
+	Else
+		nID = "no"
+	End If
+	
+	''sHTML = sHTML & ofv.GenTabla("","","","100%","","0","","-1","2","","",formulario1 & Formulario,"si")
+	sHTML = sHTML & Formulario
+	
+	
+	response.write sHTML
+	sHTML = ""
+	
+	' Acciones del procedimiento
+	
+	If OpcAgregar = "si" Or OpcAgregar = "fl"  Then
+		
+		Strsql = "Select * From Modo Order By descri"
+		
+		If Fltipo &"" = "" Then
+			
+			Set rsFiltro = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+			If Not rsFiltro.eof Then Fltipo = rsfiltro(0)
+			
+		End If
+		
+		response.write "<br>"
+		Celda = ofv.GenCelda("","ttt","","","","","","Agregar Paso","si")
+		''''Fila  = ofv.GenRow("","","","","","","",Celda,"si")
+		
+		''''Nuevo Agregado
+		'Celda  = Celda & ofv.gencelda("","ttt","","10%","","","","Tipo de Accion","si")
+		
+		
+		
+		If session("APLMDCLI") <> "BNX" And session("APLMDCLI") <> "GP"  And False Then
+			scomKK = ""
+			scomDD = ""
+			'  response.write strsql & "<br>" & chr(13)
+			Set rsniv = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+			Do Until rsniv.eof
+				scomKK = scomKK & rsniv(0) & Chr(9)
+				scomDD = scomDD & rsniv(1) & Chr(9)
+				RSNIV.MOVENEXT
+			Loop
+			Call ofv.cerrarconsulta(rsniv)
+			
+			sInput = ofv.gencomboFX("Flform","Fltipo",Fltipo,scomKK,scomDD,"")
+			
+			' sInput = ofv.GenerarCombo("Flform","Fltipo",Fltipo,Strsql,cn,0,1,"si")
+			
+			Celda  = Celda & ofv.gencelda("","vti","","","","","",sInput,"si")
+			'Celda  = Celda & ofv.gencelda("","vti","","","","","","&nbsp;","si")
+			Fila   = ofv.genrow("","","","","","","",Celda,"si")
+			''''Nuevo Agregado Fin
+			
+			sTabla = ofv.GenTabla("","","","80%","","0","","0","0","","",Fila,"si")
+			
+			sAccion = "edProcedDET.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+			sAccion = sAccion & "&Opcion=si&opcion2=no&opcion3=no&CantRegAMover=" & CantRegAMover
+			sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+			
+			sHTML = ofv.GenForm("Flform","",sAccion,"","post",sFuncion,sTabla,"si")
+		Else
+			Fila  = ofv.GenRow("","","","","","","",Celda,"si")
+			sHTML = ofv.GenTabla("","","","100%","","0","","0","0","","",Fila,"si")
+			response.write sHTML
+			sHTML = ""
+		End If
+		response.write sHTML
+		sHTML = ""
+		
+	Else
+		
+		'Encabezados
+		If wkaplic <> "PL" Then
+			
+			'Agregar Accion
+			
+			'' if bModificar then
+			''    sInput  = ofv.GenerarInput("","Agregar Accion","submit","","20","bt","")
+			''    Celda   = "" 'ofv.GenCelda("","vt title='Agregar nueva accion a la lista.' ","","1%","","","",sInput,"si")
+			''    sAccion = "AgregarAcciones.asp?tabla=Tipoaccalt&Opcion=si&volver=" & vueltaC
+			''    sAccion = sAccion & "_Codobjeto=" & nCodigo & "_Tipobjeto=" & sTipo
+			''    test    = ofv.GenForm("agracc","",sAccion,"","post","",sInput ,"si")
+			''    test= ofv.GenCelda("","vt title='Agregar nueva accion a la lista.' ","","1%","","","",test,"si")
+			''   ' test= test & "</form>"
+			'' end if
+			
+			sRetornar = "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+			
+			' sql = " select atributo from atrmUsuarios where usuario='" & session("Usuario") & "' and atributo ='19-COREM20-M-ACCIONES'"
+			' set rf = ofv.crearconsultaex(sql, cn, 1, parametros)
+			
+			' permiso=""
+			' if rf(0) = "19-COREM20-M-ACCIONES" then
+			' permiso = false
+			' else
+			' permiso = true
+			' end if
+			
+			''INC 1355
+			If bModificar  Then
+				sInput  = ofv.GenerarInput("","Agregar Accion","submit","","20","bt","")
+				sAccion = "edProceddet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+				sAccion = sAccion & "&Opcion=si&opcion2=no&opcion3=no&CantRegAMover=" & CantRegAMover
+				sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+				
+				test    = ofv.GenForm("agracc","",sAccion,"","post","",sInput ,"si")
+				
+				'''''test= ofv.GenCelda("","vt title='Agregar nueva accion a la lista.' ","","1%","","","",test,"si")
+				test= ofv.GenCelda("","","","1%","","","",test,"si")
+				
+			End If
+			
+			
+			'Cursograma
+			sInput = ofv.GenerarInput("","Cursograma","submit","","20","bt","")
+			Celda = ""'ofv.GenCelda("","vt title='Abrir grafico del cursograma.' ","","1%","","","",sInput,"si")
+			' if session("APLMDCLI") <> "BC" then
+			'    sAccion = "Cursograma.asp?volver=" & vuelta & "&Codproced=" & nID & "&Tipobjeto=" & sTipo
+			' else
+			sAccion = "CursogramaAdmin.asp?Codobjeto=" & nCodigo & "&Codproced=" & nID & "&Tipobjeto=" & sTipo
+			' end if
+			Formularioc = ofv.GenForm("Cursograma","",sAccion,"Grama","post","",sInput,"si")
+			Formularioc=ofv.GenCelda("","vt title='Abrir grafico del cursograma.' ","","1%","","","",Formularioc,"si")
+			''''
+			'Importar procedimiento
+			Formularioi = "&nbsp;"
+			If bmodificar Then
+				sInput = ofv.GenerarInput("","Importar","submit","","10","bt","")
+				Celda = "" 'ofv.GenCelda("","vt title='Incorporar pasos desde otro Circuito.' ","","1%","","","",sInput,"si")
+				sAccion = "edProceddet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+				sAccion = sAccion & "&Opcion=no&Opcion2=si&Opcion3=no&CantRegAMover=" & CantRegAMover
+				sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+				Formularioi = ofv.GenForm("Importar","",sAccion,"","post","",sInput,"si")
+				Formularioi=ofv.GenCelda("","vt title='Incorporar pasos desde otro Circuito.' ","","1%","","","",Formularioi,"si")
+			End If
+			''''
+			
+			
+			
+			Celda = ofv.GenCelda("","vtig","","90%","","","","Detalle del Circuito ","si")
+			Celda = celda & indice
+			Celda = celda & test
+			Celda = celda & Formularioc
+			Celda = celda & Formularioi
+		Else
+			Celda = ofv.GenCelda("","vtig","","90%","","","","Actividades del proceso para contingencia ","si")
+			
+		End If
+		
+		
+		
+		Fila = ofv.GenRow("","","","","25","","",Celda,"si")
+		sHTML = "<br>" & ofv.GenTabla("","aaa style='border-style:solid;border-width:1;border-color:#990000;background-color:#F9F9F9;' ","","100%","","0","","0","0","","",Fila,"si") & "<br>"
+		response.write sHTML
+		sHTML = ""
+	End If
+	
+	sHTML = ""
+	response.flush
+	
+	If OpcAgregar = "si" Then
+		
+	Else
+		
+		
+		
+		bColor = "False"
+		If nID <> "no" Then
+			
+			
+			
+			strsql = "select OBJACCION.*, b.codinx2 OBJOBSCMT  from OBJACCION "
+			
+			'strsql = strsql & " left join (select distinct codinx2 from OBJOBSCMT where actpend is null and codsol = " & session("codSol") & ") b on (OBJACCION.objid = b.codinx2) "
+			'strsql = strsql & " left join (select distinct codinx2 from OBJOBSCMT where  codsol = " & session("codSol") & ") b on (OBJACCION.objid = b.codinx2) "
+			strsql = strsql & " left join (select distinct codinx2 from OBJOBSCMT where TIPO='OBS' AND codsol = " & session("codSol") & " and codobjeto=" & nCodigo & ") b on ( cast ( OBJACCION.objid as nvarchar) = b.codinx2) "
+			strsql = strsql & " WHERE codproced = '" &  nID & "'"
+			If bVersion = "NO" Then
+				strsql = strsql & " and (modi = 0 or (modi <> 0 and tipmodi <> 'E')) "
+			End If
+			strsql = strsql & " Order By secuen"
+			
+			'response.write strsql & "<br>" & chr(13)
+			
+			Set rs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+			If Not rs2.eof Then rs2.move(CantRegAMover2)
+			posicion = 0
+			
+			
+			Filam = ""
+			xTrColor = "#F9F9F9"
+			'---
+			sImageELN    = "<font face='corflaticon' size=3 color='#dddddd'>&#0253;</font>"
+			sImageELS    = "<font face='corflaticon' size=3 color='#bb0000'>&#4;</font>"
+			wktitdelete = "Confirma la eliminacion???."
+			Do While Not rs2.eof And posicion < CantRegAMostrar2
+				nAccion   = rs2(0)
+				nAccionID = rs2(18)
+				nselec    = "Expr2"
+				sForm     = "edProcedimientos" & rs2(0)
+				
+				'Eliminar
+				sHref = ""
+				If rs2(14) And rs2(15) = "E"  And (rs2(20) & "") <> "PL" Then
+					''     sImage = ofv.GenImage("","","","","Imagenes/Botdelx.jpg","0","")
+					sImage = ofv.GenImage("","","","","Imagenes/Botdel.jpg","0","")
+					Celda = ofv.GenCelda("","vt","","2","","","",sImage,"si")
+				Else
+					If bModificar  And (rs2(20) & "") <> "PL" Then
+						If rs2(14) And rs2(15) = "A" Then
+							sHref = "asp/EliminarEN.asp?ID=" & nAccion & "&Tabla=Objaccion&volver=" & vueltaC
+							' sHref = sHref & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Eliminar=NSNC"
+							sHref = sHref & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Eliminar=SI"
+						Else
+							sHref = "asp/ActualizarEN.asp?ID=" & nAccion & "&Tabla=Objaccion&volver=" & vueltaC
+							sHref = sHref & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo & "&Eliminar=SI" '& chr(34) & " onclick="& chr(34) & "alert(1);"
+						End If
+					End If
+					
+					If sHref <> ""  And (rs2(20) & "") <> "PL" Then
+						' CeldaZ = ofv.BotonEliminar("Accion,"qqq")
+						''       sImageEL   =ofv.GenImage("","","","","Imagenes/Botdelx.jpg","0","")
+						sImage = ofv.GenImage("","","","","Imagenes/Botdel.jpg","0","")
+						sformobj   = "FRMOBJ" & rs2(0)
+						' sAccion    = "eliminarproceso.asp?codobjeto=" & rs(0) & "&tipobjeto=" & rs(20) & "&OPCION=ACC"
+						formobj    = ofv.genform(sformobj,"AAA STYLE='display:none;' ",sHref,"","post","","","si")
+						sfunobj    = " onclick="" disp_confirm('" & wktitdelete & "','" & sformobj & "'); "" "
+						'  celda= ofv.GenCelda("","ut style='cursor:pointer;' title='" & wktitdelete & "' " & sfunobj & " ","","2","","","",sImageEL ,"si") & formobj
+						Celda = ofv.BotonEliminar("Accion ",sHref)
+						' response.write celda & "2222222222222222222"
+						'celda=replace(celda,"onclick=" & chr(34) & "document", "onclick=""var r=confirm('"&wktitdelete&"');if (r==true) {document")
+						celda=Replace(celda,"onclick='document", "onclick=""var r=confirm('"&wktitdelete&"');if (r==true) {document")
+						celda=Replace(celda,".submit();'", ".submit();} else {alert('Se cancelo la accion!');}" &Chr(34))
+						' response. write ofv.BotonEliminar("AcCIqqqqqqqON ",sHref)
+					Else
+						Celda = ofv.GenCelda("","vt","","2","","","","&nbsp;","si")
+					End If
+				End If
+				
+				
+				' estado observacion
+				
+				Celdaobs  = ofv.GenCelda("","vt","","2","","","","&nbsp;" ,"si")
+				
+				
+				'response.write nAccion & " nAccion " & "<br>"
+				'response.write nCodigo & " nCodigo " & "<br>"
+				'response.write sTipo   & " sTipo " & "<br>"
+				
+				
+				''''' agregado para color del cuadrito de Observaciones version 4.6
+				wComentario = ""
+				strsql = "SELECT * from OBJOBSCMT where TIPO='OBS' AND codinx2 = " & nAccion & " and "
+				strsql = strsql & " codobjeto = " & nCodigo & " and tipobjeto = '"& sTipo &"'"      ' and "
+				
+				' strsql = strsql & " AND codcircuito='"& IDC &"'"
+				strsql = strsql & " order by codcircuito, codusr, objid"
+				'	response.write strsql
+				Set rss = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+				If Not rss.eof Then
+					wComentario = rss(13)
+				End If
+				Call ofv.cerrarconsulta(rss)
+				''''''
+				
+				If (Nestado=5  Or Nestado=6) And (rs2(30) & "") <> "" And bModificar Then
+					
+					sAccion = "getObsupd.asp?wasotxt=N&vuelve=" & vuelta  & "&Codobjeto=" & nCodigo
+					sAccion = sAccion & "&Tipobjeto=" & sTipo & "&ID=" & nAccion  & "&ID2=" & nID
+					
+					xsffun  = " onclick=""document.getElementById('DX4').style.display='';"" "
+					sHref   = sAccion
+					
+					''''''agregado para color del cuadrito de Observaciones version 4.6
+					
+					If wComentario = "" Then
+						sInput  = "<div style='border-style:solid;border-color:#993333;border-width:1;color:#993333;' >" & "OBS" & "</div>"
+					Else
+						sInput  = "<div style='border-style:solid;border-color:#008000;border-width:1;color:#00AA00;' >" & "OBS" & "</div>"
+					End If
+					''''''
+					Celdaobs  = ofv.GenLink("",xclas & "  ",sHref,"WK4","","",sInput,"si")
+					Celdaobs  = ofv.GenCelda("",xclas & xsffun & "  title='Ver observaciones para el elemento.' ","","","1","","", Celdaobs,"si")
+					
+				End If
+				
+				
+				Celda = Celda & Celdaobs
+				
+				
+				'Secuencia
+				sInput = "XX" & rs2(10)
+				
+				If Len(sInput) > 3 Then sinput = Right(sinput,3)
+				sinputS = Replace(sinput,"X","&nbsp;")
+				'   Celda = Celda & ofv.GenCelda("","vt","","2","","","",sInput,"si")
+				
+				'Acciones
+				
+				
+				sInput1 = ""
+				sAccion = " "
+				sModo   = " "
+				sArch   = "NO"
+				If rs2(4) <> "" Then
+					Strsql = "Select descri,modo From Tipoaccalt Where tipoaccionalt = " & rs2(4)
+					Set rsAcciones = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+					If Not rsAcciones.eof Then
+						sAccionM = rsAcciones(0)
+						sModo   = rsAcciones(1)
+					End If
+					Call ofv.cerrarconsulta(rsAcciones)
+				End If
+				
+				
+				westado = "S"
+				
+				For it=1 To 6
+					wstipo(it) = "N"
+				Next
+				
+				
+				strsql12 = "SELECT * from modo "
+				strsql12 = strsql12 & "Where tipomodo = '" & sModo & "' "
+				scontrol=""
+				Set rs12 = ofv.crearconsultaEx(StrSql12,cn,1,volver)
+				If Not rs12.eof Then
+					sArch   = rs12(2)
+					scontrol=rs12("control")
+					For it=1 To 6
+						If rs12(it+3) Then
+							wstipo(it) = "S"
+						End If
+					Next
+				End If
+				Call ofv.cerrarconsulta(rs12)
+				
+				
+				If wkaplic <> "PL" Then
+					
+					
+					'Icono
+					If sArch <> "NO" Then
+						sImage = ofv.GenImage("","","","","Iconos/" & sArch,"0","")
+					Else
+						sImage = ofv.GenImage("","","","","Iconos/ICorAImagen.jpg","0","")
+					End If
+					sLink = sImage
+					
+					Celda = Celda & ofv.GenCelda("","vt","","1%","","","",sLink,"si")
+					
+				End If
+				
+				
+				
+				sVerbo = sAccionM
+				sAcciont = sAccionM
+				i = InStr(sVerbo," ")
+				If i > 0 Then
+					sVerbo = Left(sAccionM,i-1)
+					sAcciont = Mid(sAccionM,i+1)
+				End If
+				
+				
+				If wkaplic <> "PL" Then
+					
+					sInput = "-" & sInputS & ".&nbsp;<i>" & sVerbo & "</i>" & "&nbsp;&nbsp;&nbsp;"
+					sInput = sInput & Replace(sAcciont," ","&nbsp;") & ""
+					
+					sID = "EdProcedDetProp.asp?"
+					sID = sID & "AccId=" & nAccion & "&Codobjeto=" & nCodigo
+					sID = sID & "&Tipobjeto=" & sTipo & "&CantRegMover=" & CantRegAMover2
+					
+					sHref = sID
+					sInput = ofv.GenLink("","nt title='Propiedades del Paso.' ",sHref,"","","",sInput,"si")
+					
+				Else
+					
+					sInput = "-" & sInputS & ".&nbsp;" & sVerbo & "" & "&nbsp;&nbsp;&nbsp;"
+					sInput = sInput & Replace(sAcciont," ","&nbsp;") & ""
+					
+				End If
+				
+				
+				Celda  = Celda & ofv.GenCelda("","uti","","80%","","","",sInput,"si")
+				
+				
+				
+				
+				If wkaplic <> "PL" Then
+					
+					'Relacion entre eventos (conectores)
+					
+					
+					sID = "EdProcedrel.asp?"
+					sID = sID & "Accion=" & nAccion & "&Codproced=" & nID & "&Codobjeto=" & nCodigo
+					sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+					sID = sID & "_Tipobjeto=" & sTipo
+					
+					
+					
+					If Not IsNull(rs2(12))  Then
+						If  CLng(rs2(12)) > 0 Then
+							xclas  = "btbs"
+							sInput = "<font class='btic' >&#060;</font>"
+						Else
+							xclas  = "btbn"
+							sInput = "<font class='btic' >&#060;</font>"
+						End If
+					Else
+						xclas  = "btbn"
+						sInput = "<font class='btic' >&#060;</font>"
+					End If
+					
+					
+					sHref = sID
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+					sInput = "<div class=" & xclas & " align=middle>" & sinput & "</div>"
+					
+					stitle = "Relacionar evento con conectores."
+					XXX=ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",XXX,"si")
+					' Celda = Celda & ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					
+				End If
+				
+				'Texto de referencia
+				
+				sID = "TextoEsquema.asp?"
+				sID = sID & "Accion=" & nAccion & "&Codproced=" & nID & "&Codobjeto=" & nCodigo
+				sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+				sID = sID & "_Tipobjeto=" & sTipo
+				
+				
+				
+				If rs2(11) <> "" Or rs2(16) <> "" Or rs2(17) <> "" Then
+					xclas  = "btbs"
+					sInput = "<font class='btic' >&#0165;</font>"
+				Else
+					xclas  = "btbn"
+					sInput = "<font class='btic' >&#0165;</font>"
+				End If
+				
+				sHref = sID
+				
+				sInput = "<div class=" & xclas & " ALIGN=MIDDLE>" & sinput & "</div>"
+				
+				xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+				
+				stitle = "Actualizar texto de referencia."
+				xxx=ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+				Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","", xxx,"si")
+				'   Celda = Celda &
+				
+				
+				If wkaplic <> "PL" Then
+					
+					'Link a paginas internas/externas
+					
+					
+					sID = "EdGENLnk.asp?"
+					sID = sID & "ID=" & nAccion & "&TABLA=OBJACCION&Codobjeto=" & nCodigo
+					sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+					sID = sID & "_Tipobjeto=" & sTipo
+					
+					
+					
+					If wstipo(3) = "S" Then
+						If Not IsNull(rs2(19))  Then
+							If  CLng(rs2(19)) > 0 Then
+								xclas  = "btbs"
+								
+								sInput = "<font class='btic' >&#0126;</font>"
+								
+							Else
+								xclas  = "btbn"
+								
+								sInput = "<font class='btic' >&#0126;</font>"
+								
+							End If
+						Else
+							xclas  = "btbn"
+							
+							sInput = "<font class='btic' >&#0126;</font>"
+						End If
+						
+						
+						sHref = sID
+						
+					Else
+						sHref  = "javascript:void(0);"
+						xclas  = "ut"
+						sInput = "<font face='corflaticon' size=2 color='#eeeeee' >&#032;</font>"
+					End If
+					
+					sInput = "<div class=" & xclas & " ALIGN=MIDDLE>" & sinput & "</div>"
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+					stitle = "Actualizar link a otro documento."
+					xxx=ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+					' Celda = Celda &
+					
+				End If
+				
+				
+				
+				'Asociacion de Complementos
+				
+				sID = "EdProcedCMP.asp?"
+				sID = sID & "Accion=" & nAccion & "&Codproced=" & nID & "&Codobjeto=" & nCodigo
+				sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+				sID = sID & "_Tipobjeto=" & sTipo
+				
+				
+				sID = "EdGENLnkCOMP.asp?"
+				sID = sID & "ID=" & nAccion & "&TABLA=OBJACCION&Codobjeto=" & nCodigo
+				sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+				sID = sID & "_Tipobjeto=" & sTipo
+				
+				
+				
+				If CStr(rs2(6) & "") <> "0" Then
+					xclas  = "btbs"
+					
+					
+					sInput = "<font class='btic' >&#0163;</font>"
+					
+				Else
+					xclas  = "btbn"
+					
+					sInput = "<font class='btic' >&#0163;</font>"
+					
+				End If
+				
+				sHref = sID
+				sInput = "<div class=" & xclas & " ALIGN=MIDDLE >" & sinput & "</div>"
+				
+				xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+				
+				stitle = "Asociar componente."
+				xxx= ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+				Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+				' Celda = Celda &
+				
+				If wkaplic <> "PL" Then
+					
+					'Copias de formularios
+					
+					sInput1  = ""
+					xfuncion = ""
+					
+					If wstipo(2) = "S" And CStr(rs2(6) & "") <> "0" Then
+						nCopias = 0
+						xclas  = "btbs"
+						If Not IsNull(rs2(13)) Then nCopias = rs2(13)
+						If CInt(nCopias) = 0 Then
+							xclas   = "btbn"
+							westado = "N"
+							wntexto = "ACCION RELACIONADA A EMISION/RECEPCION DE DOCUMENTOS: No tiene informado la cantidad de copias a administrar!."
+						End If
+						
+						
+						
+						
+						
+						If bModificar Then
+							
+							
+							
+							sForm = "FACC" & rs2(0)
+							
+							xfuncion = " onclick=""window.top.xopcom('" & rs2(13).name & "','" & rs2(13).name & "2','" & sForm & "','3'); return false;"" "
+							
+							SCOMSEP = ""
+							scomK   = ""
+							scomD   = ""
+							
+							For i=0 To 9
+								scomK = scomK & SCOMSEP & i
+								scomD = scomD & SCOMSEP & i
+								SCOMSEP = Chr(9)
+							Next
+							
+							sInput1 = ofv.gencomboFX(sForm,rs2(13).name,rs2(13),scomK,scomD,"")
+							
+							
+							
+							
+							sAccion = "asp/ActualizarEN.asp?ID=" & rs2(0) & "&Referencia=SI&Tabla=Objaccion&volver=" & vueltaC
+							sAccion = sAccion & "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+							sInput1  = ofv.GenForm(sForm,"aaa STYLE='display:none;' ",sAccion,"","post","",sInput1,"si")
+							
+							
+						End If
+						
+						sInput = "<font  class='btic2' " & xfuncion & " title='Cantidad de copias: " & nCopias & ".' style='cursor:pointer;' >" & nCopias & "</font>"
+						
+						
+					Else
+						xclas  = "ut"
+						sInput = "<font face='corflaticon' size=2 color='#eeeeee' >&#032;</font>"
+					End If
+					
+					sHref  = "javascript:void(0);"
+					
+					sInput = "<div class=" & xclas & " style='width:14;' ><center>&nbsp;" & sinput & "&nbsp;</center></div>" & sInput1
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" " & xfuncion & " "
+					stitle = "Cantidad de copias: " & nCopias & "."
+					sInput = ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",sInput,"si")
+					
+					
+					Celda = Celda & ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					
+					
+					
+					
+					
+					'Procedimiento alternativo (control)
+					'Acciones alternativas
+					session("volverproc") = ""
+					
+					sID = "EdProcedAlt.asp?"
+					sID = sID & "Accion=" & nAccionID & "&Codproced=" & nID & "&Codobjeto=" & nCodigo
+					sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+					sID = sID & "_Tipobjeto=" & sTipo
+					
+					If wstipo(1) = "S" Then
+						strsql11 = "SELECT idaccion from accionmaster2 "
+						strsql11 = strsql11 & "Where idaccion = '" & nAccionID & "'"
+						If bVersion = "NO" Then
+							strsql11 = strsql11 & " and (modi = 0 or (modi <> 0 and "
+							strsql11 = strsql11 & "tipmodi <> 'E')) "
+						End If
+						Set rs11 = ofv.crearconsultaEx(StrSql11,cn,1,volver)
+						If Not rs11.eof Then
+							xclas  = "btbs"
+							sInput = "<font class='btic'  >2</font>"
+						Else
+							westado = "N"
+							wntexto = "ACCION DE CONTROL: No tiene acciones alternativas informadas!."
+							xclas  = "btbn"
+							sInput = "<font class='btic'  >2</font>"
+						End If
+						Call ofv.cerrarconsulta(rs11)
+						
+						sHref = sID
+						
+					Else
+						sHref  = "javascript:void(0);"
+						xclas  = "ut"
+						sInput = "<font face='corflaticon' size=2 color='#eeeeee' >&#032;</font>"
+					End If
+					
+					sInput = "<div class=" & xclas & " >" & sinput & "</div>"
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+					stitle = "Establecer procedimiento alternativo (por salida negativa del control)."
+					'sInput = ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",sInput,"si")
+					'Celda = Celda & ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					xxx=ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+					
+					'Continuador
+					
+					
+					'Sector Continuador
+					
+					sID = "EdProcedCON.asp?"
+					sID = sID & "Accion=" & nAccion & "&Codproced=" & nID & "&Codobjeto=" & nCodigo
+					sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+					sID = sID & "_Tipobjeto=" & sTipo
+					
+					If  CStr(rs2(8)) <> "0"  Then
+						xclas  = "btbs"
+						
+						
+						sInput = "<font class='btic' >G</font>"
+						
+					Else
+						xclas  = "btbn"
+						
+						sInput = "<font class='btic' >G</font>"
+						
+						
+					End If
+					sHref = sID
+					
+					sInput = "<div class=" & xclas & " ALIGN=MIDDLE>" & sinput & "</div>"
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+					stitle = "Establecer Sector Continuador."
+					xxx=ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+					'Celda = Celda &
+					
+					'perfil Continuador
+					
+					If  CStr(rs2(8)) <> "0"  Then
+						sID = "EdProcedPER.asp?"
+						sID = sID & "Accion=" & nAccion & "&Codproced=" & nID & "&Codobjeto=" & nCodigo
+						sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+						sID = sID & "_Tipobjeto=" & sTipo
+						
+						sper = rs2(9)
+						
+						If IsNull(sper) Then
+							xclas  = "btbn"
+							sInput = "<font class='btic' >&#0128;</font>"
+						ElseIf sper = " " Then
+							xclas  = "btbn"
+							sInput = "<font class='btic' >&#0128;</font>"
+						Else
+							xclas  = "btbs"
+							sInput = "<font class='btic' >&#0128;</font>"
+						End If
+						
+						sHref = sID
+						
+					Else
+						sHref  = "javascript:void(0);"
+						xclas  = "ut"
+						sInput = "<font face='corflaticon' size=2 color='#eeeeee' >&#032;</font>"
+					End If
+					
+					
+					sInput = "<div class=" & xclas & " >" & sinput & "</div>"
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+					stitle = "Establecer Perfil Continuador."
+					xxx= ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					
+					Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+					' Celda = Celda &
+					
+					'Observaciones
+					
+					
+					If westado = "N" Then
+						xclas  = "btbn"
+						
+						sInput = "<font class='btic'  >=</font>"
+						
+						
+					Else
+						
+						sInput = "<font class='btic'  >=</font>"
+						
+						xclas  = "btbs"
+						wntexto = "Paso correcto - sin observaciones."
+					End If
+					
+					sHref  = "javascript:void(0);"
+					sInput = "<div class=" & xclas & " ALIGN=MIDDLE>" & sinput & "</div>"
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+					stitle = "Ver observaciones."
+					xxx= ofv.GenLink("",xclas & " title='" & stitle & "' onclick=" & Chr(34) & "alert('" & wntexto & "');"  & Chr(34),sHref,"","","",sInput,"si")
+					Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+					' Celda = Celda & ofv.GenLink("",xclas & " title='" & stitle & "' onclick=" & chr(34) & "alert('" & wntexto & "');"  & chr(34),sHref,"","","",sInput,"si")
+					
+				End If
+				
+				If wkaplic = "PL" Then
+					
+					'Contingencias para la actividad
+					
+					
+					
+					sID = "EdProcedCONtingencias.asp?"
+					sID = sID & "Accion=" & nAccionID & "&Codobjeto=" & nCodigo
+					sID = sID & "&Tipobjeto=" & sTipo & "&volver=" & vueltaC & "_Codobjeto=" & nCodigo
+					sID = sID & "_Tipobjeto=" & sTipo
+					
+					xclas  = "btbs"
+					sInput = "<font class='btic' >G</font>"
+					
+					sHref = sID
+					
+					sInput = "<div class=" & xclas & " >" & sinput & "</div>"
+					
+					xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+					stitle = "Contingencias para la actividad."
+					'     '  sInput = ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",sInput,"si")
+					''   Celda = Celda & ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					xxx= ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+					Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+					
+				End If
+				
+				
+				
+				'Modi (actualizaciones por versionado)
+				
+				'Version
+				sSelect = ""
+				If bVersion = "SI" Then
+					If rs2(14) Then
+						
+						If rs2(15) = "A" Then
+							stitle = "Paso agregado."
+							xclas  = "btba"
+							sInput = "<font class='btic'  >6</font>"
+						ElseIf rs2(15) = "E" Then
+							stitle = "Paso eliminado."
+							xclas  = "btbn"
+							sInput = "<font class='btic'  >5</font>"
+						ElseIf rs2(15) = "M" Then
+							stitle = "Paso modificado."
+							xclas  = "btbs"
+							sInput = "<font class='btic'  >4</font>"
+						End If
+						
+					Else
+						stitle = "Paso sin modificaciones."
+						xclas  = "ut"
+						sInput = "<font face='corflaticon' size=2 color='#eeeeee' >&#032;</font>"
+					End If
+				Else
+					stitle = "Paso original."
+					xclas  = "ut"
+					sInput = "<font face='corflaticon' size=2 color='#eeeeee' >&#032;</font>"
+				End If
+				
+				sHref  = "javascript:void(0);"
+				xsffun = " onmouseover=""this.className='" & xclas & "r';"" onmouseout=""this.className='" & xclas & "';"" "
+				
+				sInput = "<div class=" & xclas & " >" & sinput & "</div>"
+				'sInput = ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",sInput,"si")
+				'Celda = Celda & ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+				xxx= ofv.GenLink("",xclas & " title='" & stitle & "' ",sHref,"","","",sInput,"si")
+				Celda = Celda & ofv.GenCelda("",xclas & " title='" & stitle & "'  " & xsffun & " ","","2%","","","",xxx,"si")
+				
+				
+				
+				'Libre
+				sInput = "&nbsp;"
+				Celda = Celda & ofv.GenCelda("","ut","","2%","","","",sInput,"si")
+				
+				
+				
+				FilaM  = FilaM & ofv.GenRow("","aaa bgcolor=" & xTrColor & " ","","","10","","",Celda,"si")
+				
+				If xTrColor = "#FFFFFF" Then
+					xTrColor = "#F9F9F9"
+				Else
+					xTrColor = "#FFFFFF"
+				End If
+				
+				
+				Celda = ""
+				
+				
+				
+				rs2.movenext
+				posicion = posicion + 1
+			Loop
+			
+			Tabla = ofv.GenTabla("","aaa style={border-bottom-style:solid;border-width:1;border-color:#cccccc;} ","","95%","","0","","-1","1","","",Filam,"si")
+			response.write Tabla
+			
+		End If
+		
+	End If
+	
+	
+	
+	
+	'Boton test
+	sTest = "T"
+	'  sAccion = "CoProcedimientos.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+	'  sAccion = sAccion & "&Menu=PORESTADO&Sector=3&origen=ED&CantRegAMover=A&proced=" & XEVEN
+	sAccion= " Consultar.asp?Codigo=" & nCodigo & "&Tipo=" & STIPO &"&niv1=5&niv2=" & nID & "&test=" & sTest
+	TEST = ofv.BotonTest(sAccion)
+	
+	'Boton Volver
+	sAccion = "edProcedimientos.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+	Indice = ofv.BotonVolver(sAccion)
+	
+	
+	
+	If OpcCopiar = "si" Then
+		Celda = ofv.GenCelda("","tt","","5%","","","","Procedimiento","si")
+		
+		Strsql = ""
+		Strsql = Strsql & "SELECT a.codobjeto,a.descri from Objetos a "
+		Strsql = Strsql & "   inner join tipobjeto b on a.tipobjeto = b.tipobjeto "
+		Strsql = Strsql & "   inner join objperfil c on b.perfil = c.tipoperfil "
+		Strsql = Strsql & "   left join objperfildoc d on a.codobjeto = d.codobjeto "
+		Strsql = Strsql & " Where c.objproced = 1 or d.objproced = 1 "
+		Strsql = Strsql & " order by a.descri, a.codobjeto "
+		
+		
+		
+		'  Strsql = "SELECT * from csProcObjetos Where tipobjeto = '" & sTipo & "' "
+		'  Strsql = Strsql & "Order By codiden"
+		formulario=""'Agregado PDC'
+		
+		
+		Set rsPerfil = ofv.crearconsultaEx(Strsql, cn, 1, parametros)
+		scomK = ""'"null" & Chr(9)
+		
+		scomD = "" '"" & Chr(9)
+		SCOMSEP =""
+		Do While Not rsperfil.eof
+			scomK=scomK & SCOMSEP & rsperfil(0)
+			scomd=scomd & SCOMSEP & rsperfil(1)
+			SCOMSEP = Chr(9)
+			rsPerfil.movenext
+		Loop
+		formulario=""
+		sInput =  ofv.gencomboFX("Ok", "selproc", "", scomK, scomD, "")
+		'sInput = ofv.GenerarCombo("Ok","selproc","",Strsql,cn,0,1,"no")
+		'Celda = Celda & ofv.GenCelda("","ttr","","","","","",sInput,"si")
+		
+		' sInput = ofv.GenerarInput("","Aceptar","submit","","10","bt","")
+		' Celda = Celda & ofv.GenCelda("","ttr","","","","","",sInput,"si")
+		sAccion = "edProceddet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		sAccion = sAccion & "&Opcion=no&opcion2=no&opcion3=si&CantRegAMover=" & CantRegAMover
+		sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+		
+		fila22= ofv.GenForm("Ok","",sAccion,"","post","",sInput,"si")
+		Celda = Celda & ofv.GenCelda("","ttr","","","","","",fila22,"si")
+		tabla22 = ofv.GenTabla("","","","100%","","0","","0","0","","",Celda,"si")
+		Formulario = Formulario & tabla22 ' ofv.GenForm("Ok","",sAccion,"","post","",tabla22,"si")
+		
+		
+		
+		sAccion = "edProceddet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		sAccion = sAccion & "&CantRegAMover=" & CantRegAMover
+		sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+		
+		'   sAccion = "edProceddet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		'  sAccion = sAccion & "&Opcion=no&opcion2=no&opcion3=no&CantRegAMover=" & CantRegAMover
+		'  sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+		
+		sInput = ofv.GenerarInput("","Cancelar","submit","","10","bt","")
+		fila23= ofv.GenForm("Cancel","",sAccion,"","post","",sInput,"si")
+		Celda = ofv.GenCelda("","ttr","","","","","",fila23,"si")
+		tabla23 = ofv.GenTabla("","","","100%","","0","","0","0","","",Celda,"si")
+		formulario= Formulario & tabla23 ' ofv.GenForm("xCancel","",sAccion,"","post","",tabla23,"si") 'ARREGLO A MEDIAS v1
+		
+		
+		Fila = ofv.GenRow("","","","","","","",Formulario,"si")
+		'' sHTML = sHTML & ofv.GenTabla("","","","100%","","0","","0","0","","",Fila,"si")
+		sHTML = sHTML & formulario
+	ElseIf OpcCopiar2 = "si" Then
+		Celda = ofv.GenCelda("","ttr","","5%","","","","Evento","si")
+		
+		
+		Strsql = "SELECT codproced, nombre "
+		Strsql = Strsql & " from CSCEventoSectorPerfil Where Obcodobjeto = " & request.form("selproc")
+		Strsql = Strsql & " order by secuen, secuencia, codproced "
+		'response.write "strsql " & strsql
+		''  sInput = ofv.GenerarCombo("Ok","selcom","",Strsql,cn,0,1,"no")
+		'' sInput = ofv.GenerarCombo(sForm,rs(11).name,VALOR,Strsql,cn,0,10,"")
+		''   response.write StrSql
+		
+		Set rsPerfil = ofv.crearconsultaEx(Strsql, cn, 1, parametros)
+		scomK = ""'"null" & Chr(9)
+		
+		scomD = "" '"" & Chr(9)
+		SCOMSEP =""
+		Do While Not rsperfil.eof
+			scomK=scomK & SCOMSEP & rsperfil(0)
+			scomd=scomd & SCOMSEP & rsperfil(1)
+			SCOMSEP = Chr(9)
+			rsPerfil.movenext
+		Loop
+		formulario=""
+		sInput =  ofv.gencomboFX("Ok", "selcom", "", scomK, scomD, "")
+		Celda = Celda & ofv.GenCelda("","ttr","","","","","",sInput,"si")
+		
+		sInput = ofv.GenerarInput("","Aceptar","submit","","10","bt","")
+		Celda = Celda & ofv.GenCelda("","ttr","","","","","",sInput,"si")
+		sAccion = "asp/Importar.asp?volver=" & vueltaC & "&Codobjeto=" & nCodigo & "&Tipobjeto="
+		sAccion = sAccion & sTipo & "&Codproced=" & nID
+		fila28= ofv.GenForm("ok","",sAccion,"","post","",Celda,"si")
+		tabla28 = ofv.GenTabla("","","","100%","","0","","0","0","","",fila28,"si")
+		formulario= Formulario & ofv.GenForm("Ok","",sAccion,"","post","",tabla28,"si")
+		''    Formulario = formulario & ofv.GenForm("Ok","",sAccion,"","post","",Celda,"si")
+		
+		sInput = ofv.GenerarInput("","Cancelar","submit","","10","bt","")
+		Celda = ofv.GenCelda("","ttr","","","","","",sInput,"si")
+		
+		sAccion = "edProceddet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		sAccion = sAccion & "&CantRegAMover=" & CantRegAMover
+		sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+		
+		'sAccion = "edProceddet.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		'sAccion = sAccion & "&Opcion=no&opcion2=no&opcion3=no&CantRegAMover=" & CantRegAMover
+		'sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+		
+		fila29= ofv.GenForm("Cancel","",sAccion,"","post","",Celda,"si")'
+		tabla29 = ofv.GenTabla("","","","100%","","0","","0","0","","",fila29,"si")'
+		formulario= Formulario & ofv.GenForm("Cancel","",sAccion,"","post","",tabla29,"si")'
+		'Formulario = Formulario & ofv.GenForm("Cancel","",sAccion,"","post","",Celda,"si")
+		
+		Fila = ofv.GenRow("","","","","","","",Formulario,"si")
+		' sHTML = sHTML & ofv.GenTabla("","","","100%","","0","","0","0","","",Fila,"si")
+		sHTML = sHTML & formulario
+	End If
+	
+	If OpcAgregar = "si" Then
+		
+		sql = "SELECT max(OBJACCION.secuen) FROM Objaccion, Objproced where "
+		sql = sql & "Objaccion.codproced = Objproced.codproced and Objproced.codproced='" & nID & "'"
+		Set rsSecuencia = ofv.crearconsultaEx(Sql,cn,1,volver)
+		nSecuencia = 10
+		If Not rsSecuencia.eof Then
+			If Not IsNull(rsSecuencia(0)) Then nSecuencia = CInt(rsSecuencia(0)) + 10
+		End If
+		Call ofv.cerrarconsulta(rsSecuencia)
+		
+		Celda   = ""
+		
+		sInput  = ofv.GenerarInput("secuen",nSecuencia,"agregar","","5","dtn","SI")
+		Celda   = Celda & ofv.GenCelda("","vti","","1%","","","",sInput,"si")
+		If session("APLMDCLI") = "BNX" Or session("APLMDCLI") = "GP"  Or True Then
+			Strsql  = "SELECT * From TIPOACCALT where estado=3  Order By Tipoaccalt.descri"
+		Else
+			Strsql  = "SELECT * From TIPOACCALT where estado=3  and modo = '" & Fltipo & "'  Order By Tipoaccalt.descri"
+		End If
+		' response.write strsql
+		'response.write strsql
+		
+		
+		Set rsPerfil = ofv.crearconsultaEx(Strsql, cn, 1, parametros)
+		scomK = ""'"null" & Chr(9)
+		
+		scomD = "" '"" & Chr(9)
+		SCOMSEP =""
+		Do While Not rsperfil.eof
+			scomK=scomK & SCOMSEP & rsperfil(0)
+			scomd=scomd & SCOMSEP & rsperfil(1)
+			SCOMSEP = Chr(9)
+			rsPerfil.movenext
+		Loop
+		
+		sInput =  ofv.gencomboFX("Agregarb", "tipoaccion", "", scomK, scomD, "")
+		
+		''  sInput  = ofv.GenerarCombox2(Strsql,cn,0,1,"tipoaccion")'' & "cambiar esto"
+		
+		sInput1 = ofv.GenerarInput("rellink","0","hidden","","10","","")
+		sInput1 = sInput1 & ofv.GenerarInput("Modi","1","hidden","","10","","")
+		
+		sInput2 = ofv.GenerarInput("TipModi","A","hidden","","10","","")
+		
+		sukey   = GTkey(nCodigo)
+		sInput3 = ofv.GenerarInput("codaccion",sukey,"hidden","","10","","")
+		
+		sInput4 = ofv.GenerarInput("TIPPROCED",WKAPLIC,"hidden","","10","","")
+		
+		Celda   = Celda & ofv.GenCelda("","vti","","90%","","","",sInput & sInput1 & sInput2 & sInput3 & sInput4,"si")
+		
+		
+		Fila    = ofv.genrow("","","","","20","","",Celda,"si")
+		
+		
+		sAccion = "asp/AgregarEN.asp?Tabla=Objaccion&volver=" & vueltaC & "&Codobjeto="
+		sAccion = sAccion & nCodigo & "&Tipobjeto=" & sTipo & "&Codproced=" & nID & "&Codeven="
+		sAccion = sAccion & sEven
+		
+		tabla= ofv.GenTabla("","aaa style='border-style:solid;border-width:1;border-color:#888888;'","","90%","","0","","0","0","","",fila,"si")
+		Formulario = ofv.GenForm("Agregarb","",sAccion,"","post",sFuncion,tabla,"no")
+		
+		'Formulario = ofv.GenForm("Agregarb","",sAccion,"","post",sFuncion,Fila,"no")
+		
+		sHTML = sHTML & "<center><div  >"
+		'sHTML = sHTML & ofv.GenTabla("","aaa style='border-style:solid;border-width:1;border-color:#888888;'","","90%","","0","","0","0","","",Formulario,"si") & "<br><br><br><br><br><br>"
+		sHTML = sHTML & formulario
+		
+		'Aceptar y Cancelar
+		sAccion = "edProcedDET.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		sAccion = sAccion & "&Opcion=no&opcion2=no&opcion3=no&CantRegAMover=" & CantRegAMover
+		sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+		sHTML = sHTML & ofv.AgregarBoton("Agregarb",sAccion,"") & "</div></center>"
+		
+		
+		Agregar = ""
+		Buscar  = ""
+		Celda   = ""
+		
+		''sHTML = sHTML & ofv.botoneraESSX("0",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","","",Agregar,Buscar,celda)
+		sHTML = sHTML & ofv.botoneraESSX("0",rs,cantregmoverx,cantregmostrarx,"no","no",posi,"","",Indice & Test,Agregar,Buscar,celda)
+		
+		
+	Else
+		'Botonera
+		Agregar = ""
+		sRetornar = "&Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+		If Modificar Then
+			sAccion = "edProcedDET.asp?Codobjeto=" & nCodigo & "&Tipobjeto=" & sTipo
+			sAccion = sAccion & "&Opcion=si&opcion2=no&opcion3=no&CantRegAMover=" & CantRegAMover
+			sAccion = sAccion & "&CantRegAMover2=" & CantRegAMover2
+			Agregar = ofv.BotonAgregar(sAccion)
+		End If
+		
+		If bModificar And bagregarbtn Then
+			
+			'' sInput  = ofv.GenerarInput("","Accion","submit","","20","bt","")
+			'' Celda   = "" 'ofv.GenCelda("","vt title='Agregar nueva accion a la lista.' ","","1%","","","",sInput,"si")
+			
+			sAccion = "AgregarAcciones.asp?tabla=Tipoaccalt&Opcion=si&volver=" & vueltaC
+			sAccion = sAccion & "_Codobjeto=" & nCodigo & "_Tipobjeto=" & sTipo
+			''Agregar = BtnAgAccion(21,"Accion","xform",sAccion)
+			Agregar = ofv.BotonAgregar(sAccion)
+		End If
+		
+		''end if
+		
+		If nID <> "no" Then
+			Buscar = ""
+			If posicion > 0 Then
+				
+				strsql = "select descri from OBJACCION LEFT JOIN TIPOACCALT ON OBJACCION.tipoaccion = TIPOACCALT.tipoaccionalt "
+				strsql = strsql & " WHERE codproced = '" &  nID & "'"
+				If bVersion = "NO" Then
+					strsql = strsql & " and (modi = 0 or (modi <> 0 and tipmodi <> 'E')) "
+				End If
+				strsql = strsql & " Order By secuen"
+				''''response.write strsql & " strsql " & chr(13)
+				
+				str1 = strsql   ' orden pagina
+				str2 = strsql    ' orden alfabetico
+				'         buscar = str1
+				Buscar = ofv.Combobuscar(str1,str2,cn,CantRegAMostrar2,CantRegAMover2,Replace(Replace(vueltax,"_","&"),"?","?codobjeto=" & ncodigo & "&tipobjeto=" & stipo & "&"))
+				
+			End If
+			'sHTML = sHTML & ofv.botoneraESSX("5",rs2,CantRegAMover,"",CantRegAMover2,CantRegAMostrar2,posi,"","",Indice & Test,Agregar,buscar,sRetornar)
+			'''''xxxx=ofv.botoneraESSX("5",rs2,CantRegAMover,"",CantRegAMover2,CantRegAMostrar2,posi,"","","",Agregar,buscar,sRetornar)
+			xxxx=ofv.botoneraESSX("5",rs2,CantRegAMover,"",CantRegAMover2,CantRegAMostrar2,posi,"","",Indice & Test,Agregar,buscar,sRetornar)
+		End If
+	End If
+	
+	If nID <> "no" Then Call ofv.cerrarconsulta(rs2)
+	
+	
+	'--------------------------------------------------------------------------------
+	sHTML = sHTML & "</span></div>"
+	
+	Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+	Fila = ofv.GenRow("","","","","","","",Celda,"si")
+	sHTML = sHTML &  ofv.GenTabla("TCEX1","aaa onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+	
+	'Estructura del Indice
+	
+	sHTML = sHTML & CorPnlIndx("N","") & xxxx
+	
+	'--------------------------------------------------------------------------------
+	
+	Call ofv.cerrarconsulta(rs)
+	Call ofv.cerrarconn(cn)
+	
+	
+	
+	
+	sHTML = sHTML & GTCOBS()
+	
+	sHTML = sHTML & "<script type='text/javascript'>"
+	sHTML = sHTML & "alert(document.getElementById(disp_frm));"
+	sHTML = sHTML & "function disp_confirm(disp_msg,disp_frm)"
+	sHTML = sHTML & "  {"
+	sHTML = sHTML & "  var r=confirm(disp_msg);"
+	sHTML = sHTML & "  if (r==true)"
+	sHTML = sHTML & "    {"
+	sHTML = sHTML & "  var fr= document.getElementById(disp_frm);"
+	'  sHTML = sHTML & "    alert(fr.name);"
+	sHTML = sHTML & "    fr.submit();"
+	sHTML = sHTML & "    }"
+	sHTML = sHTML & "  else"
+	sHTML = sHTML & "    {"
+	sHTML = sHTML & "    alert('Se cancelo la accion!');"
+	sHTML = sHTML & "    }"
+	sHTML = sHTML & "  }"
+	sHTML = sHTML & "function send_confirm(send_msg,send_href,send_aid)"
+	sHTML = sHTML & "  {"
+	sHTML = sHTML & "  var r=confirm(send_msg);"
+	sHTML = sHTML & "  if (r==true)"
+	sHTML = sHTML & "    {"
+	sHTML = sHTML & "    alert('ok ');"
+	sHTML = sHTML & "    var fr= document.getElementById(send_aid);"
+	sHTML = sHTML & "    fr.href = send_href;"
+	sHTML = sHTML & "    }"
+	sHTML = sHTML & "  else"
+	sHTML = sHTML & "    {"
+	sHTML = sHTML & "    alert('Se cancelo la accion! ');"
+	'  sHTML = sHTML & "    return void(0);"
+	sHTML = sHTML & "    }"
+	sHTML = sHTML & "  }"
+	sHTML = sHTML & "</script>"
+	
+	
+	
+	sHTML = sHTML & "</body></html>"
+	
+	
+	Function ZXinput2()
+		bc = Request.servervariables("HTTP_USER_AGENT")
+		
+		bcn = InStr(bc,"; MSIE")
+		If bcn > 0 Then
+			
+			xexplor = Mid(bc,bcn + 7,1)
+			
+		Else
+			
+			xexplor = "4"
+			
+		End If
+		
+		If xexplor > "5" Then
+			xalign="center"
+		Else
+			xalign="left"
+		End If
+		
+		''color='#aaCCEE' color2='#225588'
+		
+		xfstilo = "  <v:roundrect arcsize='75%' id='AP'  style='z-index:10;position:RELATIVE;width:45px;height:20px;' >"
+		'' xfsextr = "  <v:extrusion on='True' metal='True' type='perspective' backdepth='6'  rotationcenter='0,0,0'  rotationangle = '30, 0'/>"
+		'' xfsshdw = "  <v:shadow on='False' />"
+		xfsshdw = "  <v:shadow on='True' color='#eeeeee' weight='1px' /><v:stroke on='True' color='#eeeeee' weight='1px' />"
+		xfsfill = "  <v:fill on='true' color='XXXCOL1XXX' color2='XXXCOL2XXX' type='gradient' angle='30' opacity='100%'  />"
+		'' xfsfill = " <v:fill  type='gradientradial' method='sigma' color='XXXCOL2XXX' color2='XXXCOL1XXX' colors='95% XXXCOL2XXX, 0% XXXCOL1XXX' opacity='100%' angle='45'  focusposition=""95%, 15%""  />"
+		
+		XSCOLOR2 = Session("CMFPNBOT")
+		XSCOLOR1 = Session("CMFMENU")
+		
+		xfsfillD = Replace(xfsfill,"XXXCOL1XXX",XSCOLOR1)
+		xfsfillD = Replace(xfsfillD,"XXXCOL2XXX",XSCOLOR2)
+		
+		Xtypm  = "D"
+		Xweig  = "600"
+		
+		Xinput = ""
+		Xinput2 = "4"
+		Xinput3 = "corflaticon"
+		Xinput4 = "bte"
+		Xinput5 = "Eliminar"
+		Xinput6 = "_self"
+		
+		If ofv.modbot = "2" Then
+			Xinput7 = "4"
+		Else
+			Xinput7 = "Eliminar"
+		End If
+		
+		''' Xinput = Xinput & xfstilo
+		Xinput = Xinput & "  <v:roundrect arcsize='65%' id='AP'  style='z-index:4;position:RELATIVE;width:12px;height:12px;' >"
+		Xinput = Xinput & "     <v:stroke on='FALSE' color='#eeeeee' weight='1px' />"
+		
+		XSCOLOR1 = "#ff0000"
+		XSCOLOR2 = "#770000"
+		
+		If  Xtyp   = "C" Then
+			xfsfillC = Replace(xfsfill,"XXXCOL1XXX",XSCOLOR1)
+			xfsfillC = Replace(xfsfillC,"XXXCOL2XXX",XSCOLOR2)
+			Xinput = Xinput & xfsfillC
+		Else
+			Xinput = Xinput & xfsfillD
+		End If
+		
+		Xinput = Xinput & "     <v:fill on='true' color='#ff0000' color2='#770000' type='gradient' angle='30' opacity='80%'  />"
+		Xinput = Xinput & "	<v:textbox inset='0px,-4px,0px,0px' style=""text-align:" & xalign & ";font-size:7pt;font-family:'corflaticon';font-weight:400;color:#FFFFFF;"" >4"
+		Xinput = Xinput & "     </v:textbox>"
+		Xinput = Xinput & xfsshdw
+		' Xinput = Xinput & xfsextr
+		Xinput = Xinput & "  </v:roundrect>"
+		
+		
+		
+		
+		ZXinput2= Xinput 'OFV.AddBot(clng(XinD), cstr(Xinput), cstr(Xinput2), cstr(Xinput3), cstr(Xinput4), cstr(Xinput5), cstr(Xinput6), cstr(Xinput7))
+		
+	End Function
+	
+End If
+
+response.write sHTML
+response.flush
+
+%>

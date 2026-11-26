@@ -1,0 +1,1962 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<!-- #INCLUDE FILE="IncFile/CorWKFNro.inc" -->
+<!-- #INCLUDE FILE="IncFile/CorWKFMANAGER.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+
+if ok <> "Y" then
+  sHTML = ok
+else
+  response.expires=0
+
+
+  sHTML = ofv.MenuHeader("","")
+
+
+
+'----------------------------------------------
+
+  shtml = shtml & CorPnlFnc("N","")
+
+  sHTML = sHTML &  "<div id='mt2'  style='display:none;height:350px;overflow:auto;" & styl & "' >"
+
+'-------------------------------------------------
+
+  CantRegMostrarx = 12
+  CantRegMoverx = cdbl(request.querystring("CantRegMover"))
+  vuelta = ofv.vueltaasp("../",CantRegMostrarx,Cantregmoverx)
+
+  set cn = ofv.conectar(ofv.strconn5)
+  set cn4 = ofv.conectar(ofv.strconn6)
+  set cn3 = ofv.conectar(ofv.strconn2)
+
+  ofv.ObtenerAtributos session("Form"),""
+  bAgregar = ofv.AAgregar
+  bModificar = ofv.AModificar
+  bSuprimir = ofv.AEliminar
+  bConsultar = ofv.AConsultar
+'response.write session("PASOOBS")
+  IF session("PASOOBS")="OBS" THEN
+  ''' RESPONSE.WRITE "222" & session("PASOOBS") & "222222222222222"
+    WKFAUTOB = "WKF00016631121722600921928999"
+    WKFAPROB = "WKF00016631121722600921928999"
+    WKFAUTO  = "WKF00016631121722600921928999"
+    WKFAPRO  = "WKF00016631121722600921928999"
+  ELSE
+    WKFAUTOB = "WKF00016631121722600921928"
+    WKFAPROB = "WKF00016631121722600921928"
+    WKFAUTO  = "WKF00016631121722600921928"
+    WKFAPRO  = "WKF00016631121722600921928"
+   END IF
+
+  DESLEVL = 9
+  SUPLEVL = 9
+
+
+  IF session("NCliente") <> "NO" THEN
+
+   SESSION("NOMREQ")=""
+
+   SQL= "SELECT   'Solicitud nro:' + cast (a.objid as nvarchar)  + ': ' + BA.NOMBRE FROM PEDIDOS A "
+   							   SQL= SQL  & "  INNER JOIN PEDIDOSDET BA ON(BA.IDPEDIDO=A.OBJID)"
+   							   SQL= SQL  & "  INNER JOIN TIPOBJETO B ON(B.TIPOBJETO=A.TIPOBJETO)"
+   							   SQL= SQL  & " WHERE A.OBJID=0" & session("NCliente") & " and a.tipobjeto='" &  session("TCliente") & "'"
+   							    'RESPONSE.WRITE SQL
+   							    'TIPOBJETO WHERE TIPOBJETO='" & TIPOBJETO & "'"
+   					            set rsx1 = ofv.crearconsultaEx(SQL,cn3,1,parametros)
+   					           if not rsx1.eof then
+   					             SESSION("NOMREQ")=UCASE(rsx1(0) & "")
+				               end if
+
+    call ofv.cerrarconsulta(rsx1)
+
+    IF  SESSION("NOMREQ") <> ""  THEN
+     Strsql = "Select * From TIPOBJETO where TIPOBJETO = '" & session("TCliente") & "' "
+	         set rs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+	         if not rs.eof then
+
+
+	            WKFAUTO = RS(19)
+	            WKFAPRO = RS(20)
+				tipocpt = rs(21)
+	            DESLEVL = 9
+	            SUPLEVL = RS(18)
+         END IF
+
+
+
+     ELSEIF session("TCliente") = "RSK" THEN
+
+         Strsql = "Select * From ORRSKCONFIG where APLIC = '" & WKAPLIC & "' "
+         set rs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+         if not rs.eof then
+
+            WKFAUTO = RS(5)
+            WKFAPRO = RS(6)
+
+            DESLEVL = 9
+            SUPLEVL = 8
+         END IF
+
+
+        mstdsc = ""
+
+
+         Strsql = "SELECT MSGCHAT FROM OBJWFL  "
+         Strsql = Strsql & " Where codobjeto=" & session("NCliente")
+         Strsql = Strsql & " And tipobjeto = '" & session("TCliente") & "'"
+         set rs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+
+         if not rs.eof then
+            mstdsc = RS(0)
+         END IF
+
+       strsql = "SELECT * FROM  ORRSKCIRCUITO "
+       strsql = strsql & " Where OBJID = 0" & session("NCliente")
+       set xrs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+       if not xrs.eof then
+          IF XRS("APLIC") = "OR" THEN
+             TIPOOBJ = "CIRCUITO AUTOEVALUACION"
+             XSPROCESO=GetProceso(XRS(0))
+          ELSE
+             TIPOOBJ = "PLAN DE CONTINGENCIAS"
+          END IF
+
+          Strsql = "Select * From objetos where codobjeto = 0" & XRS("CODOBJETO")
+          set xrs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+          if not xrs.eof then
+             TIPOOBJ2 = XRS(1)
+             TIPOOBJ3 = XRS(3)
+
+          end if
+
+          'SESSION("NOMREQ") = TIPOOBJ & ":&nbsp;" & TIPOOBJ2  & "&nbsp;-&nbsp;" & TIPOOBJ3
+          if WKAPLIC="OR" THEN
+		  	SESSION("NOMREQ")=TIPOOBJ & ":&nbsp;" & XSPROCESO   '& "&nbsp;-&nbsp;" & TIPOOBJ3
+		  ELSE
+		  	SESSION("NOMREQ") = TIPOOBJ & ":&nbsp;" & TIPOOBJ2  & "&nbsp;-&nbsp;" & TIPOOBJ3
+		   END IF
+
+
+       END IF
+       call ofv.cerrarconsulta(xrs)
+
+     ELSE
+
+
+         Strsql = "Select * From TIPOBJETO where TIPOBJETO = '" & session("TCliente") & "' "
+         set rs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+         if not rs.eof then
+
+
+            WKFAUTO = RS(19)
+            WKFAPRO = RS(20)
+			tipocpt = rs(21)
+            DESLEVL = 9
+            SUPLEVL = RS(18)
+         END IF
+
+         mstdsc = ""
+
+
+         Strsql = "SELECT MSGCHAT FROM OBJWFL  "
+         Strsql = Strsql & " Where codobjeto=" & session("NCliente")
+         Strsql = Strsql & " And tipobjeto = '" & session("TCliente") & "'"
+         set rs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+
+         if not rs.eof then
+            mstdsc = RS(0)
+         END IF
+
+
+         'StrSql = "Select a.*,b.codigoform From OBJETOS a "
+         If session ("base") ="K" Then
+          StrSql = "Select a.*,b.codigoform From OBJETOS a "
+         StrSql = strsql & " inner join objpropiedades b on (a.codobjeto = b.codobjeto and a.tipobjeto=b.tipobjeto)"
+         else
+          StrSql = "Select a.* From OBJETOS a"
+         end if
+         StrSql = Strsql & " where a.CODOBJETO = " & session("NCliente")
+         set rs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+         if not rs.eof then
+
+            Strsql = "Select * From TIPOBJETO where TIPOBJETO = '" & session("TCliente") & "' "
+            set rsX1 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+            if not rsX1.eof then
+               TIPOOBJ = RSX1(1)
+            END IF
+            call ofv.cerrarconsulta(rsx1)
+
+
+		If session ("base") ="K" Then
+			 SESSION("NOMREQ") = TIPOOBJ & ":&nbsp;" & RS(1) & "&nbsp;-&nbsp;" & RS(3)
+
+		else
+
+			 SESSION("NOMREQ") = TIPOOBJ & ":&nbsp;" & RS(1)  & "&nbsp;-&nbsp;" & RS(3)
+		end if
+
+         END IF
+
+
+
+
+     END IF
+
+
+
+  END IF
+
+
+
+
+
+
+
+
+
+
+
+if (WKFAUTO & "") = "" then WKFAUTO = WKFAUTOB
+if (WKFAPRO & "") = "" then WKFAPRO = WKFAPROB
+
+ sMODAL = request.querystring("MODAL")
+
+ sopcion = request.querystring("opcion")
+ sACCION = request.querystring("ACCION")
+ act = request.querystring("act")
+ SACC = request.querystring("acc")
+ nCodigo = request.querystring("Codobjeto")
+ sTipo   = request.querystring("Tipobjeto")
+'RESPONSE.WRITE SACC
+
+
+
+
+if nFecini < clng(cdate("01-01-1900")) then
+   nFecini = clng(cdate("01-01-1900"))
+else
+   nFecini = 0
+end if
+
+vNuevoValor = clng(DATE()) - nFecini
+
+''RESPONSE.WRITE SOPCION & " " & SACCION
+
+
+
+ SELECT CASE SOPCION
+
+        CASE "AUTO"
+             SESSION("WKF") = WKFAUTO
+             TITULO = SESSION("WKF") & " INICIO DE CIRCUITO DE AUTORIZACION "
+
+
+
+        CASE "APRO"
+             SESSION("WKF") = WKFAPRO
+             TITULO = SESSION("WKF") & " INICIO DE CIRCUITO DE OBSERVACIONES "
+
+
+ END SELECT
+
+ DIM ATABLA(200,6)
+
+ DIM ATABSW(200,3)
+
+ TSHW = 0
+
+
+
+
+''' GENERA EL PASO INICIAL
+
+  StrSql = "Select * From WKFCKTMASTER WHERE INI=1 AND WKFCOD = '" & SESSION("WKF") & "' "
+  ''RESPONSE.WRITE STRSQL & "<BR>" & cn & "<BR>"
+  set rs = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+  if not rs.eof then
+
+'''  INICIA EL CIRCUITO
+
+     session("WKFDSC") = rs(1)
+     session("WKFCLASE") = rs(3)
+
+     XMODEL  = RS(5)
+
+     XRTIPO  = RS(15)
+     XRCOD   = RS(16)
+
+
+
+     XPASCOD = RS(12)
+     XPDSC   = RS(6) & ": " & RS(7)
+     XPDSC1   = RS(6) & ": " & RS(7)
+
+
+''' VER SI CONFIRMA ENVIO
+
+     if act = "S" then
+
+        set cn2 = ofv.conectar(ofv.strconn0)
+
+        sInputx = "COR@MANAGER.COM"
+
+        IF SESSION("WKFETPU") = "D" THEN               ' EMISOR DEFAULT (EL RESPONSABLE DEL PASO)
+
+           xxxx = getInfoUser(SESSION("USUARIO"))
+           if session("SGU_mail") <> "" then    SINPUTX = SESSION("SGU_mail")
+
+           SINPUTX =  SINPUTX & ""
+
+        ELSEIF SESSION("WKFETPU") = "U" THEN           ' EMISOR PREDETERMINADO (PARAMETRIZADO EL LA BASE DE USUARIOS)
+
+           WKFEUSR = SESSION("WKFEUSR")
+
+           if WKFEUSR = "" then   WKFEUSR = "COREMANAGER"
+
+
+           strsql = "Select EMAIL From USUARIOS where ID = '" & WKFEUSR & "' "
+           set rsniv = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+           if not rsniv.eof then sInputx = rsniv(0)
+           call ofv.cerrarconsulta(rsniv)
+
+        ELSE                                           ' EMISOR FIJO (USUARIO Y MAIL FIJOS EN CORCONECT)
+
+           sInputx = SESSION("WKFEMAI")
+
+
+        END IF
+
+
+
+        if SINPUTX = "" then SINPUTX = "COR@MANAGER.COM"
+
+        SESSION("ORGMAIL") = SINPUTX
+
+
+
+        GENCKTINI()
+
+        GENCKTRESPO(SOPCION)
+
+        SEGCKTPSC = GTCKTPSC()
+
+        XOBSERV = REQUEST.FORM("OBS")
+
+        XRTIPO  = ATABLA(1,2)
+        XRCOD   = ATABLA(1,1)
+        XRASG   = ATABLA(1,1)
+        XRLVL   = ATABLA(1,4)
+        XRSCD   = ATABLA(1,5)
+        XRID   = ATABLA(1,6)
+
+        SEGCKTPSCSIG = GTCKTPSC() & "A"
+        'response.write "1 GENCKTPSC" & XRID & "<br>"
+        WXX = GENCKTPSC(SEGCKTPSC,SEGCKTPSCSIG,XMODEL,"SI",XRTIPO,XRCOD,XRASG,XPDSC,XOBSERV,XRLVL,XRSCD,XRID)
+
+        SSS = GENACCION(RS(5),"INI")
+
+        TSHW           = TSHW + 1
+        ATABSW(TSHW,1) = XPDSC
+        ATABSW(TSHW,2) = 1
+        ATABSW(TSHW,3) = GETRESPOCKT(XRCOD,XRTIPO)
+
+
+
+''''' ANALISIS PASO SIGUIENTE
+
+
+      StrSql = "Select * From WKFCKTMASTER WHERE WKFPASCOD = '" & XPASCOD & "' "
+      set rs2 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+      if not rs2.eof then
+         XMODEL  = RS2(5)
+
+
+
+
+
+
+
+         IF  ATABLA(0,1) =  0 OR session("WKFCLASE") = "E" THEN
+
+''''''''''' GENERA EL PASO FINAL AL DESTINATARIO OK
+
+              XRTIPO  = ATABLA(2,2)
+              XRCOD   = ATABLA(2,1)
+              XRLVL   = ATABLA(2,4)
+              XRSCD   = ATABLA(2,5)
+              XRID   = ATABLA(2,6)
+
+              XPASCOD = RS2(12)
+              XPDSC   = RS2(6) & ": " & RS2(7)
+              XRASG   = "NO"
+
+              IF XRTIPO = "USR" OR XRTIPO = "RSP" THEN
+                 XRASG   = XRCOD
+                 IF XRTIPO = "RSP" THEN XRTIPO = "USR"
+              END IF
+
+
+            IF  session("WKFCLASE") = "E" THEN
+
+
+		XRTIPO  = RS2(15)
+		XRCOD   = RS2(16)
+		XRASG   = "NO"
+
+                                          IF XRTIPO = "USR" OR XRTIPO = "RSP" THEN
+                                             XRASG   = XRCOD
+                                             IF XRTIPO = "RSP" THEN
+                                                XRTIPO = "USR"
+                                                FOR YYY=1 TO ATABLA(0,0)
+
+                                                    IF ATABLA(YYY,0) =  XRCOD THEN
+					               XRCOD   = ATABLA(YYY,1)
+                                                       XRASG   = XRCOD
+                                                       XRLVL   = ATABLA(YYY,4)
+                                                       XRSCD   = ATABLA(YYY,5)
+                                                       XRID   = ATABLA(YYY,6)
+                                                       EXIT FOR
+                                                    END IF
+
+                                                NEXT
+
+                                             END IF
+                                          END IF
+
+
+
+
+            END IF
+
+
+
+
+
+
+
+'response.write "2 GENCKTPSC" & XRID & "<br>"
+              WXX = GENCKTPSC(SEGCKTPSCSIG,"NO",XMODEL,"NO",XRTIPO,XRCOD,XRASG,XPDSC,"",XRLVL,XRSCD,XRID)
+
+              TSHW           = TSHW + 1
+              ATABSW(TSHW,1) = XPDSC
+              ATABSW(TSHW,2) = 0
+              ATABSW(TSHW,3) = GETRESPOCKT(XRCOD,XRTIPO)
+
+            ' '''''''''''''''''''
+            ' Envio de mail
+  ' response.write "1-XPDSC: " & XPDSC
+              XXXX = GENCKTMAIL(XRTIPO,XRCOD,mstdsc & "<br><br>" & XPDSC & " POR @@@NORMREQ@@@",SESSION("ORGMAIL"),XRLVL)
+
+            '''''''''''''''''''
+
+         ELSE
+
+
+              XSENNIV = 0
+              XSENLIS = 0
+
+
+              IF ATABLA(3,1) =  SESSION("USUARIO") THEN
+
+''''''''''''''' GENERAR EL PRIMER PASO OK - NO REQUIERE AUTORIZANTES PARA EL ORIGINANTE
+
+                 XSENNIV = 0
+
+                 XRTIPO  = ATABLA(3,2)
+                 XRCOD   = ATABLA(3,1)
+                 XPASCOD = RS2(12)
+                 XPDSC   = RS2(6) & ": " & RS2(7)
+                 XRASG   = ATABLA(3,1)
+                 XRLVL   = ATABLA(3,4)
+                 XRSCD   = ATABLA(3,5)
+                 XRID   = ATABLA(3,6)
+
+                 SEGCKTPSCSIG2 = GTCKTPSC() & "B"
+'response.write "3 GENCKTPSC" & XRID & "<br>"
+                 WXX = GENCKTPSC(SEGCKTPSCSIG,SEGCKTPSCSIG2,XMODEL,"SI",XRTIPO,XRCOD,XRASG,XPDSC,XOBSERV,XRLVL,XRSCD,XRID)
+
+                 TSHW           = TSHW + 1
+                 ATABSW(TSHW,1) = XPDSC
+                 ATABSW(TSHW,2) = 1
+                 ATABSW(TSHW,3) = GETRESPOCKT(XRCOD,XRTIPO)
+
+                 IF  ATABLA(0,1) > 1 THEN
+
+''''''''''''''''''' SI HAY LISTA DE AUTORIZANTES PARA SECTORES AFECTADOS ACTIVA PASO RECURRENTE PARA EL PRIMERO
+
+                     XSENLIS = 0
+
+                     XRTIPO  = ATABLA(4,2)
+                     XRCOD   = ATABLA(4,1)
+                     XPASCOD = RS2(12)
+                     XPDSC   = RS2(6) & ": " & RS2(7)
+                     XRASG   = "NO"
+                     IF XRTIPO = "USR" THEN  XRASG   = XRCOD
+                     XRLVL   = ATABLA(4,4)
+                     XRSCD   = ATABLA(4,5)
+					XRID   = ATABLA(4,6)
+
+
+                 ELSE
+
+''''''''''''''''''' SI NO HAY LISTA DE AUTORIZANTES PARA SECTORES AFECTADOS ACTIVA PASO FINAL AL DESTINATARIO
+
+                     XSENLIS = 1
+
+                     SSS = GENACCION(XMODEL,"APR")
+
+                     StrSql = "Select * From WKFCKTMASTER WHERE WKFPASCOD = '" & XPASCOD & "' "
+                     set rs3 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+                     if not rs3.eof then
+                        XMODEL  = RS3(5)
+
+                        XRTIPO  = ATABLA(2,2)
+                        XRCOD   = ATABLA(2,1)
+                        XPASCOD = RS3(12)
+                        XPDSC   = RS3(6) & ": " & RS3(7)
+                        XRASG   = "NO"
+                        IF XRTIPO = "USR" THEN  XRASG   = XRCOD
+                        XRLVL   = ATABLA(2,4)
+                        XRSCD   = ATABLA(2,5)
+					    XRID   = ATABLA(2,6)
+                     END IF
+                     call ofv.cerrarconsulta(rs3)
+
+
+                 END IF
+
+'''''''''''''' GENERAR EL SIGUIENTE PASO OK
+'response.write "4 GENCKTPSC" & XRID & "<br>"
+                 WXX = GENCKTPSC(SEGCKTPSCSIG2,"NO",XMODEL,"NO",XRTIPO,XRCOD,XRASG,XPDSC,"",XRLVL,XRSCD,XRID)
+
+                 TSHW           = TSHW + 1
+                 ATABSW(TSHW,1) = XPDSC
+                 ATABSW(TSHW,2) = 0
+                 ATABSW(TSHW,3) = GETRESPOCKT(XRCOD,XRTIPO)
+
+                '''''''''''''''''''
+                ' Envio de mail
+                  ' response.write "2-XPDSC: " & XPDSC
+                 XXXX = GENCKTMAIL(XRTIPO,XRCOD,mstdsc & "<br><br>" & XPDSC & " POR @@@NORMREQ@@@",SESSION("ORGMAIL"),XRLVL)
+
+                '''''''''''''''''''
+
+
+
+              ELSE
+
+''''''''''''''' GENERAR EL PRIMER PASO AUTORIZACION PARA EL ORIGINANTE OK
+
+                 XSENNIV = 1
+
+                 IF  ATABLA(0,1) > 1 THEN
+
+                     XSENLIS = 0
+
+                 ELSE
+
+                     XSENLIS = 1
+
+                 END IF
+
+                 XRTIPO  = ATABLA(3,2)
+                 XRCOD   = ATABLA(3,1)
+                 XPASCOD = RS2(12)
+                 XPDSC   = RS2(6) & ": " & RS2(7)
+                 XRASG   = "NO"
+                 IF XRTIPO = "USR" THEN  XRASG   = XRCOD
+                 XRLVL   = ATABLA(3,4)
+                 XRSCD   = ATABLA(3,5)
+                 XRID   = ATABLA(3,6)
+'response.write "5 GENCKTPSC" & XRID & "<br>"
+                 WXX = GENCKTPSC(SEGCKTPSCSIG,"NO",XMODEL,"NO",XRTIPO,XRCOD,XRASG,XPDSC,"",XRLVL,XRSCD,XRID)
+
+                 TSHW           = TSHW + 1
+                 ATABSW(TSHW,1) = XPDSC
+                 ATABSW(TSHW,2) = 0
+                 ATABSW(TSHW,3) = GETRESPOCKT(XRCOD,XRTIPO)
+
+                '''''''''''''''''''
+                ' Envio de mail
+                   'response.write "3-XPDSC: " & XPDSC
+                 XXXX = GENCKTMAIL(XRTIPO,XRCOD,mstdsc & "<br><br>" & XPDSC & " POR @@@NORMREQ@@@",SESSION("ORGMAIL"),XRLVL)
+
+                '''''''''''''''''''
+
+
+              END IF
+
+''''''''  ACA AGREGAR TRATAMIENTO PARA ENVIO CON ORDEN INDISTINTO ''''''''''''''''''''
+'response.write SMODAL & "            " &  XSENLIS
+
+           IF SMODAL = "N" AND XSENLIS = 0 THEN
+
+              XSENSTRT = 2
+
+              IF  XSENNIV = 1 THEN XSENSTRT = 1
+
+              XIND = XSENSTRT + 2
+
+              IF  ATABLA(0,1) > XSENSTRT THEN
+
+                  for XIND= (XIND+1) TO 200
+
+                     IF ATABLA(XIND,0) <>  "L" THEN EXIT FOR
+
+             ''        XIND = XIND + 1
+
+
+''''''''''''''''' SI HAY LISTA DE AUTORIZANTES PARA SECTORES AFECTADOS ACTIVA PASO RECURRENTE PARA CADA UNO
+
+                      XRTIPO  = ATABLA(XIND,2)
+                      XRCOD   = ATABLA(XIND,1)
+                      XPASCOD = RS2(12)
+                      XPDSC   = RS2(6) & ": " & RS2(7)
+                      XRASG   = "NO"
+                      IF XRTIPO = "USR" THEN  XRASG   = XRCOD
+                      XRLVL   = ATABLA(XIND,4)
+                      XRSCD   = ATABLA(XIND,5)
+                      XRID   = ATABLA(XIND,6)
+
+                      SEGCKTPSCSIGX = GTCKTPSC() & "IND" & XIND
+
+              ''' GENERAR EL SIGUIENTE PASO OK
+             ' response.write "6 GENCKTPSC" & XRID & "<br>"
+                      WXX = GENCKTPSC(SEGCKTPSCSIGX,"NO",XMODEL,"NO",XRTIPO,XRCOD,XRASG,XPDSC,"",XRLVL,XRSCD,XRID)
+
+                      TSHW           = TSHW + 1
+                      ATABSW(TSHW,1) = XPDSC
+                      ATABSW(TSHW,2) = 0
+                      ATABSW(TSHW,3) = GETRESPOCKT(XRCOD,XRTIPO)
+
+                    '''''''''''''''''''
+                    ' envio de mail
+'response.write "ENVIO MAIL"
+  ' response.write "4-XPDSC: " & XPDSC
+                      XXXX = GENCKTMAIL(XRTIPO,XRCOD,mstdsc & "<br><br>" & XPDSC & " POR @@@NORMREQ@@@",SESSION("ORGMAIL"),XRLVL)
+
+                    '''''''''''''''''''
+                 NEXT
+
+
+              END IF
+
+           END IF
+
+''''''''  FIN AGREGAR TRATAMIENTO PARA ENVIO CON ORDEN INDISTINTO ''''''''''''''''''''
+
+
+       END IF
+
+    END IF
+    call ofv.cerrarconsulta(rs2)
+
+''''' FIN ANALISIS PASO SIGUIENTE
+
+
+
+
+
+   end if
+''' FIN VER SI CONFIRMA ENVIO
+
+
+   call ofv.cerrarconsulta(rs)
+
+    sImagen0 = "<FONT FACE=corflaticon SIZE=2>F</FONT>"
+    sImagen1 = "<FONT FACE=corflaticon SIZE=2>ñ</FONT>"
+    sImagen1N = "<FONT FACE=corflaticon COLOR=#FFFFFF SIZE=2>l</FONT>"
+    sImagen2 = "<FONT FACE=VERDANA SIZE=2>+</FONT>"
+    sImagen3 = "<FONT FACE=corflaticon SIZE=2>2</FONT>"
+    sImagen4so = "<B><FONT FACE=CorFlaticon COLOR=#6699cc SIZE=2>&#0128;</FONT></B>"
+    sImagen4si = "<B><FONT FACE=CorFlaticon COLOR=#aa0000 SIZE=2>&#0128;</FONT></B>"
+    sImagen4sA = "<B><FONT FACE=CorFlaticon COLOR=#BBBBBB SIZE=2>&#0128;</FONT></B>"
+    sImagen4n = "<B><FONT FACE=CorFlaticon COLOR=#993333 SIZE=2>x</FONT></B>"
+    sImagen6S = "<B><FONT FACE=corflaticon COLOR=#008000 SIZE=2>&#0174;</FONT></B>"
+    sImagen6SS = "<B><FONT FACE=CorFlaticon COLOR=#f7aa22 SIZE=3>G</FONT></B>"
+    sImagen6N = "<B><FONT FACE=corflaticon COLOR=#AA0000 SIZE=3>3</FONT></B>"
+    sImagen6OT = "<B><FONT FACE=CorFlaticon COLOR=#008000 SIZE=3>&#0254;</FONT></B>"
+    sImagen6T = "<B><FONT FACE=CorFlaticon COLOR=#336699 SIZE=3>q</FONT></B>"
+    sImagenut = "<B><FONT FACE=corflaticon COLOR=#6699cc SIZE=3>&#0192;</FONT></B>"
+    sImagendu = "<B><FONT FACE=corflaticon COLOR=#993333 SIZE=3>6</FONT></B>"
+    sImagenfi = "<B><FONT FACE=corflaticon COLOR=#f7aa22 SIZE=3>R</FONT></B>"
+    sImagenC = "<B><FONT FACE=corflaticon COLOR=#f7aa22 SIZE=3>&#0240;</FONT></B>"
+    sImagenS = "<B><FONT FACE=corflaticon COLOR=#008000 SIZE=3>R</FONT></B>"
+    sImagenES = "<B><FONT FACE=CorFlaticon COLOR=#993333 SIZE=3>&#0232;</FONT></B>"
+    sImagenP = "<B><FONT FACE=corflaticon COLOR=#6699cc SIZE=3>2</FONT></B>"
+    sImagenE = "<B><FONT FACE=corflaticon COLOR=#000080 SIZE=3>&#0237;</FONT></B>"
+    sImagenPC = "<B><FONT FACE=CorFlaticon COLOR=#6699cc SIZE=3>.</FONT></B>"
+
+    sInput = "SIN ASIGNAR"
+
+  IF session("NCliente") <> "NO" THEN
+
+     IF session("TCliente") = "RSK" THEN
+
+       strsql = "SELECT * FROM  ORRSKCIRCUITO "
+       strsql = strsql & " Where OBJID = 0" & session("NCliente")
+       set xrs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+       if not xrs.eof then
+          IF XRS("APLIC") = "OR" THEN
+             TIPOOBJ = "CIRCUITO AUTOEVALUACION"
+          ELSE
+             TIPOOBJ = "PLAN DE CONTINGENCIAS"
+          END IF
+
+          Strsql = "Select * From objetos where codobjeto = 0" & XRS("CODOBJETOBS")
+          set xrs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+          if not xrs.eof then
+             TIPOOBJ2 = XRS(2)
+             sInput = "<B>" & XRS(3) & "</B>"
+          end if
+
+
+       END IF
+       call ofv.cerrarconsulta(xrs)
+     ELSEif session("TCliente") = "PDCORXY" THEN
+
+     if sacc="PEDIDOOK" THEN
+
+	 	        SQL= "SELECT   'Solicitud nro:' + cast (a.objid as nvarchar)  + ': ' + BA.NOMBRE FROM PEDIDOS A "
+	 			    SQL= SQL  & "  INNER JOIN PEDIDOSDET BA ON(BA.IDPEDIDO=A.OBJID)"
+	 			    SQL= SQL  & "  INNER JOIN TIPOBJETO B ON(B.TIPOBJETO=A.TIPOBJETO)"
+	 			    SQL= SQL  & " WHERE A.OBJID=0" & session("NCliente")
+	 			    'RESPONSE.WRITE SQL
+	 			    'TIPOBJETO WHERE TIPOBJETO='" & TIPOBJETO & "'"
+	 	          set rsx1 = ofv.crearconsultaEx(SQL,cn3,1,parametros)
+	 	          if not rsx1.eof then
+	 	            SESSION("NOMREQ")=UCASE(rsx1(0) & "")
+	               end if
+	               call ofv.cerrarconsulta(rsx1)
+
+        END IF
+
+     ELSE
+
+        StrSql = "Select * From OBJETOS where CODOBJETO = " & session("NCliente")
+        set rs = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+        if not rs.eof then
+          sInput = "<B>" & RS(3) & "</B>"
+          TIPOOBJ2 = RS(2)
+
+           Strsql = "Select * From TIPOBJETO where TIPOBJETO = '" & session("TCliente") & "' "
+           set rsX1 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+
+           if not rsX1.eof then
+              TIPOOBJ = RSX1(1)
+           END IF
+          call ofv.cerrarconsulta(rsx1)
+
+
+          SESSION("NOMREQ") = TIPOOBJ & " " & RS(2)
+        END IF
+
+     END IF
+
+     SESSION("NOMREQ") = TIPOOBJ & " " & TIPOOBJ2
+
+  END IF
+
+    sImagen = "<FONT FACE=corflaticon SIZE=4>4</FONT>"
+
+
+    filas  = ""
+
+
+
+ set cn2 = ofv.conectar(ofv.strconn0)
+
+  StrSql = "Select * From USUARIOS WHERE ID = '" & Session("Usuario") & "' "
+  set rs = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+  if not rs.eof THEN
+
+       sInput = "CIRCUITO " & session("WKFDSC")
+       celdas = ""
+    ''''   sInput = session("WKFDSC")
+       celdas = celdas & ofv.GenCelda("","ttr colspan=2 ","","80%","","","",sInput,"si")
+       filas  = filas & ofv.GenRow("","","","","22","","",celdas,"si")
+
+
+       sInput = "ORIGINANTE:"
+       celdas = ofv.GenCelda("","tt","","","","","",sInput,"si")
+
+       sInput = sImagen4so & "&nbsp;" & Session("SEGUsuario") & ""
+       celdas = celdas & ofv.GenCelda("","uti","","","","","",sInput,"si")
+
+       filas = filas & ofv.GenRow("","","","","","","",celdas,"si")
+
+       sInput = "GRUPO:"
+       celdas = ofv.GenCelda("","tt","","","","","",sInput,"si")
+
+       sgrp = ""
+
+       StrSql = "Select * From grupos WHERE ID = '" & Session("SEGGRP") & "' "
+       set rs5 = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+
+       if not rs5.eof THEN
+          sgrp = rs5(1)
+       end if
+
+       sInput = sImagen6S & "&nbsp;" & SESSION("SEGGRP") & " - " & sgrp & ""
+       celdas = celdas & ofv.GenCelda("","uti","","","","","",sInput,"si")
+
+       filas = filas & ofv.GenRow("","","","","","","",celdas,"si")
+
+       sInput = "SECTOR:"
+       celdas = ofv.GenCelda("","tt","","","","","",sInput,"si")
+
+       sInput = "SIN ASIGNAR"
+
+  set cn2 = ofv.conectar(ofv.strconn2)
+           ON ERROR RESUME NEXT
+           strsql = "Select * From ECO where ECO = " & rs(21)
+           set rsniv = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+           if not rsniv.eof then sInput = rsniv(1)
+           call ofv.cerrarconsulta(rsniv)
+  call ofv.cerrarconn(cn2)
+
+       celdas = celdas & ofv.GenCelda("","uti","","","","","",sImagen6SS & "&nbsp;" & sInput,"si")
+       filas = filas & ofv.GenRow("","","","","","","",celdas,"si")
+
+
+
+
+  END IF
+
+
+
+    celdas = ofv.GenCelda("","vt colspan=2 ","","","","","","&nbsp;","si")
+    filas = filas & ofv.GenRow("","","","","","","",celdas,"si")
+    TAB = TAB  & ofv.GenTabla("","","","90%","","0","","0","0","","",filas,"si") & "<BR>"
+
+
+
+   if act = "S" then
+
+    filas = ""
+      FOR ISHW = 1 TO TSHW
+
+       sinput = sImagenPC  & "&nbsp;PASO  " & ATABSW(ISHW,1)
+       celdas = ofv.GenCelda("","vT ","","","50%","","",sInput,"si")
+
+       IF ATABSW(ISHW,2) = 0 THEN
+          SINPUT3 = "<FONT SIZE=1 COLOR=#008000><U>INICIADO</U></FONT>"
+       ELSE
+          SINPUT3 = "<FONT SIZE=1 COLOR=#993333><U>CONFORMADO</U></FONT>"
+       END IF
+
+       sinput = sImagenC & "&nbsp;ESTADO:&nbsp;" & SINPUT3 & "<BR>" & GETDH()
+       celdas = celdas & ofv.GenCelda("","vt","","","50%","","",sInput,"si")
+
+       filas = FILAS &  ofv.GenRow("","","","","","","",celdas,"si")
+
+
+       celdas = ofv.GenCelda("","vt COLSPAN=2","","","50%","","","&nbsp;","si")
+       filas = FILAS &  ofv.GenRow("","","","","","","",celdas,"si")
+
+       sinput = "DESTINO:"
+       celdas = ofv.GenCelda("","vt","","","50%","","",sInput,"si")
+
+       sinput =  sImagen6SS & "&nbsp;" & ATABSW(ISHW,3)
+       celdas = celdas & ofv.GenCelda("","vt","","","50%","","",sInput,"si")
+
+       filas = FILAS &  ofv.GenRow("","","","","","","",celdas,"si")
+
+       celdas = ofv.GenCelda("","vt COLSPAN=2 style='border-TOP-style:SOLID;border-TOP-width:1;border-TOP-color:#6699CC;' ","","","50%","","","&nbsp;","si")
+       filas = FILAS &  ofv.GenRow("","","","","","","",celdas,"si")
+
+
+     NEXT
+
+       sinput = "&nbsp;"
+       celdas = ofv.GenCelda("","vt","","","50%","","",sInput,"si")
+
+       sinput = "<a class=tt  href=EDREQUER.asp?OPCION=RELOAD"
+       sinput = sinput  & " ><u><b>VOLVER A SOLICITUD</b></u></a>"
+       celdas = CELDAS & ofv.GenCelda("","tt","CENTER","","50%","","",sInput,"si")
+
+      ''' filas = FILAS & ofv.GenRow("","","","","","","",celdas,"si")
+
+       TAB = TAB  & ofv.GenTabla("","","","98%","","0","","0","0","","",filas,"si")
+       IF SACC="PEDIDOOK" THEN
+        sInput="<B>CIRCUITO WORKFLOW DE SOLICITUD ABM INICIADO Y ENVIADO AL IMPLEMENTADOR</B><br>" '&  sacc & "  "  & session("NCliente") & " " & session("TCliente")
+        ' session("NCliente") <> "NO" THEN
+
+     'IF session("TCliente") = "RSK" THEN
+
+        '
+        celda =  ofv.GenCelda("","tt style='text-align: center !important;border-style:solid;border-width:1;border-color:#dddddd;'","","","50%","","",sInput,"si")
+        fila=ofv.GenRow("","","","","","","",celda,"si")
+        TAB =  ofv.GenTabla("","","","50%","","0","","0","0","","",fila,"si")
+       end if
+
+   else
+
+       sinput = sImagenPC  & "&nbsp;PASO  " & XPDSC1
+       celdas = ofv.GenCelda("","vT","","","50%","","",sInput,"si")
+
+       sinput = sImagenC & "&nbsp;ESTADO:&nbsp;PENDIENTE DE INICIO"
+       celdas = celdas & ofv.GenCelda("","vt","","","50%","","",sInput,"si")
+
+       filas =  ofv.GenRow("","","","","","","",celdas,"si")
+
+       TAB = TAB  & ofv.GenTabla("","","","98%","","0","","0","0","","",filas,"si") & "<BR>"
+
+
+		    Celda = ofv.GenCelda("","vt colspan=3","CENTER","100%","","","","OBSERVACIONES","si")
+		    FilaS = Ofv.GenRow("","","","","","","",Celda,"si")
+
+		    nCol = 80
+
+		    wdescri = "EL AUTORIZANTE NO REGISTRA OBSERVACIONES "
+
+		    t3b = "<font class=at><textarea class=dt "
+		    t3b = t3b & "name=OBS cols=" & nCol & " rows=10 "
+		    if bModificar then
+		 '''     t3b = t3b & " onblur=Usuarios.submit() "
+		      t3b = t3b & " onkeypress=" & chr(34)
+		      t3b = t3b & " if (this.value.length > 1950) {alert('El texto es demasiado"
+		      t3b = t3b & " extenso'); return false;}" & chr(34) & " >"
+		    else
+		      t3b = t3b & " readonly >"
+		    end if
+		    xdatos =  wdescri
+		    t3b = t3b & xdatos & "</textarea></font><br><br>"
+		    Celda = ofv.GenCelda("","abc colspan=3","center","100%","","","",t3b,"si")
+		    FilaS =  filaS & ofv.GenRow("","","","","","","",Celda,"si")
+
+                    sinput = "&nbsp;"
+                    celda = ofv.GenCelda("","","center","","50%","","",sInput,"si")
+
+                 '' Agregado 20042015
+                 '''sinput = "<input CLASS=BT type=submit value='CONTINUAR' size=10 >"
+                    sinput = "<input CLASS=BT type=submit value='CONTINUAR' size=10 onclick=""this.style.cursor='wait';this.style.visibility='hidden';""  >"
+                 '' Agregado 20042015 FIN
+
+                    'celda = celda & ofv.GenCelda("","","center","","1%","","",sInput,"si")
+                    XVUELTA=REQUEST.QUERYSTRING
+                    'response.write xvuelta
+
+
+                   if wkaplic="OR" THEN
+
+                      SFUNC="document.Usuarios.action='EdObjwFlor.ASP?" & XVUELTA &"';document.Usuarios.submit();"
+                    ELSE
+                      ' sAccion  = "edobjwfl.asp?Tipobjeto=" & sTipo & "&Codobjeto=" & nCodigo
+                      SFUNC="document.Usuarios.action='edobjwfl.asp?Tipobjeto=" & sTipo & "&Codobjeto=" & nCodigo  &"';document.Usuarios.submit();"
+                    END IF
+
+
+					sInput2 = ofv.GenerarInput("","VOLVER","button","","10","bt",sFunc)
+
+                    if bModificar then
+							      sAccion = "EDWKFSTART.ASP?CantRegMover=0&OPCION=" & SOPCION & "&ACT=S&MODAL=" & SMODAL
+							      sinput = ofv.GenForm("Usuarios","",sAccion,"","post","",t3b & sinput & sinput2,"si")
+				    else
+							      sinput = ofv.GenForm("","","","","post","",t3b & sinput & sinput2,"si")
+		            end if
+
+
+                    celda = celda & ofv.GenCelda("","abc colspan=3","center","","1%","","",sInput ,"si")
+
+              ''      sinput = "&nbsp;"
+               ''     celda = celda & ofv.GenCelda("","","center","","50%","","",sInput,"si")
+		            formulario0 =  ofv.GenRow("","","","","","","",Celda,"si")
+
+
+
+
+		   TAB = TAB  & ofv.GenTabla("","","","98%","","0","","0","0","","",formulario0,"si") & "<BR>"
+
+
+   end if
+
+
+
+    Celda = ofv.GenCelda("","","center","","","","",TAB,"si")
+    FilaS = ofv.GenRow("","","","","","","",Celda,"si")
+
+    sHTML = sHTML & "<DIV CLASS='DINDC' >"
+    sHTML = sHTML & ofv.GenTabla("","","","90%","","0","","0","0","","",filas,"si")
+    sHTML = sHTML & "</DIV>"
+
+
+
+  ELSE
+   SHTML = SHTML & "<P>ERROR EN EL INICIO DEL CIRCUITO</P>"
+
+  END IF
+
+
+
+
+
+  call ofv.cerrarconsulta(rs)
+  call ofv.cerrarconn(cn)
+
+
+
+  IF WKAPLIC = "OR" OR WKAPLIC = "PL" THEN
+
+     sAccion = Session("ASPSTR") & "&ACCIONEJEC=ABREESTAD"
+     Retornar = ofv.BotonVolver(sAccion)
+
+     xxxxx = ofv.botoneraESSX("0","","","","","","","","","no","",Retornar,"")
+
+
+  END IF
+
+'--------------------------------------------------------------------------------
+  sHTML = sHTML & "</div>"
+
+  Celda = ofv.GenCelda("","vt","","60%","","","","&nbsp;&nbsp;","si")
+  Fila = ofv.GenRow("","","","","","","",Celda,"si")
+  sHTML = sHTML &  ofv.GenTabla("TCEX1","aaa onresize='DCEXRCLC();' ","","100%","","0","","4","0","","",Fila,"si")
+
+  'Estructura del Indice
+
+  sHTML = sHTML & CorPnlIndx("N","")
+
+'--------------------------------------------------------------------------------
+
+  sHTML = sHTML & xxxxx
+
+
+  sHTML = sHTML  & "</body></html>"
+end if
+
+response.write sHTML
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+FUNCTION GENCKTINI()
+
+    SEGCKT = GTCKT()
+
+    SESSION("SEGCKT") = SEGCKT
+
+    strsql = "insert into SEGCIRCUITO (MODEL,COMIENZO,FIN,OBJTIPO,OBJCOD,SEGCKT,RESPONSABLE,CKTDSC,CKTMODAL) values "
+    STRSQL = STRSQL & " ('" & SESSION("WKF") & "','" & GETDH() & "','NO','" & session("TCliente") & "',"
+    STRSQL = STRSQL & "'" & session("NCliente") & "','" & SEGCKT & "','" & SESSION("USUARIO")
+    STRSQL = STRSQL & "','" & session("WKFDSC") & "','" & sModal & "')"
+    call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+END FUNCTION
+
+
+FUNCTION GENCKTRESPO(XTIPO)
+
+''' session("SegNivel")
+
+    ATABLA(0,0) =  2
+    ATABLA(0,1) =  0
+
+''''''''' 1. GENERA ORIGINANTE DEL CIRCUITO --> USUARIO DE LA SESION.
+
+    ATABLA(1,0) =  "O"
+    ATABLA(1,1) =  SESSION("USUARIO")
+    ATABLA(1,2) =  "USR"
+    ATABLA(1,3) =  "NO"
+    ATABLA(1,4) =  session("SegNivel")
+    ATABLA(1,5) =  "0"
+    ATABLA(1,6) =  0
+    xxx = getinfouser(SESSION("USUARIO"))
+'response.write "1" & "<br>"
+    STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+    STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','NO','O','USR','" & SESSION("USUARIO") & "','10','" & session("SegNivel") & "','0','" & session("SGU_MAIL") & "')"
+    'response.write strsql & "<br>"
+    call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+ IF session("WKFCLASE") <> "E" THEN
+
+''''''''' 2. GENERA DESTINATARIO DEL CIRCUITO --> A: AUTO > SECTOR INTERVINIENTE - NIVEL DESTINO. B: APRO > USUARIO SOLICITANTE - NIVEL 9
+
+  '  IF XTIPO = "AUTO" THEN
+
+       ATABLA(2,0) =  "D"
+       ATABLA(2,1) =  SESSION("USUARIO")
+       ATABLA(2,2) =  "USR"
+       ATABLA(2,3) =  "NO"
+       ATABLA(2,4) =  session("SegNivel")
+       ATABLA(2,5) =  "0"
+       ATABLA(2,6) =  999
+       xxx = getinfouser(SESSION("USUARIO"))
+'response.write "2" & "<br>"
+       STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+       STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','NO','D','USR','" & SESSION("USUARIO") & "','999','"
+       STRSQL = STRSQL & session("SegNivel") & "','0','" & session("SGU_MAIL") & "')"
+       'response.write strsql & "<br>"
+       call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+  '  END IF
+
+
+
+
+    STRSQL = "Select * From WKFCKTMASTER WHERE TIPO = 'R' AND WKFCOD = '" & SESSION("WKF") & "' ORDER BY ORDEN "
+    set rs3 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+    DO UNTIL rs3.eof
+
+    XORDEN = 10
+
+    XINDT = 2
+
+    ATABLA(0,0) =  2
+    ATABLA(0,1) =  0
+
+ ' DESLEVL = 9
+ ' SUPLEVL = 9
+
+
+''''''''' 3. GENERA AUTORIZANTE DEL ORIGINANTE DEL CIRCUITO --> A: AUTO > SECTOR SOLICITANTE - NIVEL MINIMO SUPERVISION.
+'                                                               B: APRO > SECTOR INTERVINIENTE - NIVEL MINIMO SUPERVISION.
+'                                                                 (SOLO SI HAY PASOS RECURRENTES DE AUTORIZACION)
+
+    XINDT = XINDT + 1
+
+ '   IF XTIPO = "AUTO" THEN
+     IF SUPLEVL < session("SegNivel") THEN
+
+             XXXX = GENSECTORUSR(SESSION("USUARIO"))
+
+             XORDEN = XORDEN + 10
+
+
+             ATABLA(XINDT,0) =  "L"
+             ATABLA(XINDT,1) =  SESSION("SECTORIG")
+             ATABLA(XINDT,2) =  "SEC"
+             ATABLA(XINDT,3) =  RS3(5)
+             ATABLA(XINDT,4) =  SUPLEVL
+             ATABLA(XINDT,5) =  SESSION("SECTGEREN")
+             ATABLA(XINDT,6) =  XORDEN
+'response.write "3" & "<br>"
+             strsql = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+             STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','" & RS3(5) & "','L','SEC','" & SESSION("SECTORIG") & "','" & XORDEN & "','" & SUPLEVL & "','" & SESSION("SECTGEREN") & "','NO')"
+'             response.write strsql & "<br>"
+             call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+     ELSE
+
+       XORDEN = XORDEN + 10
+       xxx = getinfouser(SESSION("USUARIO"))
+'response.write "4" & "<br>"
+       STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+       STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','" & RS3(5) & "','L','USR','" & SESSION("USUARIO") & "','" & XORDEN & "','" & session("SegNivel") & "','0','" & session("SGU_MAIL") & "')"
+'       response.write strsql & "<br>"
+       call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+          ATABLA(XINDT,0) =  "L"
+          ATABLA(XINDT,1) =  SESSION("USUARIO")
+          ATABLA(XINDT,2) =  "USR"
+          ATABLA(XINDT,3) =  RS3(5)
+          ATABLA(XINDT,4) =  session("SegNivel")
+          ATABLA(XINDT,5) =  "0"
+          ATABLA(XINDT,6) =  xorden
+     END IF
+
+
+
+  '  END IF
+
+
+''''''''' 4. GENERA LISTA DE AUTORIZANTES PARA SECTORES AFECTADOS DEL CIRCUITO --> AUTO Y APRO >
+'                                                                 SECTOR AFECTADO - NIVEL MINIMO SUPERVISION.
+'                                                                  (SOLO SI HAY PASOS RECURRENTES DE AUTORIZACION)
+
+
+       'STRSQL = "Select * From OBJWFLDET where CODOBJETO = " & session("NCliente") & "  And "
+       'STRSQL = STRSQL & " TIPOBJETO = '" & session("TCliente") & "'  And "
+       'STRSQL = STRSQL & " CKTTYPE = '" & session("CKTTYPE") & "'  ORDER BY ORDEN,OBJID "
+
+
+       STRSQL = "Select A.* From OBJWFLDET A  "
+       STRSQL = STRSQL & " INNER JOIN Objwfl B ON (B.CODOBJETO=A.CODOBJETO AND B.TIPOBJETO=A.TIPOBJETO AND B.ESQAUTO =1) "
+       STRSQL=  STRSQL & " where A.CODOBJETO = " & session("NCliente") & "  And "
+       STRSQL = STRSQL & " A.TIPOBJETO = '" & session("TCliente") & "'  And "
+       STRSQL = STRSQL & " A.CKTTYPE = '" & session("CKTTYPE") & "'  ORDER BY A.ORDEN,A.OBJID "
+
+
+
+  ''   response.write strsql
+       set rs1 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+       DO UNTIL rs1.eof
+             XORDEN = XORDEN + 10
+             XINDT = XINDT + 1
+
+             XXXX = GENSECTORUSR(RS1(4))
+
+
+
+
+
+
+             ATABLA(XINDT,0) =  "L"
+             ATABLA(XINDT,1) =  RS1(4)
+             ATABLA(XINDT,2) =  "USR"
+             ATABLA(XINDT,3) =  RS3(5)
+             ATABLA(XINDT,4) =  SUPLEVL
+             ATABLA(XINDT,5) =  SESSION("SECTORIG")
+             ATABLA(XINDT,6) =  xorden
+             XX = getinfouser(rs1(4))
+
+'response.write "5" & "<br>"
+             STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+             STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','" & RS3(5) & "','L','USR','" & RS1(4) & "','" & XORDEN & "','" & SUPLEVL & "','" & SESSION("SECTORIG") & "','" & session("SGU_MAIL") & "')"
+'response.write strsql & "<br>"
+             call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+       RS1.MOVENEXT
+
+       LOOP
+
+
+
+    IF session("TCliente") = "RSK" THEN
+    ELSEIF sacc="PEDIDOOK" THEN
+
+
+
+         sql="select GRPUSR from pedidoSDKdet  where codobjeto=0 and tipobjeto='" & session("TCliente") & "' order by objid "
+
+
+        ' response.write sql  & "<br>" & chr(13)
+         set rx =  ofv.crearconsultaEx(sql,CN3,1,volver)
+
+         DO WHILE NOT  rx.EOF
+          XORDEN = XORDEN + 10
+		  XINDT = XINDT + 1
+         ' XUSUC=mid( rx(4)& "" ,5,len(rx(4)) &"" )
+           P_WKFAPRO=mid( rx(0)& "" ,5,len(rx(0)) &"" )
+           XXXX = GENSECTORUSR(P_WKFAPRO)
+
+
+		 ATABLA(XINDT,0) =  "L"
+		 ATABLA(XINDT,1) =  P_WKFAPRO
+		 ATABLA(XINDT,2) =  "USR"
+		 ATABLA(XINDT,3) =  RS3(5)
+		 ATABLA(XINDT,4) =  SUPLEVL
+		 ATABLA(XINDT,5) =  SESSION("SECTORIG")
+		 ATABLA(XINDT,6) =  xorden
+		 XX = getinfouser(P_WKFAPRO)
+'response.write "6" & "<br>"
+		 STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+		 STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','" & RS3(5) & "','L','USR','" &  P_WKFAPRO & "','" & XORDEN & "','" & SUPLEVL & "','" & SESSION("SECTORIG") & "','" & session("SGU_MAIL") & "')"
+		' RESPONSE.WRITE STRSQL & "<br>" & chr(13)
+'	     response.write strsql & "<br>"
+	     call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+	     RX.MOVENEXT
+
+	     LOOP
+          call ofv.cerrarconsulta(rx)
+
+    ELSE
+
+       strsql = "select * from Defwfl "
+       set rx =  ofv.crearconsultaEx(StrSql,CN3,1,volver)
+       if not rx.eof then
+           xactiva = rx(1)
+       end if
+       call ofv.cerrarconsulta(rx)
+
+       if xactiva then
+             '  strsql = "select * from objwfldet Where codobjeto = 0"
+
+
+            '   IF session("PASOOBS")="OBS" THEN
+             '   strsql = strsql & " and tipobjeto ='WKF00016631121722600921928999'  order by orden, objid"
+             '  else
+             '   strsql = strsql & " and tipobjeto ='WKF00016631121722600921928'  order by orden, objid"
+             '  end if
+
+              strsql =  " select * from objwfldet  "
+			 strsql = strsql & "  INNER  join tipObjeto on (tipobjeto.tipobjeto='" & session("TCliente") & "' )"
+			 strsql = strsql & "     Where (objwfldet.codobjeto = 0 OR  objwfldet.TIPOBJETO='ALL') "
+			 IF session("PASOOBS")="OBS" THEN
+			 strsql = strsql & " AND NOT  tipObjeto.WKFAUTO=objwfldet.TIPOBJETO"
+			  else
+			 strsql = strsql & " AND NOT  tipObjeto.WKFAPRO=objwfldet.TIPOBJETO"
+			 end if
+			  strsql = strsql & "  order by orden, objid "
+
+              '  response.write strsql
+               set rx =  ofv.crearconsultaEx(StrSql,CN3,1,volver)
+               if not rx.eof then
+                  do until rx.eof
+
+
+                     XORDEN = XORDEN + 10
+                     XINDT = XINDT + 1
+
+                     XXXX = GENSECTORUSR(rx(4))
+
+
+                     ATABLA(XINDT,0) =  "L"
+                     ATABLA(XINDT,1) =  rx(4)
+                     ATABLA(XINDT,2) =  "USR"
+                     ATABLA(XINDT,3) =  RS3(5)
+                     ATABLA(XINDT,4) =  SUPLEVL
+                     ATABLA(XINDT,5) =  SESSION("SECTORIG")
+                     ATABLA(XINDT,6) =  xorden
+                     xx = getinfouser(rx(4))
+'response.write "7" & "<br>"
+                     STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+                     STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','" & RS3(5) & "','L','USR','" & rx(4) & "','" & XORDEN & "','" & SUPLEVL & "','" & SESSION("SECTORIG") & "','" & session("SGU_MAIL") & "')"
+                    ' response.write  STRSQL
+                    'response.write strsql & "<br>"
+                     call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+                  rx.movenext
+                  loop
+               end if
+               call ofv.cerrarconsulta(rx)
+                 ' incidente nro 1374
+                 strsql =  " select * from objsdkdet  where codobjeto=0 And tiposeg ='0' and tipobjeto='" & session("TCliente") & "' "
+
+			   			  strsql = strsql & "  order by  objid "
+
+			                ' response.write strsql
+			                  set rx =  ofv.crearconsultaEx(StrSql,CN3,1,volver)
+			                  if not rx.eof then
+			                     do until rx.eof
+
+
+			                        XORDEN = XORDEN + 10
+			                        XINDT = XINDT + 1
+                                     XUSUC=mid( rx(4)&"" ,5,len(rx(4)) &"" )
+			                        XXXX = GENSECTORUSR(XUSUC)
+
+
+			                        ATABLA(XINDT,0) =  "L"
+			                        ATABLA(XINDT,1) = XUSUC
+			                        ATABLA(XINDT,2) =  "USR"
+			                        ATABLA(XINDT,3) =  RS3(5)
+			                        ATABLA(XINDT,4) =  SUPLEVL
+			                        ATABLA(XINDT,5) =  SESSION("SECTORIG")
+			                        ATABLA(XINDT,6) =  xorden
+			                        xxx = getinfouser(XUSUC)
+'response.write "8" & "<br>"
+			                        STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+			                        STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','" & RS3(5) & "','L','USR','" & XUSUC & "','" & XORDEN & "','" & SUPLEVL & "','" & SESSION("SECTORIG") & "','" & session("SEG_MAIL") & "')"
+			                    '    response.write  STRSQL
+'			                       response.write strsql & "<br>"
+			                       call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+			                     rx.movenext
+			                     loop
+			                  end if
+               call ofv.cerrarconsulta(rx)
+
+
+
+
+
+
+
+
+
+
+       end if
+
+     END IF
+
+    RS3.MOVENEXT
+    LOOP
+
+    IF XINDT > 0 THEN
+
+       ATABLA(0,0) =  XINDT
+       ATABLA(0,1) =  XINDT - 2
+
+    END IF
+
+  ELSE
+
+''''''''' E2. GENERA ORIGINANTE DEL CIRCUITO COMO SOLICITANTERO.
+if tipocpt = "SN" then
+	ATABLA(2,0) =  "L"
+else
+    ATABLA(2,0) =  "SOLICITANTERO"
+end if
+    ATABLA(2,1) =  SESSION("USUARIO")
+    ATABLA(2,2) =  "USR"
+    ATABLA(2,3) =  "NO"
+    ATABLA(2,4) =  "0" & session("SegNivel")
+    ATABLA(2,5) =  "0"
+    ATABLA(2,6) =  0
+'response.write "9" & "<br>"
+    STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+    STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','NO','" & ATABLA(2,0) & "','USR','" & SESSION("USUARIO") & "','20','0" & session("SegNivel") & "','0','" & session("SGU_MAIL") & "')"
+'    response.write strsql & "<br>"
+    call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+
+    XORDEN = 20
+
+    XINDT = 2
+
+    ATABLA(0,0) =  2
+    ATABLA(0,1) =  1
+
+
+
+
+''''''''' E3. GENERA SET DE AUTORIZANTES PARA RESPONSABLES PREDETERMINADOS (CIRCUITO TIPO:EFECTIVO)
+
+if session("TCliente") = "SN" then
+
+		STRSQL = "select * from pedidoSDKdet where codobjeto=0 and tipobjeto='" & session("TCliente") & "'"
+
+else
+
+       STRSQL = "Select A.* From OBJWFLDET "
+       STRSQL = STRSQL & " INNER JOIN Objwfl B ON (B.CODOBJETO=A.CODOBJETO AND B.TIPOBJETO=A.TIPOBJETO AND B.ESQAUTO =1) "
+       STRSQL = STRSQL & " where A.CODOBJETO = " & session("NCliente") & "  And "
+       STRSQL = STRSQL & " A.TIPOBJETO = '" & session("TCliente") & "'  And "
+       STRSQL = STRSQL & " A.CKTTYPE = '" & session("CKTTYPE") & "'  ORDER BY ORDEN,OBJID "
+
+end if
+
+       set rs1 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+       DO UNTIL rs1.eof
+             XORDEN = XORDEN + 10
+             XINDT = XINDT + 1
+
+             XXXX = GENSECTORUSR(RS1(4))
+
+
+
+
+
+			if session("TCliente") = "SN" then
+				 ATABLA(XINDT,1) =  replace(rs1(4),"USR-","")
+				ATABLA(XINDT,0) =  RS1(3)
+				sDato = RS1(3)
+				usr = ATABLA(XINDT,1)
+			else
+				 ATABLA(XINDT,1) =  RS1(4)
+            	ATABLA(XINDT,0) =  RS1(5)
+            	sDato = RS1(5)
+            		usr = ATABLA(XINDT,1)
+            end if
+
+             ATABLA(XINDT,2) =  "USR"
+             ATABLA(XINDT,3) =  "NO"
+             ATABLA(XINDT,4) =  "0" & SUPLEVL
+             ATABLA(XINDT,5) =  SESSION("SECTORIG")
+             ATABLA(XINDT,6) =  xorden
+
+             xxx = getinfouser(usr)
+'response.write "10" & "<br>"
+             STRSQL = "insert into SEGCKTRESP (SEGCKT,SEGCKTPSC,MODO,TIPO,CODIGO,ORDEN,NIVEL,SUBCODIGO,SEGEMAIL) values "
+             STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','NO','" & sDato & "','USR','" & usr & "','" & XORDEN & "','0" & SUPLEVL & "','" & SESSION("SECTORIG") & "','" & session("SGU_MAIL") & "')"
+           'response.write strsql & "<br>"
+           call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+       RS1.MOVENEXT
+
+       LOOP
+
+       ATABLA(0,0) =  XINDT
+       ATABLA(0,1) =  XINDT - 1
+
+
+  END IF
+
+sql = "select * from segcktresp where segckt='" & SESSION("SEGCKT") & "' order by orden"
+set rx = ofv.crearconsultaEx(sql,cn,1,parametros)
+iii = 1
+do while not rx.eof
+
+	if rx("modo") = "O" then
+		 ATABLA(1,6) =  rx(0)
+	elseif rx("modo") = "D" then
+		 ATABLA(2,6) =  rx(0)
+	else
+
+		 iii = (rx("orden") / 10) + 1
+		 ATABLA(iii,6) =  rx(0)
+
+	end if
+'response.write "codigo: " & rx("codigo") & " modo: " & rx("modo") & " orden: " & rx("orden") & " id: " & rx(0) & " indice: " & iii & " ATABLA: " & ATABLA(iii,1) & "<br>"
+rx.movenext
+loop
+
+END FUNCTION
+
+FUNCTION GENCKTMAIL(WETIPO,WECOD,WEMESSAGE,WEORIGEN,WELVL)
+'response.write "WETIPO: " & WETIPO & "<br>WECOD: " & WECOD & "<br>WEMESSAGE: " & WEMESSAGE & "<br>WEORIGEN: " & WEORIGEN & "<br>WELVL: " & WELVL
+
+    XRESPO = WECOD & ""
+
+    if XRESPO <> "" AND XRESPO <> "NO" then
+
+       set cn2 = ofv.conectar(ofv.strconn0)
+
+       XPARA = GETRESPOCKT(WECOD,WETIPO)
+       STRSQL = "SELECT EMAIL,DESCRIPCION FROM USUARIOS WHERE "
+
+     XGUMENSAGEw = WEMESSAGE
+
+
+     XMESAURL  = ""
+     IF Session("CORUNQWKF") = "S" THEN
+
+	 	            XMESAURL = getobjurlWK(session("NCliente"),session("TCliente"),SEGCKTPSC)
+
+        ELSE
+     IF  SESSION("URLTYP")  = "V" THEN
+
+         XMESAURL  =  left(request.servervariables("SCRIPT_NAME"),instr(RIGHT(request.servervariables("SCRIPT_NAME"),LEN(request.servervariables("SCRIPT_NAME"))-1),"/"))
+
+     END IF
+
+      IF SESSION("URLPORT")  = "N" THEN
+         XMESAURL   = "http://" & request.servervariables("SERVER_NAME")  & XMESAURL
+      ELSE
+         XMESAURL   = "http://" & request.servervariables("SERVER_NAME") & ":" & request.servervariables("SERVER_PORT") & XMESAURL
+      END IF
+     END IF
+     XGUMENSAGEw = replace(XGUMENSAGEw,"<APLURL>","<U><A HREF='" & XMESAURL  & "' TARGET='_blank' >")
+     XGUMENSAGEw = replace(XGUMENSAGEw,"</APLURL>","</A></U>")
+
+     WEMESSAGE = XGUMENSAGEw
+
+       SELECT CASE WETIPO
+
+        CASE "USR"
+          ' STRSQL = STRSQL & " ID = '" & XRESPO & "' "
+
+
+           xxxx = getInfoUser(XRESPO)
+           if session("SGU_mail")<> "" then    SINPUTX= session("SGU_mail")
+
+
+           stowho = SINPUTX & ""
+	         if len(stowho) > 0 then
+	            stowho = trim(stowho)
+	            if sopcion = "APRO" then
+	               subject = "SOLICITUD DE OBSERVACION"
+	            else
+
+	            subject = "SOLICITUD DE AUTORIZACION"
+	            end if
+	            if session("TCliente") = "PDCORXY" then
+	            	subject = "SOLICITUD ABM PEDIDO"
+	            elseif session("TCliente") = "SN" then
+	            	subject = "SOLICITUD ABM NORMATIVA"
+	            end if
+
+	            IF WETIPO = "USR" THEN
+	               XPARA2 = XPARA
+	            ELSE
+	               XPARA2 = XPARA & " / " & session("SGU_nombre")
+	            END IF
+
+                    Xmessage = GenMDLMAIL (XPARA2,WEORIGEN,WEMESSAGE)
+	          ''  message = "<u><font size=1 color=#000080 >" & XPARA2 & "</font></u><BR><BR><b><font size=1  >" & WEMESSAGE & "</font><b>"
+	            CALL SendMail(Xmessage, stowho, WEORIGEN,subject, session("MailComponent"),"SI","1", "NO")
+                 end if
+
+        CASE "GRP"
+
+          ' STRSQL = STRSQL & " GRUPO = '" & XRESPO & "' and ( NOT nivel >  " & WELVL & " ) "
+
+               call  getUsrIngroup(XRESPO)
+               A_SGU_UIGuserid =split(session("SGU_UIGuserid"),chr(9))
+               A_SGU_UIGdescri =split(session("SGU_UIGdescri") ,chr(9))
+
+             '   set RSXPA = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+               ' DO UNTIL RSXPA.EOF
+                for a_i=0 to ubound(SGU_UIGdescri)-1
+                      xxxx = getInfoUser(A_SGU_UIGuserid(a_i))
+		      stowho = session("SGU_mail") & ""
+		      if len(stowho) > 0 then
+			 stowho = trim(stowho)
+			 if sopcion = "APRO" then
+			 	subject = "SOLICITUD DE OBSERVACION"
+	         else
+
+			 subject = "SOLICITUD DE AUTORIZACION"
+			 end if
+			 IF WETIPO = "USR" THEN
+			    XPARA2 = XPARA
+			 ELSE
+			    XPARA2 = XPARA & " / " & A_SGU_UIGdescri(a_i)
+			 END IF
+			'' message = "<u><font size=1 color=#000080 >" & XPARA2 & "</font></u><BR><BR><b><font size=1  >" & WEMESSAGE & "</font><b>"
+                         Xmessage = GenMDLMAIL (XPARA2,WEORIGEN,WEMESSAGE)
+			 CALL SendMail(Xmessage, stowho, WEORIGEN,subject, session("MailComponent"),"SI","1", "NO")
+		      end if
+
+		   'RSXPA.MOVENEXT
+		   next
+
+        CASE "SEC"
+           XRESPO = 0 & XRESPO
+
+           STRSQL = STRSQL & " SECTOR = " & XRESPO & " and ( NOT nivel >  " & WELVL & " ) "
+
+       END SELECT
+
+
+
+
+
+
+
+    END IF
+
+END FUNCTION
+
+
+
+FUNCTION GETRESPOCKT(RESPCOD,RESPTIP)
+
+  GETRESPOCKT = "SIN ASIGNAR"
+
+
+
+    XRESPO = RESPCOD & ""
+
+    if XRESPO <> "" AND XRESPO <> "NO" then
+
+       set cn2 = ofv.conectar(ofv.strconn0)
+       set cn3 = ofv.conectar(ofv.strconn2)
+
+       SELECT CASE RESPTIP
+
+        CASE "USR"
+          ' strsql = "Select * From USUARIOS where ID = '" & XRESPO & "' "
+          ' set rsniv = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+          ' if not rsniv.eof then sInputx = rsniv(1)
+          ' call ofv.cerrarconsulta(rsniv)
+
+          xxxx = getInfoUser(XRESPO)
+          if session("SGU_nombre") <> "" then    SINPUTX= session("SGU_nombre")
+
+
+        CASE "GRP"
+           strsql = "Select * From GRUPOS where ID = '" & XRESPO & "' "
+           set rsniv = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+           if not rsniv.eof then sInputx = rsniv(1)
+           call ofv.cerrarconsulta(rsniv)
+
+        CASE "SEC"
+           XRESPO = 0 & XRESPO
+           strsql = "Select * From ECO where ECO = " & XRESPO
+      '''     response.write strsql
+           set rsniv = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+           if not rsniv.eof then sInputx = rsniv(1)
+           call ofv.cerrarconsulta(rsniv)
+
+       END SELECT
+
+       GETRESPOCKT = sInputx
+
+    END IF
+
+
+END FUNCTION
+
+
+
+FUNCTION GENCKTPSC(XPSC,XSIG,XMODEL,XFIN,XRTIPO,XRCOD,XRASG,XPDSC,XOBSERV,XNIVEL,XSUBCOD,XRID)
+'response.write "XPSC:" & XPSC & "<br>" & "XSIG:" & XSIG & "<br>" & "XMODEL:" & XMODEL & "<br>" & "XFIN:" & XFIN & "<br>" & "XRTIPO:" & XRTIPO & "<br>" & "XRCOD:" & XRCOD & "<br>" & "XRASG:" & XRASG & "<br>" & "XPDSC:" & XPDSC & "<br>" & "XOBSERV:" & XOBSERV & "<br>" & "XNIVEL:" & XNIVEL & "<br>" & "XSUBCOD:" & XSUBCOD & "<br>" & "<br>"
+    SEGCKTPSC = XPSC
+
+'ESTA RUTINA CIERRA EL PASO 999 AUTOMATICO
+    sqlF="select cast ( fin as int)  from WKFPASOS where wkfpascod='" & XMODEL & "'"
+    set rspsfinal=ofv.crearconsultaEx(sqlf, cn, 1, parametros)
+    spsfin="N"
+    if not rspsfinal.eof then
+     if rspsfinal(0) & ""  = "1"  then spsfin="S"
+    end if
+    call ofv.cerrarconsulta(rspsfinal)
+
+    SESSION("SEGCKTPSC") = SEGCKTPSC
+
+    XCOM = GETDH()
+    IF XFIN = "SI" THEN
+       XFIN = GETDH()
+    ELSE
+       XFIN = "NO"
+    END IF
+
+
+
+'response.write "IDRESP: " & IDRESP & "<br>"
+salida = ""
+
+if XNIVEL = 3 and XSUBCOD = 0 then
+	salida = "OK"
+end if
+
+    strsql = "insert into SEGPASO (SEGCKT,SEGCKTPSC,MODEL,COMIENZO,FIN,OKRCH,RESPTIPO,RESPONSABLE,RESPASG,PSCDSC,OBSERVACIONES,NIVEL,SUBCODIGO,SEGIDRESP,SEGSALIDA) values "
+    STRSQL = STRSQL & " ('" & SESSION("SEGCKT") & "','" & SESSION("SEGCKTPSC") & "','" & XMODEL & "','" & GETDH() & "','" & XFIN & "','" & XSIG & "','" & XRTIPO & "','" & XRCOD & "','" & XRASG & "','" & XPDSC & "','" & XOBSERV & "','" & XNIVEL & "','" & XSUBCOD & "','" & XRID & "','" & salida & "')"
+    'response.write "STRSQL: " & STRSQL & "<br>"
+    call ofv.crearconsultaEx(StrSql,cn,1,parametros)
+
+	sql = "select iddestino from envioformdet2 where codobjeto=" & session("NCliente") & " and tipobjeto='" & session("TCliente") & "'"
+	set rk = ofv.crearconsultaEx(sql,cn2,1,parametros)
+
+	'controla que tenga algun destino el formulario para entrar a la rutina de copiado de documentos
+	flg = "NO"
+	if not rk.eof then
+
+		do while not rk.eof
+
+			if rk(0) <> 0 then
+				flg = "SI"
+			else
+				flg = "NO"
+			end if
+
+		rk.movenext
+		loop
+
+	end if
+
+	'RUTINA PARA COPIAR LOS ADJUNTOS DEL DOCUMENTO A LOS DESTINOS PREVIAMENTE SELECCIONADOS
+	    If session("APLMDCLI") = "BGAL" and session("COPIA") = "S" and tipocpt = "K" and spsfin = "S" and flg = "SI" Then
+
+			xsql = "select estado from objprty where codobjeto=" & session("NCliente") & " and tipobjeto='" & session("TCliente") & "'"
+			set ri = ofv.crearconsultaEx(xsql,cn2,1,parametros)
+
+			xestado = ""
+			if not ri.eof then xestado = ri(0)
+
+	    		if xestado = 3 then
+
+					sql = "select c.directorio,c.archivo,d.url,b.iddestino,c.tipo from objetos a "
+					sql = sql & " left join envioformdet2 b on (a.codobjeto=b.codobjeto and a.tipobjeto=b.tipobjeto) "
+					sql = sql & " left join objhtm c on (a.codobjeto=c.codobjeto and a.tipobjeto=c.tipobjeto) "
+					sql = sql & " left join destinosurl d on (b.iddestino=d.id) "
+					sql = sql & " where a.codobjeto=" & session("NCliente") & " and a.tipobjeto='" & session("TCliente") & "'"
+					set ro = ofv.crearconsultaEx(sql,cn2,1,parametros)
+
+					if not ro.eof then
+
+						dim fs
+						set fs=Server.CreateObject("Scripting.FileSystemObject")
+
+						do while not ro.eof
+							'controla para copiar que no sea 0 el destino cargado para que no pinche
+							if cstr(ro(3)) <> "0" then
+
+								if ro(4) = 1 then
+
+									xOrigen = session("DirUpload") & ro(0) & "\" & ro(1)
+
+								elseif ro(4) = 3 then
+
+									xOrigen = ro(1)
+
+								end if
+
+								xDestino = ro(2)
+
+								fs.CopyFile xOrigen,xDestino
+
+							end if
+
+						ro.movenext
+						loop
+
+						set fs=nothing
+
+						asunto = "Claridad Galicia - Formulario vigente"
+
+						sql = "select a.url,c.descri,a.mail1,a.mail2 from destinosurl a "
+						sql = sql & " inner join envioformdet2 b on (a.id=b.iddestino) "
+						sql = sql & " inner join objetos c on (b.codobjeto=c.codobjeto and b.tipobjeto=c.tipobjeto) "
+						sql = sql & " where b.codobjeto=" & session("NCliente") & " and b.tipobjeto='" & session("TCliente") & "'"
+						set rj = ofv.crearconsultaEx(sql,cn2,1,parametros)
+
+						cuerpo = "Se informan las urls a las que se copio el archivo adjunto del formulario: " & rj(1) & "<br><br>"
+						mails = ""
+
+						do while not rj.eof
+
+							cuerpo = cuerpo & rj(0) & "<br>"
+							mails = mails & sep & rj(2) & ";" & rj(3)
+
+							sep = ";"
+
+						rj.movenext
+						loop
+
+						xx = SendMailAtt(cuerpo,mails,"mabraham@corconsulting.com.ar",asunto,"CDOSYS","SI","1","NO","","xClaridadGalicia@bancogalicia.com.ar",0)
+
+					end if
+
+	    		end if
+
+    end if
+
+END FUNCTION
+
+FUNCTION GENACCION(XPASO,XTPP)
+
+ '''  response.write "entro accion: " & XPASO & " -- " & XTPP & " // "
+     SQL = "SELECT TIPOCPT FROM TIPOBJETO WHERE  TIPOBJETO='" & session("TCliente") & "'"
+	 '    response.write sql & "<br>"
+	     Set RS1 = ofv.crearconsultaEx(SQL, cn3, 1, parametros)
+	     PEDIDO="N"
+	     IF NOT RS1.EOF THEN  PEDIDO=RS1(0)
+
+         CALL OFV.CERRARCONSULTA(RS1)
+
+
+    StrSql = "Select * From WKFPSCTPC WHERE WKFPASCOD = '" & XPASO & "' AND TIPO = '" & XTPP & "' "
+   ' response.write strsql
+    set rs1 = ofv.crearconsultaEx(StrSql,cn,1,parametros)
+    IF NOT RS1.EOF THEN
+       IF RS1(4) = "A" THEN
+ ' response.write "estado: " & RS1(5) & "<br>" & session("TCliente") & "        " & session("NCliente")
+          IF  session("TCliente") = "RSK" THEN
+              GETWKFTAB = "ORRSKCIRCUITO"
+           ElseIF PEDIDO="PD" or PEDIDO="SN" THEN
+               GETWKFTAB = "PEDIDOS"
+          ELSE
+              GETWKFTAB = "OBJPRTY"
+          END IF
+
+          XXXX = GETWKFMANAGER(session("NCliente"),session("TCliente"),RS1(5),GETWKFTAB,"WKF")
+         ' ffff
+       END IF
+
+
+    END IF
+
+
+
+
+END FUNCTION
+
+
+FUNCTION GENSECTORUSR(XUSR)
+
+        XSECTORIG  = 0
+        XSECTORIGB = XSECTORIG
+        XSECTGEREN = 0
+
+     StrSql = "Select * From USUARIOS where ID = '" & XUSR & "' "
+     set rsX2 = ofv.crearconsultaEx(StrSql,cn2,1,parametros)
+     if NOT rsX2.eof then
+        XSECTORIG = rsX2(21)
+        XSECTORIGB = XSECTORIG
+        XSECTGEREN = 0
+        'response.write StrSql & "---" & XSECTORIGB
+        DO
+          'Sector Principal
+          StrSql = "SELECT ECO_1.* FROM ECO, ECOREL, ECO  ECO_1 where ECO.eco = ECOREL.ECODEPEND"
+          StrSql = StrSql & " and ECOREL.ECOMASTER = ECO_1.eco and ECO.eco =0" & XSECTORIGB
+          'response.write StrSql
+          set rsX3 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+          If rsX3.EOF Then
+             EXIT DO
+          Else
+              XSECTGEREN = rsX3(0)
+              XSECTORIGB = rsX3(0)
+              StrSql = "SELECT * FROM CSECOSNJ where ECO = " & XSECTORIGB
+              set rsX4 = ofv.crearconsultaEx(StrSql,cn3,1,parametros)
+              If rsX4.EOF Then
+                 EXIT DO
+              Else
+                 XJERAR = RSX4(3)
+                 XJERAR = INSTR(XJERAR,"GEREN")
+                 IF XJERAR > 0 THEN
+                    EXIT DO
+                 END IF
+              End If
+          End If
+
+        LOOP
+
+
+
+     END IF
+      if trim(XSECTORIG & "") = "" then
+         SESSION("SECTORIG")=0
+        else
+
+        SESSION("SECTORIG") = XSECTORIG
+        end if
+
+
+          if trim(XSECTGEREN & "") = "" then
+            SESSION("SECTGEREN")=0
+          else
+        SESSION("SECTGEREN") = XSECTGEREN
+          end if
+
+
+
+END FUNCTION
+
+FUNCTION GETDH()
+
+    XKD = datepart("d",DATE())
+    XKM = datepart("m",DATE())
+    XKY = datepart("yyyy",DATE())
+
+
+
+
+
+    GETDH = XKD & "/" & XKM & "/" & XKY & " " & TIME()
+
+
+END FUNCTION
+
+function GetProceso(xcodigo)
+
+
+ xdescri =""
+sinput=""
+Strsql = ""
+   Strsql = Strsql & " select x.periodo, A.*, W.ESTADO "
+   Strsql = Strsql & " from csrelpathdescri a   "
+    Strsql = Strsql & " inner join objetos b on (a.cobj = b.codobjeto)   "
+   Strsql = Strsql & " inner join orrskcircuito w on (a.cobj = w.codobjeto)   "
+   Strsql = Strsql & " inner join orperiodos x on (w.periodo = x.objid )  "
+   Strsql = Strsql & " where  w.objid = 0" & xcodigo & "   "
+
+'
+	  '     response.write strsql & chr(13)
+
+
+	      Set rsX1 = ofv.crearconsultaEx(Strsql, cn3, 1, parametros)
+	      If Not rsX1.EOF Then
+
+		  For WKI = 1 To 8
+
+		      WKIPROC = rsX1(WKI) & ""
+
+		      If WKIPROC <> "" Then
+			  If WKIPROCD = "" Then WKIPROC =  WKIPROC
+			  WKIPROCD = WKIPROCD & WKIPROC & " / "
+		      End If
+
+
+		  Next
+
+		  If Len(WKIPROCD) > 4 Then
+		      WKIPROCD = Left(WKIPROCD, Len(WKIPROCD) - 3)
+		  End If
+
+
+		  sInput = WKIPROCD & " - (" & rsX1(0) & ")"
+
+	      End If
+       Call ofv.cerrarconsulta(rsX1)
+       getproceso=sinput
+end function
+
+%>
