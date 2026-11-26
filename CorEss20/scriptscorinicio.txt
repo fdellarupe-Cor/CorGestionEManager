@@ -1,0 +1,121 @@
+XFSCRP = XFSCRP & "function xopcom(xnomc,xnoms,xfrm,xfrmot) {" & chr(13)
+XFSCRP = XFSCRP & "    "
+
+XFSCRP = XFSCRP & "    if (xfcomv==1) {xclcomS();}"
+XFSCRP = XFSCRP & "    xfcomv   =   1;"
+XFSCRP = XFSCRP & "    xfnomc   = xnomc;"
+XFSCRP = XFSCRP & "    xfnoms   = xnoms;"
+XFSCRP = XFSCRP & "    xffrm    = xfrm;"
+XFSCRP = XFSCRP & "    xffrmot  = xfrmot;"
+XFSCRP = XFSCRP & "    xfdivc   = 'DF@' + xfnoms;"
+XFSCRP = XFSCRP & "    xftdc    = 'TD@' + xfnoms;"
+
+XFSCRP = XFSCRP & "   alert(xfwin.document.getElementById(xfdivc));"
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "    if (xffrmot=='1') {xfnfld=xfwin.document;}"
+''''XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.all[xffrm];}"
+XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.getElementById(xffrm);}"
+XFSCRP = XFSCRP & "   xfnfld=xfwin.document; "
+XFSCRP = XFSCRP & "    "
+XFSCRP = XFSCRP & "    "
+''''XFSCRP = XFSCRP & "    xfwin.document.all[xnoms].value=xfnfld.all[xnomc].value;"
+''''XFSCRP = XFSCRP & "    xfwin.document.all[xfdivc].style.display='block';"
+
+XFSCRP = XFSCRP & "    xfwin.document.getElementById(xnoms).value = xfnfld.getElementById(xnomc).value;"
+XFSCRP = XFSCRP & "    xfwin.document.getElementById(xfdivc).style.display = 'block';"
+XFSCRP = XFSCRP & ""
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "}" & chr(13)
+
+XFSCRP = XFSCRP & "function xclcom() {" & chr(13)
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "    "
+XFSCRP = XFSCRP & "    if (xffrmot=='1') {xfnfld=xfwin.document;}"
+''''XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.all[xffrm];}"
+XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.getElementById(xffrm);}"
+XFSCRP = XFSCRP & "   xfnfld=xfwin.document; "
+XFSCRP = XFSCRP & "    "
+XFSCRP = XFSCRP & "    "
+XFSCRP = XFSCRP & "    if (xffrmot=='1') {xclcomCD();}"
+XFSCRP = XFSCRP & "    else {if (xffrmot=='2') "
+
+''''XFSCRP = XFSCRP & "             {xfnfld.all[xfnomc].value = xfwin.document.all[xfnoms].value;"
+''''XFSCRP = XFSCRP & "              xfwin.document.all[xffrm].submit();}"
+
+XFSCRP = XFSCRP & "             {xfnfld.getElementById(xfnomc).value = xfwin.document.getElementById(xfnoms).value;"
+XFSCRP = XFSCRP & "              xfwin.document.getElementById(xffrm).submit();}"
+
+XFSCRP = XFSCRP & "          else {xclcomVD();}}"
+XFSCRP = XFSCRP & "    "
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "}" & chr(13)
+
+XFSCRP = XFSCRP & "function xclcomCD() {" & chr(13)
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "    "
+XFSCRP = XFSCRP & "    if (xffrmot=='1') {xfnfld=xfwin.document;}"
+''''XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.all[xffrm];}"
+XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.getElementById(xffrm);}"
+XFSCRP = XFSCRP & "   xfnfld=xfwin.document; "
+
+XFSCRP = XFSCRP & "    var xfcomfldx = xfwin.document.getElementById(xfnoms); "
+XFSCRP = XFSCRP & "    var xfindix = xfcomfldx.selectedIndex; "
+
+XFSCRP = XFSCRP & "    "
+''''XFSCRP = XFSCRP & "     xfnfld.all[xfnomc].value = xfwin.document.all[xfnoms].value;"
+XFSCRP = XFSCRP & "     xfnfld.getElementById(xfnomc).value = xfcomfldx.value;"
+
+''''XFSCRP = XFSCRP & "     xfnfld.all[xftdc].innerHTML="
+''''XFSCRP = XFSCRP & "     xfwin.document.all[xfnoms].options[xfwin.document.all[xfnoms].selectedIndex].text;"
+
+XFSCRP = XFSCRP & "     xfnfld.getElementById(xftdc).innerHTML="
+XFSCRP = XFSCRP & "     xfcomfldx.options[xfindix].text;"
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "    xclcomS();"
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "}" & chr(13)
+
+XFSCRP = XFSCRP & "function xclcomVD() {" & chr(13)
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "    "
+XFSCRP = XFSCRP & "    if (xffrmot=='1') {xfnfld=xfwin.document;}"
+''''XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.all[xffrm];}"
+XFSCRP = XFSCRP & "    else {xfnfld=xfwin.document.getElementById(xffrm);}"
+XFSCRP = XFSCRP & "   xfnfld=xfwin.document; "
+''''XFSCRP = XFSCRP & "    var xfindix = xfwin.document.all[xfnoms].selectedIndex; "
+
+XFSCRP = XFSCRP & "    var xfcomfldx = xfwin.document.getElementById(xfnoms); "
+XFSCRP = XFSCRP & "    var xfindix = xfcomfldx.selectedIndex; "
+
+''''XFSCRP = XFSCRP & "    if (xfwin.document.all[xfnoms].options[xfindix].value=='nsnc') "
+XFSCRP = XFSCRP & "    if (xfcomfldx.options[xfindix].value=='nsnc') "
+XFSCRP = XFSCRP & "       { "
+XFSCRP = XFSCRP & "         alert('La seleccion es incorrecta ...');"
+''''XFSCRP = XFSCRP & "         xfwin.document.all[xfnoms].value=xfnfld.all[xfnomc].value;"
+XFSCRP = XFSCRP & "         xfcomfldx.value=xfnfld.getElementById(xfnomc).value;"
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "       } "
+XFSCRP = XFSCRP & "    else "
+''''XFSCRP = XFSCRP & "       {xfnfld.all[xfnomc].value=xfwin.document.all[xfnoms].value;"
+''''XFSCRP = XFSCRP & "        xfwin.document.all[xffrm].submit();}"
+XFSCRP = XFSCRP & "       {xfnfld.getElementById(xfnomc).value = xfcomfldx.value;"
+XFSCRP = XFSCRP & "        xfwin.document.getElementById(xffrm).submit();}"
+'XFSCRP = XFSCRP & " {alert(xfnfld.getElementById(xfnomc));} "
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "}" & chr(13)
+
+XFSCRP = XFSCRP & "function xclcomS() {" & chr(13)
+XFSCRP = XFSCRP & " "
+''XFSCRP = XFSCRP & "    xfwin.document.all[xfdivc].style.display='none';"
+XFSCRP = XFSCRP & "    xfwin.document.getElementById(xfdivc).style.display='none';"
+XFSCRP = XFSCRP & "    xfcomv     =   0;"
+XFSCRP = XFSCRP & "    xfnomc     = 'N';"
+XFSCRP = XFSCRP & "    xfnoms     = 'N';"
+XFSCRP = XFSCRP & "    xffrm      = 'N';"
+XFSCRP = XFSCRP & "    xffrmot    = 'N';"
+XFSCRP = XFSCRP & " "
+XFSCRP = XFSCRP & "}" & chr(13)

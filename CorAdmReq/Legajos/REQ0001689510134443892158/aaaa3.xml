@@ -1,0 +1,42 @@
+<xml xmlns:s='uuid:BDC6E3F0-6DA3-11d1-A2A3-00AA00C14882'
+	xmlns:dt='uuid:C2F41010-65B3-11d1-A29F-00AA00C14882'
+	xmlns:rs='urn:schemas-microsoft-com:rowset'
+	xmlns:z='#RowsetSchema'>
+<s:Schema id='RowsetSchema'>
+	<s:ElementType name='row' content='eltOnly'>
+		<s:AttributeType name='codobjeto' rs:number='1'>
+			<s:datatype dt:type='int' dt:maxLength='4' rs:precision='10' rs:fixedlength='true' rs:maybenull='false'/>
+		</s:AttributeType>
+		<s:AttributeType name='codiden' rs:number='2' rs:nullable='true' rs:writeunknown='true'>
+			<s:datatype dt:type='string' dt:maxLength='20'/>
+		</s:AttributeType>
+		<s:AttributeType name='tipobjeto' rs:number='3' rs:nullable='true' rs:writeunknown='true'>
+			<s:datatype dt:type='string' dt:maxLength='3'/>
+		</s:AttributeType>
+		<s:AttributeType name='descri' rs:number='4' rs:nullable='true' rs:writeunknown='true'>
+			<s:datatype dt:type='string' dt:maxLength='80'/>
+		</s:AttributeType>
+		<s:AttributeType name='objrem' rs:number='5' rs:nullable='true' rs:writeunknown='true'>
+			<s:datatype dt:type='int' dt:maxLength='4' rs:precision='10' rs:fixedlength='true'/>
+		</s:AttributeType>
+		<s:AttributeType name='objrdo' rs:number='6' rs:nullable='true' rs:writeunknown='true'>
+			<s:datatype dt:type='int' dt:maxLength='4' rs:precision='10' rs:fixedlength='true'/>
+		</s:AttributeType>
+		<s:AttributeType name='OBJNIVEL' rs:number='7' rs:nullable='true' rs:writeunknown='true'>
+			<s:datatype dt:type='int' dt:maxLength='4' rs:precision='10' rs:fixedlength='true'/>
+		</s:AttributeType>
+		<s:AttributeType name='objUN' rs:number='8' rs:nullable='true' rs:writeunknown='true'>
+			<s:datatype dt:type='int' dt:maxLength='4' rs:precision='10' rs:fixedlength='true'/>
+		</s:AttributeType>
+		<s:extends type='rs:rowbase'/>
+	</s:ElementType>
+</s:Schema>
+<rs:data>
+	<z:row codobjeto='1' codiden='cc-1005' tipobjeto='NMA' descri='NORMA GENERAL CUENTAS CORRIENTES' objrem='0'
+		 objrdo='0' OBJNIVEL='9' objUN='1'/>
+	<z:row codobjeto='2' codiden='cco-1006' tipobjeto='PCD' descri='APERTURA DE CUENTAS CORRIENTES' objrem='0' objrdo='0'
+		 OBJNIVEL='9' objUN='1'/>
+	<z:row codobjeto='3' codiden='nm1-a' tipobjeto='NMA' descri='NORMA 1' objrem='0' objrdo='0' OBJNIVEL='9' objUN='1'/>
+	<z:row codobjeto='4' codiden='aa' tipobjeto='NMA' descri='AAAAAAAAA' objrem='0' objrdo='0' OBJNIVEL='9' objUN='1'/>
+</rs:data>
+</xml>

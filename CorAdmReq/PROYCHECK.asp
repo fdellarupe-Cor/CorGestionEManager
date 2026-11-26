@@ -1,0 +1,17 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+RESPONSE.WRITE "<HTML><BODY>"
+
+FOR EACH SS IN SESSION.VARIABLES
+
+    RESPONSE.WRITE SS & "<BR>"
+
+NEXT
+
+
+
+RESPONSE.WRITE "</BODY></HTML>"
+
+
+%>

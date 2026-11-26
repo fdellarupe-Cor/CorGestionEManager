@@ -1,0 +1,603 @@
+<!-- #INCLUDE FILE="IncFile/CorConect.inc" -->
+<%
+
+ok=ofv.CheckUsuario()
+
+
+     Response.expires = 0
+     if session("APLMDCLI")="" then
+	    aplcheck()
+     end if
+
+              scp = ""
+
+        fondo = " bgcolor=" & Session("CMFMENU")
+
+     xfssepar = "<font color='#ff0000' size=2 >&#0149;</font>"
+
+
+      sHTML = "<html>"
+
+     '   sHTML = sHTML & "<link rel='stylesheet' type='text/css' href='../coress20/incfile/contentflow.css' />"
+      '  sHTML = sHTML & "<script language='JavaScript' type='text/javascript' src='../coress20/incfile/contentflow.js' load='slideshow'></script>"
+
+
+        sHTML = sHTML & "<body width=400 " & fondo
+        sHTML = sHTML & " >"
+
+      '  sHTML = sHTML & "  <DIV WIDTH=30PX> "
+      '  sHTML = sHTML & "             <div id='ContentFlow' class='ContentFlow'> "
+      '  sHTML = sHTML & " 		     <div class='flow' > "
+
+        XSINICIA = REQUEST.QUERYSTRING("INICIA")
+        IF XSINICIA = "" THEN XSINICIA = "N"
+
+      if session("SMPLMENU") <> "xS" then
+
+
+        if session("WEBDESK") = "S" then
+
+           xscantmenu = 99
+
+           styl = "background-color:" & Session("CMFMENU") & ";"
+
+
+        else
+
+           xscantmenu = 4
+
+           IF  Session("FULLGUI") = "N" THEN
+               styl = "background-color:#888888;border-style:solid;border-color:#ffffff;border-width:1;"
+           else
+               styl = XspEx("#888888","#cccccc",0) & ";border-style:solid;border-color:#ffffff;border-width:1;"
+           end if
+
+        end if
+
+
+        ctablas = 0
+
+        ctabcol = 99
+
+
+
+      sOpcion = Trim(Request.querystring("Opcion"))
+        Celda = "N"
+      If sOpcion = "I" Then
+          sOpcion = ""
+
+        If ofv.ModTitCls = "1"  Then
+
+           sHTML = sHTML & OFV.GenTabla("DBML" & ctablas, "aaa style='" & styl & "' ", "", "90%", "", "0", "", "-2", "2", "", "", "", "no")
+
+        else
+
+           sHTML = sHTML & OFV.GenTabla("DBML" & ctablas, "aaa style='" & styl & "' ", "", "90%", "", "0", "", "2", "2", "", "", "", "no")
+
+        end if
+
+
+
+         sHTML = sHTML & OFV.genrow("", "", "", "", "", "", "", "", "no")
+
+          sHTML = sHTML & "<td  ><p align=center><font face=" & Session("CMFMEFTFC") & " size=1 color=" & Session("CMFMNFT") & " ><B>Bienvenido a COR ESolution Suite &reg - por favor ingrese su Usuario y Password</b></font></p></td>"
+          Session("CorApli") = ""
+          Session("CorPath") = ""
+
+         sHTML = sHTML & OFV.genfrow()
+
+      Else
+          Set cx = OFV.conectar(OFV.strconn0)
+
+          Celda = "N"
+          Session("CorApli") = sOpcion
+          sApli = sOpcion
+          If sOpcion = "CORESS20" And Session("CorPath") = "" Then
+              sOpcion = ""
+          Else
+              sOpcion = "?Opcion=I"
+          End If
+
+          Set cn = OFV.conectar(OFV.strconn1)
+
+            Session("Coraplname") = Session("CorApli")
+
+          If sApli = "xxCORESS20" Then
+              Session("CorPath") = ""
+          Else
+              StrSql = "Select DirApli,titapli From CorAplic where CorAplic.CodApli = '" & sApli & "'"
+              Set rs = OFV.crearconsultaEx(StrSql, cn, 1, "")
+              If Not rs.EOF Then
+                  Session("CorPath") = "../" & Trim(rs(0)) & "/"
+                  Session("CorTitApli") = ucase(rs(1))
+
+              Else
+                  Session("CorPath") = ""
+                  Session("CorTitApli") = " "
+
+              End If
+              Call OFV.cerrarconsulta(rs)
+          End If
+
+
+    '    if  session("SMPLMENU") <> "xS" then
+
+        if  session("SMPLMENU") <> "S" then
+
+          sImagenx3  = "<B><FONT FACE=corflaticon COLOR=" & session("CMFMNBOT") & " SIZE=1>&#0204;</FONT></B>"
+
+          sImagenx3  =   "&nbsp;" & sImagenx3 & "<font color=" & session("CMFMNBOT") & ">" & "&nbsp;" & Session("CorTitApli") & "</font>"
+
+          celdaxx = OFV.gencelda("", "vt STYLE='" & XspSShw("#aaaaaa","125") & ";' ", "", "", "", "", "", sImagenx3, "si")
+
+
+        end if
+
+            xsel = 1
+
+' xxxxxxxxxxxxxx
+
+               atrok = "N"
+              StrSql = "Select Alias,usrEstado From atrmXusuario Where Tipo = 'A' "
+              StrSql = StrSql & " And usuario = '" & Session("segperfil") & "' And "
+              StrSql = StrSql & "  Aplicacion = '" & sApli & "'"
+              Set rs1 = OFV.crearconsultaEx(StrSql, cx, 1, "")
+              If rs1.EOF Then
+                 atrok = "O"
+              ElseIf rs1(1) Then
+                     atrok = "S"
+                  Else
+                     atrok = "N"
+              End If
+              Call OFV.cerrarconsulta(rs1)
+
+              If atrok = "O" Then
+
+''''''''''''''''''''''''''''''''''
+
+
+                 StrSql = "Select Alias,grpEstado From atrmXgrupo Where Tipo = 'A' "
+                 StrSql = StrSql & " And  "
+
+                 if  Session("DELLOG") = "S" then
+
+                     XMFTGRP = split(session("SegGrpLst"),chr(9))
+
+                     xcount = ubound(XMFTGRP) + 1
+                     XMFSEP  = ""
+                     StrSql = StrSql & " grupo in ("
+
+                     for XMFI = 0 to ubound(XMFTGRP)
+                         StrSql  = StrSql  & XMFSEP & "'" & XMFTGRP(XMFI) & "'"
+                         XMFSEP  = ","
+                     next
+
+                     StrSql = StrSql & ") "
+
+                 else
+                     StrSql = StrSql & " grupo = '" & Session("seggrp") & "' "
+                 end if
+
+
+                 StrSql = StrSql & " And Aplicacion = '" & sApli & "'"
+                 Set rs1 = OFV.crearconsultaEx(StrSql, cN, 1, "")
+                 If  rs1.EOF Then
+                        atrok = "O"
+                 Else
+                     if  Session("DELLOG") = "S" then
+                         XMFSUM = 0
+                         XMFSUMN = 0
+                         do until rs1.eof
+                            XMFSUM = XMFSUM + 1
+                            If rs1(1) Then
+                               atrok = "S"
+                               exit do
+                            Else
+                               atrok   = "N"
+                               XMFSUMN = XMFSUMN + 1
+                            End If
+                         rs1.movenext
+                         loop
+
+                         if  atrok = "N" then
+                             if  xcount >  XMFSUMN then atrok = "S"
+                         end if
+
+                     else
+                         If rs1(1) Then
+                            atrok = "S"
+                         Else
+                            atrok = "N"
+                         End If
+                     end if
+                 End If
+                 Call OFV.cerrarconsulta(rs1)
+
+
+''''''''''''''''''''''''''''''''''
+
+
+
+
+
+              End If
+
+              If atrok = "O" Or atrok = "S" Then
+
+
+' xxxxxxxxxxxxx
+
+
+          StrSql = "Select Menux.* From Menux, CorAplic "
+          StrSql = StrSql & " where CorAplic.codapli = Menux.mcodapli and "
+          StrSql = StrSql & "CorAplic.CodApli = '" & sApli & "' AND Menux.mdepen = '0'"
+          Set rs = OFV.crearconsultaEx(StrSql, cn, 1, "")
+            If Not rs.EOF Then
+               If rs.fields.Count > 6 Then
+                  xsel = 6
+                  Call OFV.cerrarconsulta(rs)
+
+          StrSql = "Select Menux.* From Menux, CorAplic "
+          StrSql = StrSql & " where CorAplic.codapli = Menux.mcodapli and "
+          StrSql = StrSql & "CorAplic.CodApli = '" & sApli & "' AND Menux.mdepen = '0' order by Menux.Morden"
+                  Set rs = OFV.crearconsultaEx(StrSql, cn, 1, "")
+               Else
+                  xsel = 1
+               End If
+            End If
+          Fila = ""
+          cnm = 0
+          Do Until rs.EOF
+              atrok = "N"
+              StrSql = "Select Alias,usrEstado From atrmXusuario Where Tipo = 'S' "
+              StrSql = StrSql & " And alias = '" & rs(xsel) & "'  "
+              StrSql = StrSql & " And usuario = '" & Session("segperfil") & "' And "
+              StrSql = StrSql & "  Aplicacion = '" & sApli & "'"
+
+              Set rs1 = OFV.crearconsultaEx(StrSql, cx, 1, "")
+              If rs1.EOF Then
+                 atrok = "O"
+              ElseIf rs1(1) Then
+                     atrok = "S"
+                  Else
+                     atrok = "N"
+              End If
+              Call OFV.cerrarconsulta(rs1)
+
+              xcount  = 0
+
+              If atrok = "O" Then
+
+                 StrSql = "Select Alias,grpEstado From atrmXgrupo Where Tipo = 'S' "
+                 StrSql = StrSql & " And alias = '" & rs(xsel) & "' And  "
+
+                 if  Session("DELLOG") = "S" then
+
+                     XMFTGRP = split(session("SegGrpLst"),chr(9))
+                     xcount  = ubound(XMFTGRP) + 1
+                     XMFSEP  = ""
+                     StrSql = StrSql & " grupo in ("
+
+                     for XMFI = 0 to ubound(XMFTGRP)
+                         StrSql  = StrSql  & XMFSEP & "'" & XMFTGRP(XMFI) & "'"
+                         XMFSEP  = ","
+                     next
+
+                     StrSql = StrSql & ") "
+
+                 else
+                     StrSql = StrSql & " grupo = '" & Session("seggrp") & "' "
+                 end if
+
+
+                 StrSql = StrSql & " And Aplicacion = '" & sApli & "'"
+                 Set rs2 = OFV.crearconsultaEx(StrSql, cx, 1, "")
+                 If  rs2.EOF Then
+                        atrok = "O"
+                 Else
+                     if  Session("DELLOG") = "S" then
+                         XMFSUM = 0
+                         XMFSUMN = 0
+                         do until rs2.eof
+                            XMFSUM = XMFSUM + 1
+                            If rs2(1) Then
+                               atrok = "S"
+                               exit do
+                            Else
+                               atrok   = "N"
+                               XMFSUMN = XMFSUMN + 1
+                            End If
+                         rs2.movenext
+                         loop
+
+                         if  atrok = "N" then
+                             if  xcount >  XMFSUMN then atrok = "S"
+                         end if
+
+                     else
+                         If rs2(1) Then
+                            atrok = "S"
+                         Else
+                            atrok = "N"
+                         End If
+                     end if
+                 End If
+                 Call OFV.cerrarconsulta(rs2)
+
+              End If
+
+
+
+
+              If atrok = "O" Or atrok = "S" Then
+                            If Celda = "N" Then
+                               Celda = ""
+                               sInput = OFV.GenerarInput("boton2", "menu", "hidden", "", "10", "", "")
+                               Formulario = OFV.GenForm("initaplx", "aaa STYLE='display:none;' ", "../coress20/Submenus.asp?ID=" & rs(6) & "&Menu=" & Replace(UCase(rs(1)), " ", "_") & "&INICIA=" & XSINICIA, "Master", "post", "", sInput, "si")
+                               scp = "<script language='javascript' > document.initaplx.submit(); </script>"
+                            End If
+
+
+               ctabcol = ctabcol + 1
+
+               if ctabcol > xscantmenu then
+
+                  if ctabcol < 99 then
+
+                   if  session("SMPLMENU") <> "S" then
+
+                      if session("WEBDESK") = "S" then
+
+                      else
+
+
+                         xsclase = "ntslp style='border-right-style:solid;border-right-width:1;border-right-color:#dddddd;display:block;font-family:corflaticon;color:#cc0000;cursor:pointer;' "
+
+                         xlfun = " onclick=""document.getElementById('DBML" & (ctablas + 1) & "').style.display='block';document.all.DBML" & (ctablas) & ".style.display='none'; "" "
+
+                      '  Celda = Celda & OFV.gencelda("BAT" & CTABLAS & "S*", xsclase, "center title='siguiente' " & xlfun, "1", "", "", "", "<b>4</b>", "si")
+
+                         sHTML = sHTML & OFV.genrow("", "", "", "", "20", "", "", celda, "si")
+                         sHTML = sHTML & OFV.GenFTabla()
+
+                      end if
+
+                   end if
+
+                     Celda = ""
+
+
+                  end if
+
+                  ctabcol = 1
+
+                  ctablas = ctablas + 1
+
+
+                  if ctablas > 1 then
+
+                    if  session("SMPLMENU") <> "S" then
+
+
+
+                      if session("WEBDESK") = "S" then
+
+
+
+                      else
+
+                  '''   styl2 = "display:none;"
+
+                        xsclase = "ntslp style='border-right-style:solid;border-right-width:1;border-right-color:#dddddd;display:block;font-family:corflaticon;color:#cc0000;cursor:pointer;' "
+
+                        xlfun = " onclick=""document.getElementById('DBML" & (ctablas - 1) & "').style.display='block';document.all.DBML" & (ctablas) & ".style.display='none'; "" "
+
+                '''     Celda = OFV.gencelda("BAT" & CTABLAS & "A*", xsclase, "center title='anterior' " & xlfun, "1", "", "", "", "<b>3</b>", "si")
+
+                        styl2 = "display:block"
+                        sInput  = xfssepar
+                        Celda = OFV.gencelda("", "ut", "center", "1%", "", "", "", sInput, "si")
+
+                      end if
+
+
+
+                    end if
+
+                  else
+
+
+                      if session("WEBDESK") = "S" then
+
+
+
+                      else
+
+
+                  ''     styl2 = "display:block;"
+
+                         styl2 = "display:block;" '& session("CMFMENU") & ";"
+                         sInput  = xfssepar
+                         Celda = OFV.gencelda("", "ut", "center", "1%", "", "", "", sInput, "si")
+
+                      end if
+
+
+
+                  end if
+
+        if  session("SMPLMENU") <> "S" then
+
+          if session("WEBDESK") = "S" then
+
+          '''   sHTML = sHTML & OFV.GenTabla("DBML" & ctablas, "aaa style='" & styl & styl2 & "' ", "", "100", "", "0", "", "-2", "1", "", "", "", "no")
+
+             sHTML = sHTML & ""
+
+          else
+
+
+            If ofv.ModTitCls = "1"  Then
+
+              sHTML = sHTML & OFV.GenTabla("DBML" & ctablas, "aaa style='" & styl & styl2 & "' ", "", "100%", "", "0", "", "-2", "1", "", "", "", "no")
+
+            else
+
+              sHTML = sHTML & OFV.GenTabla("DBML" & ctablas, "aaa style='" & styl & styl2 & "' ", "", "100%", "", "0", "", "-2", "1", "", "", "", "no")
+
+            end if
+
+         end if
+
+       end if
+
+
+    end if
+
+               if  session("SMPLMENU") <> "S" then
+
+                   xsfuncion = ""
+
+                   if session("WEBDESK") = "S" then
+
+                     ' xsfuncion = " onclick=" & chr(34) & "submenu();  " & chr(34) & " "
+                   end if
+
+
+                  if session("WEBDESK") = "S" then
+
+                       ssMnn     = "SLP" & Replace(UCase(rs(1)), " ", "_")
+
+                       xGenConti = "<b>&nbsp;&nbsp;" & replace(Capitalize(UCase(rs(1) & ""))," ","&nbsp;") & "&nbsp;&nbsp;</b>"
+                       sInput    = xGenConti
+                       xsclase   = "" '"vt style='font-size:8pt;cursor:pointer;text-decoration:none;' "
+
+                       sInput   = "<span id='" & ssMnn & "'  class='ntslp' >" & sInput & "</span> "
+                       sHref   = "../coress20/Submenus.asp?ID=" & rs(6) & "&Menu=" & Replace(UCase(rs(1)), " ", "_")
+                       sLink   = OFV.GenLink("", "ntslp  onclick=" & chr(34) & "SetSlp('" & ssMnn & "');" & chr(34) & " style='cursor:pointer;'  ", sHref, "Master", "", "", sInput, "si")
+
+
+
+
+                       Celda   = Celda & "<span  >" & xfssepar & "</span> "
+                       Celda   = Celda & sLink
+                       '"<span id='" & ssMnn & "'  class='XX' >" & sInput & "</span> "
+
+          '    sHTML = sHTML & "	       <div class='item' href='" & sHref & "' target='Master' >" & sLink
+          '    sHTML = sHTML & "	            <img class='content' src='../coress20/incfile/title.png'  />"
+          '    sHTML = sHTML & "	            <div class='caption' >foobar</div>"
+           '   sHTML = sHTML & "	            <div class='label' >Slider Label</div>"
+            '  sHTML = sHTML & "	       </div>"
+
+
+
+                  else
+
+
+
+                    If ofv.ModTitCls = "1" Or ofv.ModTitCls = "0" Then
+                       xGenConti = UCase(rs(1))
+                       sInput    = xGenConti
+                       xsclase   = "uti style='border-right-style:solid;border-right-width:1;border-right-color:#dddddd;' "
+
+                    else
+
+                       sInput    = UCase(rs(1))
+                       xsclase   = "uti style='border-right-style:solid;border-right-width:1;border-right-color:#dddddd;' "
+                    End If
+
+                    sHref = "../coress20/Submenus.asp?ID=" & rs(6) & "&Menu=" & Replace(UCase(rs(1)), " ", "_")
+                    sLink = OFV.GenLink("", "aaa ", sHref, "Master", "", "", sInput , "si")
+                    Celda = Celda & OFV.gencelda("", xsclase & " " & xsfuncion , "", "", "", "", "", sLink, "si")
+
+                  end if
+
+               end if
+
+              End If
+
+
+
+
+
+
+                   rs.movenext
+                Loop
+                Call OFV.cerrarconsulta(rs)
+
+          Else
+
+                 Celda = "<B>Seleccione la Aplicacion al pie de la pantalla</b>"
+                 Celda = OFV.gencelda("", "ts  ", "center", "", "", "", "", Celda, "si")
+
+          End If
+
+
+          Call OFV.cerrarconn(cn)
+            Call OFV.cerrarconn(cx)
+
+         end if
+
+
+    '  End If
+
+        if  session("SMPLMENU") <> "S" then
+
+           if session("WEBDESK") = "S" then
+
+              sHTML = sHTML & celda &  "<span >" & xfssepar & "</span>"
+
+''////////////////
+
+        '      sHTML = sHTML & "               <div class='globalCaption'></div>"
+
+        '      sHTML = sHTML &  "               <div class='preButton'  ></div>"
+         '     sHTML = sHTML &   "              <div class='nextButton' ></div>"
+
+        '      sHTML = sHTML &  "           </div>"
+        '      sHTML = sHTML &   "    </div>"
+        '      sHTML = sHTML & " </DIV>"
+
+         '     sHTML = sHTML & " <script tyle='text/javascript' > "
+         '     sHTML = sHTML & "     var cf = new ContentFlow('ContentFlow', {reflectionColor: " & chr(34) & "#000000" & chr(34) & ", maxItemHeight: " & chr(34) & "50" & chr(34) & "}); "
+         '     sHTML = sHTML & " </script> "
+
+
+''////////////////
+
+
+           else
+
+
+              sHTML = sHTML & OFV.genrow("", "", "", "", "20", "", "", celda, "si")
+
+              sHTML = sHTML & OFV.GenFTabla()
+
+           end if
+
+        end if
+
+
+      else
+
+           sInput = OFV.GenerarInput("boton2", "menu", "hidden", "", "10", "", "")
+           Formulario = OFV.GenForm("initaplx", "aaa STYLE='display:none;' ", "../coress20/Submenus.asp?ID=0000&Menu=NO", "Master", "post", "", sInput, "si")
+           scp = "<script language='javascript' > document.initaplx.submit(); </script>"
+
+
+
+      end if
+
+
+
+
+      sHTML = sHTML & Formulario & scp & "</body></html>" ' & session("un") & "2222"
+
+
+Session("Usuario") = Ucase(Session("Usuario"))
+
+
+
+Response.Write sHTML
+
+%>
